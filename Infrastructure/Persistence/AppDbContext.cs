@@ -29,6 +29,7 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<Report> Reports => Set<Report>();
         public DbSet<Wishlist> Wishlists => Set<Wishlist>();
         public DbSet<Notification> Notifications => Set<Notification>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
@@ -176,10 +177,107 @@ namespace TouRest.Infrastructure.Persistence
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Add unique constraint for Voucher Code
+            // Configure RefreshToken - User relationship
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany()
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ============= UNIQUE CONSTRAINTS =============
+
+            // Unique constraint for Role Code
+            modelBuilder.Entity<Role>()
+                .HasIndex(r => r.Code)
+                .IsUnique();
+
+            // Unique constraint for User Email
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            // Unique constraint for Voucher Code
             modelBuilder.Entity<Voucher>()
                 .HasIndex(v => v.Code)
                 .IsUnique();
+
+            // Unique constraint for Package Code
+            modelBuilder.Entity<Package>()
+                .HasIndex(p => p.Code)
+                .IsUnique();
+
+            // Unique constraint for Booking Code
+            modelBuilder.Entity<Booking>()
+                .HasIndex(b => b.Code)
+                .IsUnique();
+
+            // Unique constraint for Provider ContactEmail
+            modelBuilder.Entity<Provider>()
+                .HasIndex(p => p.ContactEmail)
+                .IsUnique();
+
+            // Unique constraint for Wishlist (ItemId, UserId)
+            modelBuilder.Entity<Wishlist>()
+                .HasIndex(w => new { w.ItemId, w.UserId })
+                .IsUnique();
+
+            // Unique constraint for BookingItinerary (BookingId, ItineraryId)
+            modelBuilder.Entity<BookingItinerary>()
+                .HasIndex(bi => new { bi.BookingId, bi.ItineraryId })
+                .IsUnique();
+
+            // Unique constraint for PackageService (PackageId, SortOrder)
+            modelBuilder.Entity<PackageService>()
+                .HasIndex(ps => new { ps.PackageId, ps.SortOrder })
+                .IsUnique();
+
+            // Unique constraint for ItineraryStop (ItineraryId, StopOrder)
+            modelBuilder.Entity<ItineraryStop>()
+                .HasIndex(ist => new { ist.ItineraryId, ist.StopOrder })
+                .IsUnique();
+
+            // Unique constraint for ItineraryActivity (ItineraryStopId, ActivityOrder)
+            modelBuilder.Entity<ItineraryActivity>()
+                .HasIndex(ia => new { ia.ItineraryStopId, ia.ActivityOrder })
+                .IsUnique();
+
+            // ============= SEED DATA =============
+
+            // Seed default roles
+            modelBuilder.Entity<Role>().HasData(
+                new Role
+                {
+                    Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                    Code = "CUSTOMER",
+                    Name = "Khách hàng",
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                new Role
+                {
+                    Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                    Code = "ADMIN",
+                    Name = "Quản trị viên",
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                new Role
+                {
+                    Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                    Code = "PROVIDER",
+                    Name = "Nhà cung cấp dịch vụ",
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                new Role
+                {
+                    Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                    Code = "AGENCY",
+                    Name = "Đại lý du lịch",
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                }
+            );
         }
     }
 }

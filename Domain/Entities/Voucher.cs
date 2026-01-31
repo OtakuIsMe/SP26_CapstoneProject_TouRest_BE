@@ -24,10 +24,13 @@ namespace TouRest.Domain.Entities
         public DiscountType DiscountType { get; set; }
 
         [Required]
+        [Range(0, 100, ErrorMessage = "DiscountValue must be between 0 and 100")]
         public int DiscountValue { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "MaxDiscountAmount must be greater than 0")]
         public int? MaxDiscountAmount { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "MinOrderAmount must be greater than 0")]
         public int? MinOrderAmount { get; set; }
 
         [Required]
@@ -35,9 +38,11 @@ namespace TouRest.Domain.Entities
 
         public Guid? ApplicableId { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "UsageLimit must be greater than 0")]
         public int? UsageLimit { get; set; }
 
         [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "UsedCount must be greater than or equal to 0")]
         public int UsedCount { get; set; } = 0;
 
         [Required]

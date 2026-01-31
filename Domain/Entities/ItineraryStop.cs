@@ -12,6 +12,7 @@ namespace TouRest.Domain.Entities
         public Guid ItineraryId { get; set; }
 
         [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "StopOrder must be greater than or equal to 0")]
         public int StopOrder { get; set; }
 
         [Required]

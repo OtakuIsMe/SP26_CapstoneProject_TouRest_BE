@@ -20,15 +20,18 @@ namespace TouRest.Domain.Entities
         public string? Description { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public int Price { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "DurationMinutes must be greater than 0")]
         public int DurationMinutes { get; set; }
 
         [Required]
         public ServiceStatus Status { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "BasePrice must be greater than 0")]
         public int BasePrice { get; set; }
 
         // Navigation properties

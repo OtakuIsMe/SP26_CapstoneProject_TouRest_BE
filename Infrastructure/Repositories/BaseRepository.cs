@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TouRest.Domain.Base;
+using TouRest.Domain.Interfaces;
 using TouRest.Infrastructure.Persistence;
 
 namespace TouRest.Infrastructure.Repositories
 {
-    public abstract class BaseRepository<T> where T : BaseEntity
+    public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         protected readonly AppDbContext _context;
 
@@ -34,9 +35,7 @@ namespace TouRest.Infrastructure.Repositories
 
         public virtual async Task<T> CreateAsync(T entity)
         {
-            entity.CreatedAt = DateTime.UtcNow;
-            entity.UpdatedAt = DateTime.UtcNow;
-            
+
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
             return entity;
@@ -45,7 +44,7 @@ namespace TouRest.Infrastructure.Repositories
         public virtual async Task<T> UpdateAsync(T entity)
         {
             entity.UpdatedAt = DateTime.UtcNow;
-            
+
             _context.Set<T>().Update(entity);
             await _context.SaveChangesAsync();
             return entity;

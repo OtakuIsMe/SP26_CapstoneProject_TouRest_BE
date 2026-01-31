@@ -15,6 +15,7 @@ namespace TouRest.Domain.Entities
         public Guid ServiceId { get; set; }
 
         [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "ActivityOrder must be greater than or equal to 0")]
         public int ActivityOrder { get; set; }
 
         [Required]
@@ -24,6 +25,7 @@ namespace TouRest.Domain.Entities
         public DateTime EndTime { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public int Price { get; set; }
 
         [MaxLength(500)]

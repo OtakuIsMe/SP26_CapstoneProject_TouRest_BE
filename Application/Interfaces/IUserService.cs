@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TouRest.Application.DTOs;
+using TouRest.Application.DTOs.User;
 using TouRest.Domain.Entities;
 
 namespace TouRest.Application.Interfaces

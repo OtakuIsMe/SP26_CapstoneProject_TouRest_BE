@@ -33,12 +33,12 @@ namespace TouRest.Api.Middlewares
                     ex.Message
                 );
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
                 await HandleException(
                     context,
                     RespCode.UNAUTHORIZED,
-                    RespMsg.UNAUTHORIZED
+                    ex.Message ?? RespMsg.UNAUTHORIZED
                 );
             }
             catch (Exception ex)

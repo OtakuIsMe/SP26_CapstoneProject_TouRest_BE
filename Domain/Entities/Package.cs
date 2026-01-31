@@ -18,6 +18,7 @@ namespace TouRest.Domain.Entities
         public string Name { get; set; } = null!;
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "BasePrice must be greater than 0")]
         public int BasePrice { get; set; }
 
         [Required]

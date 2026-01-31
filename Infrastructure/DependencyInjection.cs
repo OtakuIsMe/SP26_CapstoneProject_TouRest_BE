@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using TouRest.Application.Interfaces;
 using TouRest.Domain.Interfaces;
 using TouRest.Infrastructure.Persistence;
 using TouRest.Infrastructure.Repositories;
+using TouRest.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace TouRest.Infrastructure
@@ -14,8 +16,7 @@ namespace TouRest.Infrastructure
             IConfiguration configuration)
         {
             var connectionString =
-            configuration["DATABASE_CONNECTION"]; // KHÔNG throw
-            Console.WriteLine("Connection String: " + connectionString);
+            configuration["DATABASE_CONNECTION"];
             // Register DbContext
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(
@@ -24,6 +25,11 @@ namespace TouRest.Infrastructure
 
             // Register Repositories
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+
+            // Register Services
+            services.AddScoped<IJwtService, JwtService>();
 
             return services;
         }

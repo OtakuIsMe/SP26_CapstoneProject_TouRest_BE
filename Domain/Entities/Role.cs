@@ -11,6 +11,10 @@ namespace TouRest.Domain.Entities
     {
         [Required]
         [MaxLength(50)]
+        public string Code { get; set; } = null!;
+
+        [Required]
+        [MaxLength(50)]
         public string Name { get; set; } = null!;
 
         // Navigation

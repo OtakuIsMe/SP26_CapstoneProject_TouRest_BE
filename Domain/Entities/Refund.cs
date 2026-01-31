@@ -13,6 +13,7 @@ namespace TouRest.Domain.Entities
         public Guid BookingId { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "TotalRefundAmount must be greater than 0")]
         public int TotalRefundAmount { get; set; }
 
         [MaxLength(500)]

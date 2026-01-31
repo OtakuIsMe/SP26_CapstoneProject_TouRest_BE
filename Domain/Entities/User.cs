@@ -24,7 +24,7 @@ namespace TouRest.Domain.Entities
 
         [Required]
         [MaxLength(255)]
-        public string Password { get; set; } = null!;
+        public string PasswordHash { get; set; } = null!;
 
         [MaxLength(20)]
         public string? Phone { get; set; }

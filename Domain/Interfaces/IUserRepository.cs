@@ -7,9 +7,8 @@ using TouRest.Domain.Entities;
 
 namespace TouRest.Domain.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepository<User>
     {
-        Task<User?> GetByIdAsync(Guid id);
-        Task<IEnumerable<User>> GetAllAsync();
+        Task<User?> GetByEmailAsync(string email);
     }
 }

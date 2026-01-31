@@ -14,6 +14,7 @@ namespace TouRest.Domain.Entities
         public Guid ServiceId { get; set; }
 
         [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "SortOrder must be greater than or equal to 0")]
         public int SortOrder { get; set; }
 
         // Navigation properties

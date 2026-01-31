@@ -17,6 +17,7 @@ namespace TouRest.Domain.Entities
         public string Code { get; set; } = null!;
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "TotalAmount must be greater than 0")]
         public int TotalAmount { get; set; }
 
         [Required]

@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
+using TouRest.Application.Common.Constants;
 using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
         [ApiController]
         [Route("api/users")]
+        [Authorize]
         public class UserController : ControllerBase
         {
             private readonly IUserService _userService;
@@ -15,9 +18,6 @@ namespace TouRest.Api.Controllers
                 _userService = userService;
             }
 
-            /// <summary>
-            /// Get user by id
-            /// </summary>
             [HttpGet("{id:guid}")]
             public async Task<IActionResult> GetById(Guid id)
             {
@@ -27,6 +27,7 @@ namespace TouRest.Api.Controllers
             }
 
             [HttpGet("")]
+            [Authorize(Roles = RoleCodes.Admin)]
             public async Task<IActionResult> GetUsers()
             {
                 var users = await _userService.GetUsers();
