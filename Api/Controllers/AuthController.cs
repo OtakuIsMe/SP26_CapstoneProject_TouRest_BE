@@ -39,7 +39,7 @@ namespace TouRest.Api.Controllers
         /// <summary>
         /// Register a new user
         /// </summary>
-        [HttpPost("register")]
+        [HttpGet("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDTO request)
         {
             _logger.LogInformation("Register endpoint called for email: {Email}", request.Email);
