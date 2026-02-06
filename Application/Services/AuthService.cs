@@ -116,5 +116,17 @@ namespace TouRest.Application.Services
                 ExpiresIn = AuthConstants.AccessTokenExpiryMinutes * 60
             }, newRefreshToken);
         }
+
+        public async Task LogoutAsync(string refreshTokenValue, Guid userId)
+        {
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(refreshTokenValue);
+            if (refreshToken == null)
+                throw new UnauthorizedAccessException("Invalid refresh token");
+
+            if (refreshToken.UserId != userId)
+                throw new UnauthorizedAccessException("Refresh token does not match user");
+
+            await _refreshTokenRepository.RevokeAsync(refreshTokenValue);
+        }
     }
 }

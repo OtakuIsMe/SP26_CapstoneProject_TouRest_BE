@@ -12,5 +12,6 @@ namespace TouRest.Application.Interfaces
         Task<(AuthResponseDTO auth, string refreshToken)> LoginAsync(LoginRequestDTO request);
         Task RegisterAsync(RegisterRequestDTO request);
         Task<(AuthResponseDTO auth, string refreshToken)> RefreshTokenAsync(string refreshToken, Guid userId);
+        Task LogoutAsync(string refreshToken, Guid userId);
     }
 }

@@ -41,6 +41,14 @@ namespace TouRest.Api.Middlewares
                     ex.Message ?? RespMsg.UNAUTHORIZED
                 );
             }
+            catch (InvalidOperationException ex)
+            {
+                await HandleException(
+                    context,
+                    RespCode.BAD_REQUEST,
+                    ex.Message ?? RespMsg.BAD_REQUEST
+                );
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);

@@ -39,7 +39,7 @@ namespace TouRest.Api.Controllers
         /// <summary>
         /// Register a new user
         /// </summary>
-        [HttpGet("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDTO request)
         {
             _logger.LogInformation("Register endpoint called for email: {Email}", request.Email);
@@ -50,7 +50,7 @@ namespace TouRest.Api.Controllers
         }
 
         [Authorize]
-        [HttpPost("refresh")]
+        [HttpGet("refresh")]
         public async Task<IActionResult> RefreshToken()
         {
             _logger.LogInformation("RefreshToken endpoint called");
@@ -66,6 +66,25 @@ namespace TouRest.Api.Controllers
             SetRefreshTokenCookie(result.refreshToken);
 
             return ApiResponseFactory.Ok(result.auth, "Token refreshed successfully");
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            _logger.LogInformation("Logout endpoint called");
+
+            var refreshToken = Request.Cookies[AuthConstants.RefreshTokenCookieName];
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedAccessException("Refresh token is missing");
+
+            var userId = User.GetUserId();
+
+            await _authService.LogoutAsync(refreshToken, userId);
+
+            Response.Cookies.Delete(AuthConstants.RefreshTokenCookieName);
+
+            return ApiResponseFactory.Ok(new { }, "Logout successful");
         }
 
         private void SetRefreshTokenCookie(string refreshToken)
