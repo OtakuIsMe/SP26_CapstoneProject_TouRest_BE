@@ -13,12 +13,13 @@ using TouRest.Infrastructure;
 using TouRest.Application;
 using DotNetEnv;
 using TouRest.Application.Mappings;
+using TouRest.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 Env.Load("../.env");
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
