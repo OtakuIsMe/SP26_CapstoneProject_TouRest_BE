@@ -8,7 +8,7 @@ using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Report
 {
-    public class ReportCreateDTO
+    public class ReportCreateRequest
     {
         [Required]
         public Guid UserId { get; set; }

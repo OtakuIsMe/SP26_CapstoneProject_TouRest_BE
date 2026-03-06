@@ -16,13 +16,13 @@ namespace TouRest.Application.Mappings
             // CreateMap<Source, Destination>();
             CreateMap<Feedback, FeedbackDTO>();
             // For creating new feedback, we don't want to include Id, CreatedAt, UpdatedAt, and Booking navigation property
-            CreateMap<FeedbackCreateDTO, Feedback>()
+            CreateMap<FeedbackCreateRequest, Feedback>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Booking, opt => opt.Ignore());
             // For updating feedback, we want to ignore Id, CreatedAt, and Booking navigation property
-            CreateMap<FeedbackUpdateDTO, Feedback>()
+            CreateMap<FeedbackUpdateRequest, Feedback>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Booking, opt => opt.Ignore());

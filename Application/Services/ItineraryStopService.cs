@@ -21,7 +21,7 @@ namespace TouRest.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<ItineraryStopDTO> AddItineraryStop(ItineraryStopCreateDTO create)
+        public async Task<ItineraryStopDTO> AddItineraryStop(ItineraryStopCreateRequest create)
         {
             var itineraryStop = _mapper.Map<ItineraryStop>(create);
             await _itineraryStopRepository.CreateAsync(itineraryStop);
@@ -38,7 +38,7 @@ namespace TouRest.Application.Services
             var itineraryStop = await _itineraryStopRepository.GetItineraryStop(id);
             return _mapper.Map<ItineraryStopDTO>(itineraryStop);
         }
-        public async Task<ItineraryStopDTO> UpdateItineraryStop(Guid id, ItineraryStopUpdateDTO update)
+        public async Task<ItineraryStopDTO> UpdateItineraryStop(Guid id, ItineraryStopUpdateRequest update)
         {
             var itineraryStop = _mapper.Map<ItineraryStop>(update);
             itineraryStop.Id = id;

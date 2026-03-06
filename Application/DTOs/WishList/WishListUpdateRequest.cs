@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TouRest.Application.DTOs.WishList
 {
-    internal class WishListUpdateDTO
+    internal class WishListUpdateRequest
     {
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TouRest.Application.DTOs.ItineraryActivity
 {
-    public class ItineraryActivityCreateDTO
+    public class ItineraryActivityCreateRequest
     {
         [Required]
         public Guid ItineraryStopId { get; set; }

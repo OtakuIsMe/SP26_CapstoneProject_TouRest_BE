@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TouRest.Application.DTOs.ItineraryStop
 {
-    public class ItineraryStopCreateDTO
+    public class ItineraryStopCreateRequest
     {
         public int StopOrder { get; set; }
         public string Name { get; set; } = null!;

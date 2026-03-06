@@ -10,6 +10,6 @@ namespace TouRest.Application.Interfaces
     public interface IItineraryStopService
     {
         Task<List<ItineraryStopDTO>> GetItineraryStopsByItineraryId(Guid itineraryId);
-        Task<ItineraryStopDTO> AddItineraryStop(ItineraryStopCreateDTO create);
+        Task<ItineraryStopDTO> AddItineraryStop(ItineraryStopCreateRequest create);
     }
 }
