@@ -11,7 +11,7 @@ namespace TouRest.Domain.Interfaces
 {
     public interface IFeedbackRepository : IBaseRepository<Feedback>
     {
-        Task<List<Feedback>> GetFeedbacksByBookingIdAsync(Guid bookingId);
+        Task<List<Feedback>> GetFeedbacksByBookingItineraryIdAsync(Guid bookingItineraryId);
         Task<Feedback?> GetFeedback(Guid id);
         Task<List<Feedback>> GetFeedbacks();
         Task<List<Feedback>> GetFeedbacks(FeedbackSearch search);

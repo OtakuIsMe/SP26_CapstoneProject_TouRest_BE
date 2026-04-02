@@ -10,7 +10,7 @@ namespace TouRest.Application.DTOs.Feedback
 {
     public class FeedbackDTO
     {
-        public Guid BookingId { get; set; }
+        public Guid BookingItineraryId { get; set; }
         public FeedbackItemType ItemType { get; set; }
         public Guid ItemId { get; set; }
         public int Rating { get; set; }

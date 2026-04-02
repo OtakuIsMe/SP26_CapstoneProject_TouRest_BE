@@ -20,9 +20,9 @@ namespace TouRest.Application.Services
             _feedbackRepository = feedbackRepository;
             _mapper = mapper;
         }
-        public async Task<List<FeedbackDTO>> GetFeedbacksByBookingId(Guid bookingId)
+        public async Task<List<FeedbackDTO>> GetFeedbacksByBookingItineraryId(Guid bookingItineraryId)
         {
-            var list = await _feedbackRepository.GetFeedbacksByBookingIdAsync(bookingId);
+            var list = await _feedbackRepository.GetFeedbacksByBookingItineraryIdAsync(bookingItineraryId);
             return _mapper.Map<List<FeedbackDTO>>(list);
         }
         public async Task<FeedbackDTO> GetFeedback(Guid id)

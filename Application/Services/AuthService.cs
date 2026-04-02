@@ -128,5 +128,21 @@ namespace TouRest.Application.Services
 
             await _refreshTokenRepository.RevokeAsync(refreshTokenValue);
         }
+
+        public async Task<MeDTO> GetMeAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found");
+
+            return new MeDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Phone = user.Phone,
+                Role = user.Role.Code.ToLower()
+            };
+        }
     }
 }

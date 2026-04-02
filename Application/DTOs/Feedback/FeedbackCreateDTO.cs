@@ -11,7 +11,7 @@ namespace TouRest.Application.DTOs.Feedback
     public class FeedbackCreateDTO
     {
         [Required]
-        public Guid BookingId { get; set; }
+        public Guid BookingItineraryId { get; set; }
 
         [Required]
         public FeedbackItemType ItemType { get; set; }

@@ -16,10 +16,10 @@ using TouRest.Application.Mappings;
 using TouRest.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-Env.Load("../.env");
+Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("DATABASE_CONNECTION")));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -74,7 +74,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure();
 
 builder.Services.AddAutoMapper(
     typeof(UserProfile).Assembly

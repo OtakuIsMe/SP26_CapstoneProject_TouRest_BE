@@ -69,6 +69,15 @@ namespace TouRest.Api.Controllers
         }
 
         [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var userId = User.GetUserId();
+            var result = await _authService.GetMeAsync(userId);
+            return ApiResponseFactory.Ok(result, "User retrieved successfully");
+        }
+
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
