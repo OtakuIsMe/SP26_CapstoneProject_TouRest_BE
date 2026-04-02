@@ -11,9 +11,9 @@ using TouRest.Infrastructure.Persistence;
 
 namespace TouRest.Infrastructure.Repositories
 {
-    public class ReportRepostiory : BaseRepository<Report>, IReportRepository
+    public class ReportRepository : BaseRepository<Report>, IReportRepository
     {
-        public ReportRepostiory(AppDbContext context) : base(context)
+        public ReportRepository(AppDbContext context) : base(context)
         {
         }
 /*        public async Task<List<Report>> GetReportsByItemIdAsync(Guid itemId, ReportItemType type)

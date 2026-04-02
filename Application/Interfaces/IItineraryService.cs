@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Itinerary;
+using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Interfaces
@@ -14,5 +15,8 @@ namespace TouRest.Application.Interfaces
         Task<ItineraryDTO> AddItinerary(ItineraryCreateRequest create);
         Task<ItineraryDTO> UpdateItinerary(Guid id, ItineraryUpdateRequest update);
         Task<bool> DeleteItinerary(Guid id);
+        Task<ItineraryDTO?> GetItineraryById(Guid id);
+        Task<ItineraryDTO?> UpdateItineraryStatus(Guid id, ItineraryUpdateStatusRequest status);
+
     }
 }
