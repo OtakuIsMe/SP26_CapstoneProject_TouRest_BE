@@ -18,9 +18,13 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<Package> Packages => Set<Package>();
         public DbSet<Service> Services => Set<Service>();
         public DbSet<PackageService> PackageServices => Set<PackageService>();
+        public DbSet<Agency> Agencies => Set<Agency>();
+        public DbSet<AgencyUser> AgencyUsers => Set<AgencyUser>();
         public DbSet<Itinerary> Itineraries => Set<Itinerary>();
         public DbSet<ItineraryStop> ItineraryStops => Set<ItineraryStop>();
         public DbSet<ItineraryActivity> ItineraryActivities => Set<ItineraryActivity>();
+        public DbSet<ItinerarySchedule> ItinerarySchedules => Set<ItinerarySchedule>();
+        public DbSet<ItineraryTracking> ItineraryTrackings => Set<ItineraryTracking>();
         public DbSet<Booking> Bookings => Set<Booking>();
         public DbSet<BookingItinerary> BookingItineraries => Set<BookingItinerary>();
         public DbSet<Voucher> Vouchers => Set<Voucher>();
@@ -59,12 +63,39 @@ namespace TouRest.Infrastructure.Persistence
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure Itinerary - User (Agency) relationship
+            // Configure Agency - AgencyUser relationship
+            modelBuilder.Entity<AgencyUser>()
+                .HasOne(au => au.Agency)
+                .WithMany()
+                .HasForeignKey(au => au.AgencyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AgencyUser>()
+                .HasOne(au => au.User)
+                .WithMany()
+                .HasForeignKey(au => au.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure Itinerary - Agency relationship
             modelBuilder.Entity<Itinerary>()
                 .HasOne(i => i.Agency)
                 .WithMany()
                 .HasForeignKey(i => i.AgencyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure ItinerarySchedule - Itinerary relationship
+            modelBuilder.Entity<ItinerarySchedule>()
+                .HasOne(s => s.Itinerary)
+                .WithMany()
+                .HasForeignKey(s => s.ItineraryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure ItineraryTracking - ItinerarySchedule relationship
+            modelBuilder.Entity<ItineraryTracking>()
+                .HasOne(t => t.ItinerarySchedule)
+                .WithMany()
+                .HasForeignKey(t => t.ItineraryScheduleId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure ItineraryStop - Itinerary relationship
             modelBuilder.Entity<ItineraryStop>()
@@ -95,9 +126,9 @@ namespace TouRest.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<BookingItinerary>()
-                .HasOne(bi => bi.Itinerary)
+                .HasOne(bi => bi.ItinerarySchedule)
                 .WithMany()
-                .HasForeignKey(bi => bi.ItineraryId)
+                .HasForeignKey(bi => bi.ItineraryScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BookingItinerary>()
@@ -142,11 +173,11 @@ namespace TouRest.Infrastructure.Persistence
                 .HasForeignKey(pu => pu.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure Feedback - Booking relationship
+            // Configure Feedback - BookingItinerary relationship
             modelBuilder.Entity<Feedback>()
-                .HasOne(f => f.Booking)
+                .HasOne(f => f.BookingItinerary)
                 .WithMany()
-                .HasForeignKey(f => f.BookingId)
+                .HasForeignKey(f => f.BookingItineraryId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Configure Refund - Booking relationship
@@ -221,9 +252,9 @@ namespace TouRest.Infrastructure.Persistence
                 .HasIndex(w => new { w.ItemId, w.UserId })
                 .IsUnique();
 
-            // Unique constraint for BookingItinerary (BookingId, ItineraryId)
+            // Unique constraint for BookingItinerary (BookingId, ItineraryScheduleId)
             modelBuilder.Entity<BookingItinerary>()
-                .HasIndex(bi => new { bi.BookingId, bi.ItineraryId })
+                .HasIndex(bi => new { bi.BookingId, bi.ItineraryScheduleId })
                 .IsUnique();
 
             // Unique constraint for PackageService (PackageId, SortOrder)

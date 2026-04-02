@@ -13,7 +13,7 @@ namespace TouRest.Domain.Entities
         public Guid BookingId { get; set; }
 
         [Required]
-        public Guid ItineraryId { get; set; }
+        public Guid ItineraryScheduleId { get; set; }
 
         public Guid? VoucherId { get; set; }
 
@@ -26,7 +26,7 @@ namespace TouRest.Domain.Entities
 
         // Navigation properties
         public Booking Booking { get; set; } = null!;
-        public Itinerary Itinerary { get; set; } = null!;
+        public ItinerarySchedule ItinerarySchedule { get; set; } = null!;
         public Voucher? Voucher { get; set; }
     }
 }

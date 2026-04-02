@@ -29,6 +29,6 @@ namespace TouRest.Domain.Entities
         public ItineraryStatus Status { get; set; }
 
         // Navigation properties
-        public User Agency { get; set; } = null!;
+        public Agency Agency { get; set; } = null!;
     }
 }

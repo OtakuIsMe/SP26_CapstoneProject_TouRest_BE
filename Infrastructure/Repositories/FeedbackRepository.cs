@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,35 +15,36 @@ namespace TouRest.Infrastructure.Repositories
         public FeedbackRepository(AppDbContext context) : base(context)
         {
         }
-        public async Task<List<Feedback>> GetFeedbacksByBookingIdAsync(Guid bookingId)
+        public async Task<List<Feedback>> GetFeedbacksByBookingItineraryIdAsync(Guid bookingItineraryId)
         {
             return await _context.Feedbacks
-                .Where(f => f.BookingId == bookingId).Include(x => x.BookingId)
+                .Where(f => f.BookingItineraryId == bookingItineraryId)
+                .Include(x => x.BookingItinerary)
                 .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<Feedback?> GetFeedback(Guid id)
         {
             return await _context.Feedbacks
-                .Include(x => x.BookingId)
+                .Include(x => x.BookingItinerary)
                 .FirstOrDefaultAsync(f => f.Id == id);
         }
         public async Task<List<Feedback>> GetFeedbacks()
         {
             return await _context.Feedbacks
-                .Include(x => x.BookingId)
+                .Include(x => x.BookingItinerary)
                 .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<List<Feedback>> GetFeedbacks(FeedbackSearch search)
         {
             var query = _context.Feedbacks
-                .Include(x => x.BookingId)
+                .Include(x => x.BookingItinerary).ThenInclude(bi => bi.Booking)
                 .AsNoTracking()
                 .AsQueryable();
             if(!string.IsNullOrEmpty(search.BookingCode))
             {
-                query = query.Where(f => f.Booking.Code.Contains(search.BookingCode));
+                query = query.Where(f => f.BookingItinerary.Booking.Code.Contains(search.BookingCode));
             }
             if(search.ItemType.HasValue)
             {

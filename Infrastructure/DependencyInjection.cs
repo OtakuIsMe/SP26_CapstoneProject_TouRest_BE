@@ -12,17 +12,8 @@ namespace TouRest.Infrastructure
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(
-            this IServiceCollection services,
-            IConfiguration configuration)
+            this IServiceCollection services)
         {
-            var connectionString =
-            configuration["DATABASE_CONNECTION"];
-            // Register DbContext
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(
-                    connectionString
-                ));
-
             // Register Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

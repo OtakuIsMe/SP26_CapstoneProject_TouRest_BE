@@ -10,7 +10,7 @@ namespace TouRest.Domain.Entities
     public class Feedback : BaseEntity
     {
         [Required]
-        public Guid BookingId { get; set; }
+        public Guid BookingItineraryId { get; set; }
 
         [Required]
         public FeedbackItemType ItemType { get; set; }
@@ -36,6 +36,6 @@ namespace TouRest.Domain.Entities
         public FeedbackStatus Status { get; set; }
 
         // Navigation properties
-        public Booking Booking { get; set; } = null!;
+        public BookingItinerary BookingItinerary { get; set; } = null!;
     }
 }
