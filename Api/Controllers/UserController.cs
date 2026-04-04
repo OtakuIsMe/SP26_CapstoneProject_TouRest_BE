@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
+using TouRest.Api.Extensions;
 using TouRest.Application.Common.Constants;
+using TouRest.Application.DTOs.User;
 using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
@@ -32,6 +34,14 @@ namespace TouRest.Api.Controllers
             {
                 var users = await _userService.GetUsers();
                 return ApiResponseFactory.Ok(users);
+            }
+
+            [HttpPut("profile")]
+            public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDTO dto)
+            {
+                var userId = User.GetUserId();
+                var result = await _userService.UpdateProfileAsync(userId, dto);
+                return ApiResponseFactory.Ok(result, "Profile updated successfully");
             }
         }
 }

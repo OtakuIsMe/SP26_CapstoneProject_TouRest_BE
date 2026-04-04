@@ -16,6 +16,7 @@ namespace TouRest.Infrastructure
         {
             // Register Repositories
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();

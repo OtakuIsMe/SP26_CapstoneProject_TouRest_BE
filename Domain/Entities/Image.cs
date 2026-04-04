@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TouRest.Domain.Base;
+using TouRest.Domain.Enums;
 
 namespace TouRest.Domain.Entities
 {
@@ -11,8 +12,8 @@ namespace TouRest.Domain.Entities
         [MaxLength(500)]
         public string Url { get; set; } = null!;
 
-        [MaxLength(100)]
-        public string? Type { get; set; }
+        [Required]
+        public ImageType Type { get; set; }
 
         // Navigation
         public User Users { get; set; } = null!;
