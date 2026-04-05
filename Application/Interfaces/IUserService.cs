@@ -12,5 +12,6 @@ namespace TouRest.Application.Interfaces
     {
         Task<UserDTO> GetByIdAsync(Guid id);
         Task<IEnumerable<User>> GetUsers();
+        Task<UserDTO> UpdateProfileAsync(Guid userId, UpdateProfileDTO dto);
     }
 }

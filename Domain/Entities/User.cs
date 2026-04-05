@@ -29,6 +29,20 @@ namespace TouRest.Domain.Entities
         [MaxLength(20)]
         public string? Phone { get; set; }
 
+        [MaxLength(255)]
+        public string? FullName { get; set; }
+
+        public DateTime? DateOfBirth { get; set; }
+
+        [MaxLength(500)]
+        public string? AddressDetail { get; set; }
+
+        [MaxLength(100)]
+        public string? CityId { get; set; }
+
+        [MaxLength(100)]
+        public string? DistrictId { get; set; }
+
         [Required]
         public UserStatus Status { get; set; }
 
