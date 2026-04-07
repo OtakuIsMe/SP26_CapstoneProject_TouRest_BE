@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TouRest.Api.Common;
 using TouRest.Application.Common.Constants;
 using TouRest.Application.DTOs.Itinerary;
 using TouRest.Application.Interfaces;
@@ -9,7 +10,7 @@ using TouRest.Domain.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/itinerary")]
     [ApiController]
     public class ItineraryController : ControllerBase
     {
@@ -22,26 +23,36 @@ namespace TouRest.Api.Controllers
             _itineraryActivityService = itineraryActivityService;
             _itineraryStopService = itineraryStopService;
         }
+        // API endpoints for Itinerary
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetItineraries([FromQuery] ItinerarySearch search)
         {
             var itineraries = await _itineraryService.GetItineraries(search);
-            return Ok(itineraries);
+            return ApiResponseFactory.Ok(itineraries);
+        }
+        [HttpGet("{id:guid}")]
+        [Authorize]
+        public async Task<IActionResult> GetItineraryById(Guid id)
+        {
+            var itinerary = await _itineraryService.GetItineraryById(id);
+            if (itinerary == null)
+                return NotFound();
+            return ApiResponseFactory.Ok(itinerary);
         }
         [HttpPost]
         [Authorize(Roles = ("AGENCY"))]
         public async Task<IActionResult> AddItinerary([FromBody] ItineraryCreateRequest create)
         {
             var result = await _itineraryService.AddItinerary(create);
-            return Ok(result);
+            return ApiResponseFactory.Created<ItineraryDTO>(result, "Itinerary created");
         }
         [HttpPut("{id:guid}")]
         [Authorize(Roles = ("ADMIN, AGENCY"))]
         public async Task<IActionResult> UpdateItinerary(Guid id, [FromBody] ItineraryUpdateRequest update)
         {
             var result = await _itineraryService.UpdateItinerary(id, update);
-            return Ok(result);
+            return ApiResponseFactory.Ok(result,"itinerary updated");
         }
         [HttpPut("{id:guid}/status")]
         [Authorize(Roles = ("ADMIN, AGENCY"))]
@@ -50,7 +61,7 @@ namespace TouRest.Api.Controllers
             try
             {
                 var result = await _itineraryService.UpdateItineraryStatus(id, status);
-                return NoContent();
+                return ApiResponseFactory.NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -63,10 +74,10 @@ namespace TouRest.Api.Controllers
         {
             var result = await _itineraryService.DeleteItinerary(id);
             if (result)
-                return Ok();
+                return ApiResponseFactory.NoContent();
             else
                 return NotFound();
         }
-
+        // API endpoints for ItineraryStops
     }
     }

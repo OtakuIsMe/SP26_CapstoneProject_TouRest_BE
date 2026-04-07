@@ -1,4 +1,5 @@
-﻿using TouRest.Application.Interfaces;
+﻿using TouRest.Application.Common.Helpers;
+using TouRest.Application.Interfaces;
 using TouRest.Application.Services;
 using TouRest.Domain.Interfaces;
 using TouRest.Infrastructure.Repositories;
@@ -9,7 +10,7 @@ namespace TouRest.Api.Extensions
     {
         public static IServiceCollection AddApiServices(this IServiceCollection services)
         {
-            //Add repositories to the DI container, count = 9
+            //Add repositories to the DI container, count = 10
             services.AddScoped<IItineraryStopRepository, ItineraryStopRepository>();
             services.AddScoped<IItineraryActivityRepository, ItineraryActivityRepository>();
             services.AddScoped<IItineraryRepository, ItineraryRepository>();
@@ -19,7 +20,8 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IProviderRepository, ProviderRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
-            //Add services to the DI container, count = 9
+            services.AddScoped<IServiceRepository, ServiceRepository>();
+            //Add services to the DI container, count = 11
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IItineraryService, ItineraryService>();
             services.AddScoped<IItineraryStopService, ItineraryStopService>();
@@ -29,6 +31,8 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWishListService, WishListService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IServiceService, ServiceService>();
+            services.AddScoped<IRouteOptimizerService, RouteOptimizerService>();
             return services;
         }
     }

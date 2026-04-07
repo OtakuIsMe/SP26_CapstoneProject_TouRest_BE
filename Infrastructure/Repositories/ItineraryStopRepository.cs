@@ -29,5 +29,10 @@ namespace TouRest.Infrastructure.Repositories
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
+        public async Task UpdateRangeAsync(List<ItineraryStop> ordered)
+        {
+            _context.UpdateRange(ordered);
+             await _context.SaveChangesAsync();
+        }
     }
 }

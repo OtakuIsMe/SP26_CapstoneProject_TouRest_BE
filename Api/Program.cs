@@ -1,6 +1,8 @@
 using DotNetEnv;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Runtime.CompilerServices;
@@ -109,6 +111,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddApiServices();
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(Environment.GetEnvironmentVariable("DATABASE_CONNECTION")));
+builder.Services.AddHangfireServer();
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandler>();
 

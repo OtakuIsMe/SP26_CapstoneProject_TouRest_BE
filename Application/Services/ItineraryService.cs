@@ -26,6 +26,11 @@ namespace TouRest.Application.Services
         public async Task<ItineraryDTO> AddItinerary(ItineraryCreateRequest create)
         {
             var itinerary = _mapper.Map<Itinerary>(create);
+            //after mapping, set default values for fields that are not in the create request
+            itinerary.Status = ItineraryStatus.Draft;
+            itinerary.Id = Guid.NewGuid();
+            itinerary.CreatedAt = DateTime.UtcNow;
+            itinerary.UpdatedAt = DateTime.UtcNow;
             var result = await _itineraryRepository.CreateAsync(itinerary);
             return _mapper.Map<ItineraryDTO>(result);
         }

@@ -21,8 +21,8 @@ namespace TouRest.Infrastructure.Repositories
         {
             var query = _context.Itineraries.Include(x => x.Agency).AsNoTracking().AsQueryable();
 
-            if (search.AgencyId != null)
-                query = query.Where(x => x.AgencyId == search.AgencyId);
+            if (search.AgencyName != null)
+                query = query.Where(x => x.Agency.Name == search.AgencyName);
 
             if (!string.IsNullOrWhiteSpace(search.Name))
                 query = query.Where(x => EF.Functions.Like(x.Name, $"%{search.Name}%"));
