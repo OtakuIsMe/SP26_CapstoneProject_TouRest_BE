@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TouRest.Application.DTOs.ItineraryActivity
 {
-    public class ItineraryActivityUpdateDTO
+    public class ItineraryActivityUpdateRequest
     {
         public Guid ServiceId { get; set; }
         public DateTime StartTime { get; set; }

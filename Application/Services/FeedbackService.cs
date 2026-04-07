@@ -40,7 +40,7 @@ namespace TouRest.Application.Services
             var list = await _feedbackRepository.GetFeedbacks();
             return _mapper.Map<List<FeedbackDTO>>(list);
         }
-        public async Task<FeedbackDTO> AddFeedback(FeedbackCreateDTO create)
+        public async Task<FeedbackDTO> AddFeedback(FeedbackCreateRequest create)
         {
             var feedback = _mapper.Map<Feedback>(create);
             var result = await _feedbackRepository.CreateAsync(feedback);
@@ -51,7 +51,7 @@ namespace TouRest.Application.Services
             var result = await _feedbackRepository.DeleteAsync(id);
             return result;
         }
-        public async Task<FeedbackDTO> UpdateFeedback(Guid id, FeedbackUpdateDTO update)
+        public async Task<FeedbackDTO> UpdateFeedback(Guid id, FeedbackUpdateRequest update)
         {
             var feedback = _mapper.Map<Feedback>(update);
             feedback.Id = id;

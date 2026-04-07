@@ -12,8 +12,8 @@ namespace TouRest.Application.Interfaces
     {
         Task<List<ReportDTO>> GetReports(ReportSearch search);
         Task<ReportDTO> GetReport(Guid id);
-        Task<ReportDTO> UpdateReport(Guid id, ReportUpdateDTO update);
-        Task<ReportDTO> AddReport(ReportCreateDTO create);
+        Task<ReportDTO> UpdateReport(Guid id, ReportUpdateRequest update);
+        Task<ReportDTO> AddReport(ReportCreateRequest create);
         Task<bool> DeleteReport(Guid id);
     }
 }

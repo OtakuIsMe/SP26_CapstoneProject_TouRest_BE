@@ -8,7 +8,7 @@ using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Report
 {
-    public class ReportUpdateDTO
+    public class ReportUpdateRequest
     {
         [MaxLength(1000)]
         public string Description { get; set; } = null!;

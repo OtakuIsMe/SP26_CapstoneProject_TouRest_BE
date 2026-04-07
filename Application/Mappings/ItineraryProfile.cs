@@ -19,28 +19,28 @@ namespace TouRest.Application.Mappings
             // Map Itinerary entity to ItineraryDTO for responses
             CreateMap<Itinerary,ItineraryDTO>();
             //Map ItineraryCreateDTO to Itinerary entity for creating new itineraries
-            CreateMap<ItineraryCreateDTO, Itinerary>()
+            CreateMap<ItineraryCreateRequest, Itinerary>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Domain.Enums.ItineraryStatus.Active));
             //Map ItineraryUpdateDTO to Itinerary entity for updating existing itineraries
-            CreateMap<ItineraryUpdateDTO, Itinerary>()
+            CreateMap<ItineraryUpdateRequest, Itinerary>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()) // Id should not be updated
                 .ForMember(dest => dest.Status, opt => opt.Ignore()); // Status should not be updated here
             //Map ItineraryActivity entity to ItineraryActivityDTO for responses
             CreateMap<ItineraryActivity, ItineraryActivityDTO>();
             //Map ItineraryActivityCreateDTO to ItineraryActivity entity for creating new itinerary activities
-            CreateMap<ItineraryActivityCreateDTO, ItineraryActivity>()
+            CreateMap<ItineraryActivityCreateRequest, ItineraryActivity>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()));
             //Map ItineraryActivityUpdateDTO to ItineraryActivity entity for updating existing itinerary activities
-            CreateMap<ItineraryActivityUpdateDTO, ItineraryActivity>()
+            CreateMap<ItineraryActivityUpdateRequest, ItineraryActivity>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()); // Id should not be updated
             //Map ItineraryStop entity to ItineraryStopDTO for responses
             CreateMap<ItineraryStop, ItineraryStopDTO>();
             //Map ItineraryStopCreateDTO to ItineraryStop entity for creating new itinerary stops
-            CreateMap<ItineraryStopCreateDTO, ItineraryStop>()
+            CreateMap<ItineraryStopCreateRequest, ItineraryStop>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()));
             //Map ItineraryStopUpdateDTO to ItineraryStop entity for updating existing itinerary stops
-            CreateMap<ItineraryStopUpdateDTO, ItineraryStop>()
+            CreateMap<ItineraryStopUpdateRequest, ItineraryStop>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()); // Id should not be updated
             //Map ItineraryActvity to ItineraryActivitySummaryDTO for summary responses
             CreateMap<ItineraryActivity, ItineraryActivitySummaryDTO>();

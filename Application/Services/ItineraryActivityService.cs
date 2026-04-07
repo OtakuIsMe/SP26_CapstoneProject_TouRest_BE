@@ -31,9 +31,14 @@ namespace TouRest.Application.Services
             var itineraryActivity = await _itineraryActivityRepository.GetItineraryActivity(id);
             return _mapper.Map<ItineraryActivityDTO>(itineraryActivity);
         }
-        public async Task<ItineraryActivityDTO> AddItineraryActivity(ItineraryActivityCreateDTO create)
+        public async Task<ItineraryActivityDTO> AddItineraryActivity(ItineraryActivityCreateRequest create, Guid stopId)
         {
             var itineraryActivity = _mapper.Map<ItineraryActivity>(create);
+            //after mapping, set default values for fields that are not in the create request but are required in the entity
+            itineraryActivity.Id = Guid.NewGuid();
+            itineraryActivity.ItineraryStopId = stopId;
+            itineraryActivity.CreatedAt = DateTime.UtcNow;
+            itineraryActivity.UpdatedAt = DateTime.UtcNow;
             var result = await _itineraryActivityRepository.CreateAsync(itineraryActivity);
             return _mapper.Map<ItineraryActivityDTO>(result);
         }
@@ -42,7 +47,7 @@ namespace TouRest.Application.Services
             var result = await _itineraryActivityRepository.DeleteAsync(id);
             return result;
         }
-        public async Task<ItineraryActivityDTO> UpdateItineraryActivity(Guid id, ItineraryActivityUpdateDTO update)
+        public async Task<ItineraryActivityDTO> UpdateItineraryActivity(Guid id, ItineraryActivityUpdateRequest update)
         {
             var itineraryActivity = _mapper.Map<ItineraryActivity>(update);
             itineraryActivity.Id = id;

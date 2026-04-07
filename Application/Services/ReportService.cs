@@ -30,7 +30,7 @@ namespace TouRest.Application.Services
             var report = await _reportRepository.GetReport(id);
             return _mapper.Map<ReportDTO>(report);
         }
-        public async Task<ReportDTO> AddReport(ReportCreateDTO create)
+        public async Task<ReportDTO> AddReport(ReportCreateRequest create)
         {
             var report = _mapper.Map<Report>(create);
             var result = await _reportRepository.CreateAsync(report);
@@ -41,7 +41,7 @@ namespace TouRest.Application.Services
             var result = await _reportRepository.DeleteAsync(id);
             return result;
         }
-        public async Task<ReportDTO> UpdateReport(Guid id, ReportUpdateDTO update)
+        public async Task<ReportDTO> UpdateReport(Guid id, ReportUpdateRequest update)
         {
             var report = _mapper.Map<Report>(update);
             report.Id = id;

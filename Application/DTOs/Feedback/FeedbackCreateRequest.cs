@@ -8,7 +8,7 @@ using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Feedback
 {
-    public class FeedbackCreateDTO
+    public class FeedbackCreateRequest
     {
         [Required]
         public Guid BookingItineraryId { get; set; }

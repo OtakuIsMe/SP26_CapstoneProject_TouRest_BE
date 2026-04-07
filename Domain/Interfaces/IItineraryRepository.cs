@@ -14,7 +14,7 @@ namespace TouRest.Domain.Interfaces
     }
     public class ItinerarySearch
     {
-        public Guid? AgencyId { get; set; }
+        public string? AgencyName { get; set; }
         public string? Name { get; set; }
         public int? LowPrice { get; set; }
         public int? HighPrice { get; set; }

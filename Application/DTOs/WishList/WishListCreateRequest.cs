@@ -8,7 +8,7 @@ using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.WishList
 {
-    public class WishListCreateDTO
+    public class WishListCreateRequest
     {
         [Required]
         public Guid UserId { get; set; }

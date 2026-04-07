@@ -1,20 +1,25 @@
+using DotNetEnv;
+using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using TouRest.Api.Extensions;
 using TouRest.Api.Middlewares;
+using TouRest.Application;
 using TouRest.Application.Common.Constants;
 using TouRest.Application.Interfaces;
+using TouRest.Application.Mappings;
 using TouRest.Application.Services;
 using TouRest.Domain.Interfaces;
 using TouRest.Infrastructure;
-using TouRest.Application;
-using DotNetEnv;
-using TouRest.Application.Mappings;
 using TouRest.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using TouRest.Infrastructure.Repositories;
 
 Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -30,8 +35,12 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Logging.ClearProviders();
@@ -101,7 +110,10 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role
     };
 });
-
+builder.Services.AddApiServices();
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(Environment.GetEnvironmentVariable("DATABASE_CONNECTION")));
+builder.Services.AddHangfireServer();
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandler>();
 
