@@ -18,6 +18,8 @@ namespace TouRest.Application
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IProviderService, ProviderService>();
+            services.AddScoped<IPackageServiceService, PackageServiceService>();
+            services.AddScoped<IVoucherService, VoucherService>();
             return services;
         }
     }
