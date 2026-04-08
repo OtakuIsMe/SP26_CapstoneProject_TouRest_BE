@@ -17,6 +17,9 @@ namespace TouRest.Domain.Entities
         public ProviderStatus Status { get; set; }
 
         [Required]
+        public bool IsPrimaryContact { get; set; }
+
+        [Required]
         [MaxLength(255)]
         public string ContactEmail { get; set; } = null!;
 

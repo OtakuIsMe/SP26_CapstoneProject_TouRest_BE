@@ -14,6 +14,8 @@ namespace TouRest.Domain.Entities
         [Required]
         public Guid UserId { get; set; }
 
+        [Required]
+        public bool IsPrimaryContact { get; set; }
         // Navigation properties
         public Agency Agency { get; set; } = null!;
         public User User { get; set; } = null!;

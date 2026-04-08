@@ -8,10 +8,10 @@ namespace TouRest.Application.Interfaces
 {
     public interface IAgencyUserService
     {
+        Task<bool> IsUserInAgencyAsync(Guid userId, Guid agencyId);
         Task AddUserToAgencyAsync(Guid agencyId, Guid userId);
-            Task RemoveUserFromAgencyAsync(Guid agencyId, Guid userId);
-        Task<List<Guid>> GetUsersInAgencyAsync(Guid agencyId);
         Task<List<Guid>> GetAgenciesForUserAsync(Guid userId);
-        Task<bool> IsUserInAgencyAsync(Guid agencyId, Guid userId);
+        Task<List<Guid>> GetUsersInAgencyAsync(Guid agencyId);
+        Task RemoveUserFromAgencyAsync(Guid agencyId, Guid userId);
     }
 }

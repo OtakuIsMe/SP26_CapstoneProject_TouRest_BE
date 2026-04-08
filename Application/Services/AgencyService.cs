@@ -1,38 +1,58 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Agency;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Entities;
+using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Services
 {
     public class AgencyService : IAgencyService
     {
-        public Task<AgencyDTO> AddAgency(AgencyCreateRequestDTO create)
+        private readonly IMapper _mapper;   
+        private readonly IAgencyRepository _agencyRepository;
+        public AgencyService(IAgencyRepository agencyRepository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _mapper = mapper;
+            _agencyRepository = agencyRepository;
+        }
+        public async Task<AgencyDTO> AddAgency(AgencyCreateRequestDTO create)
+        {
+           var agency = _mapper.Map<Agency>(create);
+            var createdAgency = await _agencyRepository.CreateAsync(agency);
+            return _mapper.Map<AgencyDTO>(createdAgency);
         }
 
-        public Task<bool> DeleteAgency(Guid id)
+        public async Task<bool> DeleteAgency(Guid id)
         {
-            throw new NotImplementedException();
+            return await _agencyRepository.DeleteAsync(id);
         }
 
-        public Task<AgencyDTO> GetAgencyById(Guid id)
+        public async Task<AgencyDTO> GetAgencyById(Guid id)
         {
-            throw new NotImplementedException();
+            var agency = await _agencyRepository.GetByIdAsync(id);
+            return _mapper.Map<AgencyDTO>(agency);
         }
 
-        public Task<AgencyDTO> UpdateAgency(Guid id, AgencyUpdateRequestDTO update)
+        public async Task<AgencyDTO> UpdateAgency(Guid id, AgencyUpdateRequestDTO update)
         {
-            throw new NotImplementedException();
+            var existing = await _agencyRepository.GetByIdAsync(id);
+            if (existing == null)
+            {
+                throw new KeyNotFoundException($"Agency with ID {id} not found.");
+            }
+            _mapper.Map(update, existing);
+            var updatedAgency = await _agencyRepository.UpdateAsync(existing);
+            return _mapper.Map<AgencyDTO>(updatedAgency);
         }
 
-        public Task<List<AgencyDTO>> GetAgencyUsers(AgencySearchUser search)
+        public async Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId)
         {
-            return GetAgencyUsers(search);
+            return await _agencyRepository.GetAgencyUsers(agencyId);
         }
     }
 

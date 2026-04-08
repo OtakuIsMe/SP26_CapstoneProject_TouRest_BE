@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,11 @@ namespace TouRest.Infrastructure.Repositories
     public class AgencyRepository : BaseRepository<Agency>, IAgencyRepository
     {
         public AgencyRepository(AppDbContext context) : base(context) { }
+        public async Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId)
+        {
+            return await _context.AgencyUsers
+                .Where(au => au.AgencyId == agencyId)
+                .ToListAsync();
+        }
     }
 }
