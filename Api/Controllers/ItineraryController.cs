@@ -85,6 +85,5 @@ namespace TouRest.Api.Controllers
             else
                 return NotFound();
         }
-        // API endpoints for ItineraryStops
     }
     }
