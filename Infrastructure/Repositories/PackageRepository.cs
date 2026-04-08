@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,13 @@ namespace TouRest.Infrastructure.Repositories
     {
         public PackageRepository(AppDbContext context) : base(context)
         {
+        }
+
+        public async Task<Package?> GetByCodeAsync(string code)
+        {
+            return await _context.Packages
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Code == code);
         }
     }
 }
