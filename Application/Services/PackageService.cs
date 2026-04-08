@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
 using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Services
 {
-    public class PackageService
+    public class PackageService : IPackageService
     {
         private readonly IPackageRepository _packageRepository;
         public PackageService(IPackageRepository packageRepository)

@@ -10,27 +10,36 @@ namespace TouRest.Api.Extensions
     {
         public static IServiceCollection AddApiServices(this IServiceCollection services)
         {
-            //Add repositories to the DI container, count = 10
-            services.AddScoped<IItineraryStopRepository, ItineraryStopRepository>();
+            //Add repositories to the DI container, count = 14
+            services.AddScoped<IBookingItineraryRepository, BookingItineraryRepository>();
+            services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddScoped<IItineraryActivityRepository, ItineraryActivityRepository>();
             services.AddScoped<IItineraryRepository, ItineraryRepository>();
+            services.AddScoped<IItineraryStopRepository, ItineraryStopRepository>();
+            services.AddScoped<IPackageRepository, PackageRepository>();
+            services.AddScoped<IPackageServiceRepository, PackageServiceRepository>();
+            services.AddScoped<IProviderRepository, ProviderRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
-            services.AddScoped<IFeedbackRepository, FeedbackRepository>();
-            services.AddScoped<IServiceRepository, ServiceRepository>();
-            //Add services to the DI container, count = 11
+            //Add services to the DI container, count = 15
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IBookingItineraryService, BookingItineraryService>();
+            services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IItineraryActivityService, ItineraryActivityService>();
             services.AddScoped<IItineraryService, ItineraryService>();
             services.AddScoped<IItineraryStopService, ItineraryStopService>();
-            services.AddScoped<IItineraryActivityService, ItineraryActivityService>();
+            services.AddScoped<IPackageService, PackageService>();
+            services.AddScoped<IPackageServiceService, PackageServiceService>();
             services.AddScoped<IProviderService, ProviderService>();
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWishListService, WishListService>();
-            services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IRouteOptimizerService, RouteOptimizerService>();
             return services;
