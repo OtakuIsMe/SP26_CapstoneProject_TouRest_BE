@@ -8,40 +8,40 @@ using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-        [ApiController]
-        [Route("api/users")]
-        [Authorize]
-        public class UserController : ControllerBase
+    [ApiController]
+    [Route("api/users")]
+    [Authorize]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
         {
-            private readonly IUserService _userService;
-
-            public UserController(IUserService userService)
-            {
-                _userService = userService;
-            }
-
-            [HttpGet("{id:guid}")]
-            public async Task<IActionResult> GetById(Guid id)
-            {
-                var user = await _userService.GetByIdAsync(id);
-
-                return ApiResponseFactory.Ok(user);
-            }
-
-            [HttpGet("")]
-            [Authorize(Roles = RoleCodes.Admin)]
-            public async Task<IActionResult> GetUsers()
-            {
-                var users = await _userService.GetUsers();
-                return ApiResponseFactory.Ok(users);
-            }
-
-            [HttpPut("profile")]
-            public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDTO dto)
-            {
-                var userId = User.GetUserId();
-                var result = await _userService.UpdateProfileAsync(userId, dto);
-                return ApiResponseFactory.Ok(result, "Profile updated successfully");
-            }
+            _userService = userService;
         }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var user = await _userService.GetByIdAsync(id);
+
+            return ApiResponseFactory.Ok(user);
+        }
+
+        [HttpGet("")]
+        [Authorize(Roles = RoleCodes.Admin)]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = await _userService.GetUsers();
+            return ApiResponseFactory.Ok(users);
+        }
+
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDTO dto)
+        {
+            var userId = User.GetUserId();
+            var result = await _userService.UpdateProfileAsync(userId, dto);
+            return ApiResponseFactory.Ok(result, "Profile updated successfully");
+        }
+    }
 }

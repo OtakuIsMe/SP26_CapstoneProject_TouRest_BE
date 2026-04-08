@@ -17,5 +17,12 @@ namespace TouRest.Api.Extensions
 
             return userId;
         }
+        public static string GetUserRole(this ClaimsPrincipal user)
+        {
+            var roleClaim = user.FindFirst(ClaimTypes.Role);
+            if (roleClaim == null)
+                throw new UnauthorizedAccessException("User role is missing in token");
+            return roleClaim.Value;
+        }
     }
 }

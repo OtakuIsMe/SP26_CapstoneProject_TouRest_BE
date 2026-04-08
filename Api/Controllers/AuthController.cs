@@ -95,7 +95,28 @@ namespace TouRest.Api.Controllers
 
             return ApiResponseFactory.Ok(new { }, "Logout successful");
         }
-
+        [HttpPut("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO request)
+        {
+            var refreshToken = Request.Cookies[AuthConstants.RefreshTokenCookieName];
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedAccessException("Refresh token is missing");
+            var userId = User.GetUserId();
+            await _authService.ChangePasswordAsync(userId, request, refreshToken);
+            return ApiResponseFactory.Ok(new { }, "Password changed successfully, Please Login again");
+        }
+        [HttpPut("change-role")]
+        [Authorize]
+        public async Task<IActionResult> ChangeRoleAsync(Guid id, [FromBody] ChangeRoleRequestDTO request)
+        {
+            var refreshToken = Request.Cookies[AuthConstants.RefreshTokenCookieName];
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedAccessException("Refresh token is missing");
+            var userId = User.GetUserId();
+            await _authService.ChangeRoleAsync(userId, request, refreshToken);
+            return ApiResponseFactory.Ok(new { }, "Role have been changed, Please Login again");
+        }
         private void SetRefreshTokenCookie(string refreshToken)
         {
             Response.Cookies.Append(AuthConstants.RefreshTokenCookieName, refreshToken, new CookieOptions

@@ -10,6 +10,8 @@ namespace TouRest.Application.Interfaces
     public interface IAuthService
     {
         Task<(AuthResponseDTO auth, string refreshToken)> LoginAsync(LoginRequestDTO request);
+        Task ChangePasswordAsync(Guid userId, ChangePasswordRequestDTO request, string refreshToken);
+        Task ChangeRoleAsync(Guid userId, ChangeRoleRequestDTO request, string refreshToken);
         Task RegisterAsync(RegisterRequestDTO request);
         Task<(AuthResponseDTO auth, string refreshToken)> RefreshTokenAsync(string refreshToken, Guid userId);
         Task LogoutAsync(string refreshToken, Guid userId);

@@ -23,7 +23,6 @@ namespace TouRest.Infrastructure.Repositories
         {
             return await _context.Users
                 .Include(u => u.Role)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
     }

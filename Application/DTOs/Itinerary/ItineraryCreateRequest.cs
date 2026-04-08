@@ -12,6 +12,5 @@ namespace TouRest.Application.DTOs.Itinerary
         public string Description { get; set; } = null!;
         public int Price { get; set; }
         public int DurationDay { get; set; }
-        public Guid AgencyId { get; set; }
     }
 }

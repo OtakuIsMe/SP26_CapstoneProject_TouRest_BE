@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.Interfaces;
 
@@ -35,6 +36,7 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PROVIDER")]
         public async Task<IActionResult> Create([FromBody] CreateProviderRequest request)
         {
             var result = await _providerService.CreateAsync(request);
@@ -42,6 +44,7 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "PROVIDER")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProviderRequest request)
         {
             var result = await _providerService.UpdateAsync(id, request);

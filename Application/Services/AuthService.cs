@@ -116,7 +116,32 @@ namespace TouRest.Application.Services
                 ExpiresIn = AuthConstants.AccessTokenExpiryMinutes * 60
             }, newRefreshToken);
         }
-
+        public async Task ChangePasswordAsync(Guid userId,ChangePasswordRequestDTO request, string refreshToken)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found");
+            if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+                throw new UnauthorizedAccessException("Current password is incorrect");
+            user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword);
+            await _userRepository.UpdateAsync(user);
+            //Log out user from all devices by revoking all refresh tokens
+            await LogoutAsync(refreshToken, userId);
+            
+        }
+        public async Task ChangeRoleAsync(Guid userId, ChangeRoleRequestDTO request, string refreshToken)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found");
+            var newRole = await _roleRepository.GetByCodeAsync(request.NewRoleCode);
+            if (newRole == null)
+                throw new InvalidOperationException("Specified role does not exist");
+            user.RoleId = newRole.Id;
+            await _userRepository.UpdateAsync(user);
+            //Log out user from all devices by revoking all refresh tokens
+            await LogoutAsync(refreshToken, userId);
+        }
         public async Task LogoutAsync(string refreshTokenValue, Guid userId)
         {
             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(refreshTokenValue);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TouRest.Api.Common;
@@ -13,12 +14,12 @@ namespace TouRest.Api.Controllers
     [ApiController]
     public class ItineraryStopController : ControllerBase
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<ItineraryStopController> _logger;
         private readonly IItineraryStopService _itineraryStopService;
         private readonly IItineraryService _itineraryService;
-        public ItineraryStopController(IHttpContextAccessor httpContextAccessor, IItineraryStopService itineraryStopService, IItineraryService itineraryService)
+        public ItineraryStopController(ILogger<ItineraryStopController> logger, IItineraryStopService itineraryStopService, IItineraryService itineraryService)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
             _itineraryStopService = itineraryStopService;
             _itineraryService = itineraryService;
         }
@@ -29,8 +30,11 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok(stops);
         }
         [HttpPost]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> AddItineraryStop([FromBody] ItineraryStopCreateRequest create, Guid itineraryId)
         {
+            var agencyId = User.GetUserId();
+            _logger.LogInformation("Agency {UserId} is adding a stop to itinerary {ItineraryId}", agencyId, itineraryId);
             var itinerary = await _itineraryService.GetItineraryById(itineraryId);
             if (itinerary == null)
             {
@@ -46,8 +50,11 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Created(result);
         }
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> DeleteItineraryStop(Guid id)
         {
+            var agencyId = User.GetUserId();
+            _logger.LogInformation("Agency {UserId} is deleting itinerary stop {StopId}", agencyId, id);
             var stop = await _itineraryStopService.GetItineraryStopById(id);
             if (stop == null)
             {
@@ -71,8 +78,11 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok("Itinerary stop deleted successfully");
         }
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> UpdateItineraryStop(Guid id, [FromBody] ItineraryStopUpdateRequest update)
         {
+            var agencyId = User.GetUserId();
+            _logger.LogInformation("Agency {UserId} is updating itinerary stop {StopId}", agencyId, id);
             var stop = await _itineraryStopService.GetItineraryStopById(id);
             if (stop == null)
             {

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
+using TouRest.Api.Extensions;
 using TouRest.Application.DTOs.ItineraryActivity;
 using TouRest.Application.Interfaces;
 
@@ -10,14 +12,17 @@ namespace TouRest.Api.Controllers
     [ApiController]
     public class ItineraryActivityController : ControllerBase
     {
+        private readonly ILogger<ItineraryActivityController> _logger;
         private readonly IItineraryActivityService _itineraryActivityService;
         private readonly IItineraryStopService _itineraryStopService;
-        public ItineraryActivityController( IItineraryActivityService itineraryActivityService, IItineraryStopService itineraryStopService)
+        public ItineraryActivityController(ILogger<ItineraryActivityController> logger ,IItineraryActivityService itineraryActivityService, IItineraryStopService itineraryStopService)
         {
+            _logger = logger;
             _itineraryActivityService = itineraryActivityService;
             _itineraryStopService = itineraryStopService;
         }
         [HttpGet("{id:guid}")]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> GetItineraryActivityById(Guid id)
         {
             var activity = await _itineraryActivityService.GetItineraryActivity(id);
@@ -37,6 +42,8 @@ namespace TouRest.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddItineraryActivity(Guid stopId, [FromBody] ItineraryActivityCreateRequest create)
         {
+            var agencyId = User.GetUserId();
+            _logger.LogInformation("Adding itinerary activity for stop {StopId} by agency {AgencyId}", stopId, agencyId);
             var stop = await _itineraryStopService.GetItineraryStopById(stopId);
             if (stop == null)
             {
@@ -48,6 +55,8 @@ namespace TouRest.Api.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteItineraryActivity(Guid id)
         {
+            var agencyId = User.GetUserId();
+            _logger.LogInformation("Deleting itinerary activity {ActivityId} by agency {AgencyId}", id, agencyId);
             var activity = await _itineraryActivityService.GetItineraryActivity(id);
             if (activity == null)
             {
@@ -63,6 +72,8 @@ namespace TouRest.Api.Controllers
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateItineraryActivity(Guid id, [FromBody] ItineraryActivityUpdateRequest update)
         {
+            var agencyId = User.GetUserId();
+            _logger.LogInformation("Updating itinerary activity {ActivityId} by agency {AgencyId}", id, agencyId);
             var existing = await _itineraryActivityService.GetItineraryActivity(id);
             if (existing == null)
             {

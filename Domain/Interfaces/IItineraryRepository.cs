@@ -10,7 +10,6 @@ namespace TouRest.Domain.Interfaces
     public interface IItineraryRepository : IBaseRepository<Itinerary>
     {
         Task<List<Itinerary>> GetItineraries(ItinerarySearch search);
-        Task<Itinerary?> GetItinerary(Guid id);
     }
     public class ItinerarySearch
     {

@@ -42,7 +42,7 @@ namespace TouRest.Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
-        public async Task<Itinerary?> GetItinerary(Guid id)
+        public override async Task<Itinerary?> GetByIdAsync(Guid id)
         {
             return await _context.Itineraries
                 .Include(x => x.Agency)

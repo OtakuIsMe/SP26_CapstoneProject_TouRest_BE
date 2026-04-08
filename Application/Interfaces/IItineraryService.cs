@@ -12,7 +12,7 @@ namespace TouRest.Application.Interfaces
     public interface IItineraryService
     {
         Task<List<ItineraryDTO>> GetItineraries(ItinerarySearch search);
-        Task<ItineraryDTO> AddItinerary(ItineraryCreateRequest create);
+        Task<ItineraryDTO> AddItinerary(Guid agencyId, ItineraryCreateRequest create);
         Task<ItineraryDTO> UpdateItinerary(Guid id, ItineraryUpdateRequest update);
         Task<bool> DeleteItinerary(Guid id);
         Task<ItineraryDTO?> GetItineraryById(Guid id);

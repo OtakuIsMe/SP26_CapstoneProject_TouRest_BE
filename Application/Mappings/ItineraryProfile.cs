@@ -21,11 +21,16 @@ namespace TouRest.Application.Mappings
             //Map ItineraryCreateDTO to Itinerary entity for creating new itineraries
             CreateMap<ItineraryCreateRequest, Itinerary>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Domain.Enums.ItineraryStatus.Active));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Domain.Enums.ItineraryStatus.Draft))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.AgencyId, opt => opt.Ignore()); // AgencyId will be set
             //Map ItineraryUpdateDTO to Itinerary entity for updating existing itineraries
             CreateMap<ItineraryUpdateRequest, Itinerary>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()) // Id should not be updated
-                .ForMember(dest => dest.Status, opt => opt.Ignore()); // Status should not be updated here
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
             //Map ItineraryActivity entity to ItineraryActivityDTO for responses
             CreateMap<ItineraryActivity, ItineraryActivityDTO>();
             //Map ItineraryActivityCreateDTO to ItineraryActivity entity for creating new itinerary activities

@@ -23,14 +23,11 @@ namespace TouRest.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<ItineraryDTO> AddItinerary(ItineraryCreateRequest create)
+        public async Task<ItineraryDTO> AddItinerary(Guid agencyId, ItineraryCreateRequest create)
         {
             var itinerary = _mapper.Map<Itinerary>(create);
             //after mapping, set default values for fields that are not in the create request
-            itinerary.Status = ItineraryStatus.Draft;
-            itinerary.Id = Guid.NewGuid();
-            itinerary.CreatedAt = DateTime.UtcNow;
-            itinerary.UpdatedAt = DateTime.UtcNow;
+            itinerary.AgencyId = agencyId;
             var result = await _itineraryRepository.CreateAsync(itinerary);
             return _mapper.Map<ItineraryDTO>(result);
         }
@@ -59,9 +56,8 @@ namespace TouRest.Application.Services
             if (!ItineraryStatusTransitions.CanTransition(existing.Status, update.Status))
                 throw new InvalidOperationException(
                     $"Invalid transition from {existing.Status} to {update.Status}");
-            var itinerary = _mapper.Map<Itinerary>(update);
-            itinerary.Id = id;
-            var result = await _itineraryRepository.UpdateAsync(itinerary);
+            _mapper.Map(update, existing);
+            var result = await _itineraryRepository.UpdateAsync(existing);
             return _mapper.Map<ItineraryDTO>(result);
         }
         public async Task<ItineraryDTO?> GetItineraryById(Guid id)
