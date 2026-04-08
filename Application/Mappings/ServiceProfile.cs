@@ -15,9 +15,18 @@ namespace TouRest.Application.Mappings
         {
             //Mapping configurations for Service
             CreateMap<Service, ServiceDTO>();
-            //Mapping create and update DTOs to entity
-            CreateMap<ServiceCreateRequest, Service>();
-            CreateMap<ServiceUpdateRequest, Service>();
+            // For creating new service, we don't want to include Id, CreatedAt, UpdatedAt, and Provider navigation property
+            CreateMap<ServiceCreateRequest, Service>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src=> Guid.NewGuid()))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Provider, opt => opt.Ignore());
+            // For updating service, we want to ignore Id, CreatedAt, and Provider navigation property
+            CreateMap<ServiceUpdateRequest, Service>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Provider, opt => opt.Ignore());
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TouRest.Api.Common;
+using TouRest.Api.Extensions;
 using TouRest.Application.Common.Helpers;
 using TouRest.Application.DTOs.ItineraryStop;
 using TouRest.Application.Interfaces;
@@ -35,8 +36,8 @@ namespace TouRest.Api.Controllers
             {
                 return ApiResponseFactory.NoContent("Itinerary not found");
             }
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null || itinerary.AgencyId.ToString() != userId)
+            var userId = User.GetUserId();
+            if (itinerary.AgencyId != userId)
             {
                 return ApiResponseFactory.NoContent("Unauthorized");
             }
@@ -57,8 +58,8 @@ namespace TouRest.Api.Controllers
             {
                 return ApiResponseFactory.NoContent("Itinerary not found");
             }
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null || itinerary.AgencyId.ToString() != userId)
+            var userId = User.GetUserId();
+            if ( itinerary.AgencyId!= userId)
             {
                 return ApiResponseFactory.NoContent("Unauthorized");
             }
@@ -82,8 +83,8 @@ namespace TouRest.Api.Controllers
             {
                 return ApiResponseFactory.NoContent("Itinerary not found");
             }
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null || itinerary.AgencyId.ToString() != userId)
+            var userId = User.GetUserId();
+            if (itinerary.AgencyId != userId)
             {
                 return ApiResponseFactory.NoContent("Unauthorized");
             }

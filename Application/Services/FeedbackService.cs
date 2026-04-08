@@ -53,8 +53,12 @@ namespace TouRest.Application.Services
         }
         public async Task<FeedbackDTO> UpdateFeedback(Guid id, FeedbackUpdateRequest update)
         {
-            var feedback = _mapper.Map<Feedback>(update);
-            feedback.Id = id;
+            var feedback = await _feedbackRepository.GetFeedback(id);
+            if(feedback == null)
+            {
+                throw new Exception("Feedback not found");
+            }
+            _mapper.Map(update, feedback);
             var result = await _feedbackRepository.UpdateAsync(feedback);
             return _mapper.Map<FeedbackDTO>(result);
         }
