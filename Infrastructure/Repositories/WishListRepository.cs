@@ -15,30 +15,36 @@ namespace TouRest.Infrastructure.Repositories
         public WishListRepository(AppDbContext context) : base(context)
         {
         }
-        public async Task<List<Wishlist>> GetWishListsByUserIdAsync(Guid userId)
+
+        public async Task<IEnumerable<Wishlist>> GetByUserIdAsync(Guid userId)
         {
-            return await _context.Wishlists.Where(w => w.UserId == userId).Include(x=>x.User).ToListAsync();
+            return await _context.Wishlists
+                .AsNoTracking()
+                .Where(w => w.UserId == userId)
+                .OrderByDescending(w => w.CreatedAt)
+                .ToListAsync();
         }
-        public async Task<Wishlist?> GetWishList(Guid id)
+
+        public async Task<Wishlist?> GetDuplicateAsync(Guid userId, Guid itemId)
         {
-            return await _context.Wishlists.Include(x => x.User).FirstOrDefaultAsync(w => w.Id == id);
+            return await _context.Wishlists
+                .AsNoTracking()
+                .FirstOrDefaultAsync(w => w.UserId == userId && w.ItemId == itemId);
         }
-        public async Task<List<Wishlist>> GetWishLists()
+
+        public async Task<bool> UserExistsAsync(Guid userId)
         {
-            return await _context.Wishlists.Include(x => x.User).AsNoTracking().ToListAsync();
+            return await _context.Users.AnyAsync(u => u.Id == userId);
         }
-         public async Task<List<Wishlist>> GetWishLists(WishListSearch search)
+
+        public async Task<bool> ServiceExistsAsync(Guid serviceId)
         {
-            var query = _context.Wishlists.Include(x => x.User).AsNoTracking().AsQueryable();
-            if(search.ItemType.HasValue)
-            {
-                query = query.Where(w => w.ItemType == search.ItemType.Value);
-                if(search.ItemId.HasValue)
-                {
-                    query = query.Where(w => w.ItemId == search.ItemId.Value);
-                }
-            }
-            return await query.ToListAsync();
+            return await _context.Services.AnyAsync(s => s.Id == serviceId);
+        }
+
+        public async Task<bool> PackageExistsAsync(Guid packageId)
+        {
+            return await _context.Packages.AnyAsync(p => p.Id == packageId);
         }
     }
 }

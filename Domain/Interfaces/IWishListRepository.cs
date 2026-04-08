@@ -8,15 +8,25 @@ using TouRest.Domain.Enums;
 
 namespace TouRest.Domain.Interfaces
 {
+    //public interface IWishListRepository : IBaseRepository<Wishlist>
+    //{
+    //    Task<List<Wishlist>> GetWishListsByUserIdAsync(Guid userId);
+    //    Task<Wishlist?> GetWishList(Guid id);
+    //    Task<List<Wishlist>> GetWishLists(WishListSearch search);
+    //}
+    //public class WishListSearch
+    //{
+    //    public Guid? ItemId { get; set; }
+    //    public WishlistItemType? ItemType { get; set; }
+    //}
+
     public interface IWishListRepository : IBaseRepository<Wishlist>
     {
-        Task<List<Wishlist>> GetWishListsByUserIdAsync(Guid userId);
-        Task<Wishlist?> GetWishList(Guid id);
-        Task<List<Wishlist>> GetWishLists(WishListSearch search);
+        Task<IEnumerable<Wishlist>> GetByUserIdAsync(Guid userId);
+        Task<Wishlist?> GetDuplicateAsync(Guid userId, Guid itemId);
+        Task<bool> UserExistsAsync(Guid userId);
+        Task<bool> ServiceExistsAsync(Guid serviceId);
+        Task<bool> PackageExistsAsync(Guid packageId);
     }
-    public class WishListSearch
-    {
-        public Guid? ItemId { get; set; }
-        public WishlistItemType? ItemType { get; set; }
-    }
+
 }
