@@ -20,6 +20,7 @@ namespace TouRest.Infrastructure
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();
+            services.AddScoped<IPackageServiceRepository, PackageServiceRepository>();
 
             // Register Services
             services.AddScoped<IJwtService, JwtService>();
