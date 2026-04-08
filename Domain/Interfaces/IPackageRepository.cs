@@ -9,5 +9,6 @@ namespace TouRest.Domain.Interfaces
 {
     public interface IPackageRepository : IBaseRepository<Package>
     {
+        Task<Package?> GetByCodeAsync(string code);
     }
 }

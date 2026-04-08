@@ -6,7 +6,21 @@ using System.Threading.Tasks;
 
 namespace TouRest.Application.DTOs.Package
 {
-    internal class PackageCreateRequest
+    public class PackageCreateRequest
     {
+        [Required]
+        [MaxLength(50)]
+        public string Code { get; set; } = null!;
+
+        [Required]
+        [MaxLength(255)]
+        public string Name { get; set; } = null!;
+
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "BasePrice must be greater than 0")]
+        public int BasePrice { get; set; }
+
+        [Required]
+        public PackageStatus Status { get; set; }
     }
 }
