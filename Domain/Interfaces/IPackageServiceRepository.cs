@@ -11,9 +11,12 @@ namespace TouRest.Domain.Interfaces
     {
         Task<List<PackageService>> GetPackageServicesByServiceId(Guid serviceId);
         Task<List<PackageService>> GetPackageServicesByPackageId(Guid packageId);
-        Task<PackageService> GetPackageService(Guid packageId, Guid serviceId);
+        Task<PackageService?> GetPackageService(Guid packageId, Guid serviceId);
+        Task<PackageService> CreateAsync(PackageService packageService);
         Task<PackageService> UpdateAsync(PackageService packageService);
         Task<bool> DeleteAsync(Guid packageId, Guid serviceId);
-        Task<PackageService> CreateAsync(PackageService packageService);
+        Task<bool> ExistsSortOrderInPackage(Guid packageId, int sortOrder, Guid? excludeServiceId = null);
+        Task<bool> PackageExists(Guid packageId);
+        Task<bool> ServiceExists(Guid serviceId);
     }
 }
