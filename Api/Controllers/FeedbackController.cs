@@ -93,28 +93,28 @@ namespace TouRest.Api.Controllers
         //    return Ok(result);
         //}
 
-        //// GET: api/feedback
-        //[HttpGet]
-        //public async Task<IActionResult> GetFeedbacks(
-        //    [FromQuery] string? bookingCode,
-        //    [FromQuery] FeedbackItemType? itemType,
-        //    [FromQuery] int? rating,
-        //    [FromQuery] string? title,
-        //    [FromQuery] bool? isAnonymous,
-        //    [FromQuery] FeedbackStatus? status)
-        //{
-        //    var search = new FeedbackSearch
-        //    {
-        //        BookingCode = bookingCode,
-        //        ItemType = itemType,
-        //        Rating = rating,
-        //        Title = title,
-        //        IsAnonymous = isAnonymous,
-        //        Status = status
-        //    };
+        // GET: api/feedback
+        [HttpGet("search")]
+        public async Task<IActionResult> GetFeedbacks(
+            [FromQuery] string? bookingCode,
+            [FromQuery] FeedbackItemType? itemType,
+            [FromQuery] int? rating,
+            [FromQuery] string? title,
+            [FromQuery] bool? isAnonymous,
+            [FromQuery] FeedbackStatus? status)
+        {
+            var search = new FeedbackSearch
+            {
+                BookingCode = bookingCode,
+                ItemType = itemType,
+                Rating = rating,
+                Title = title,
+                IsAnonymous = isAnonymous,
+                Status = status
+            };
 
-        //    var result = await _feedbackService.GetFeedbacks(search);
-        //    return Ok(result);
-        //}
+            var result = await _feedbackService.GetFeedbacks(search);
+            return Ok(result);
+        }
     }
 }
