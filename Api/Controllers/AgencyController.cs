@@ -57,7 +57,7 @@ namespace TouRest.Api.Controllers
         public async Task<IActionResult> CreateAgency([FromBody] AgencyCreateRequestDTO request)
         {
             var result = await _agencyService.AddAgency(request);
-            return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to approve.");
+            return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to appr");
         }
         [HttpPut]
         public async Task<IActionResult> UpdateAgency([FromBody] AgencyUpdateRequestDTO request)

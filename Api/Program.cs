@@ -110,6 +110,15 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role
     };
 });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AgencyOrAdmin", policy => policy.RequireRole(RoleCodes.Admin, RoleCodes.Agency));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole(RoleCodes.Admin));
+    options.AddPolicy("AgencyOnly", policy => policy.RequireRole(RoleCodes.Agency));
+    options.AddPolicy("ProviderOnly", policy => policy.RequireRole(RoleCodes.Provider));
+    options.AddPolicy("CustomerOnly", policy => policy.RequireRole(RoleCodes.Customer));
+    options.AddPolicy("ProviderOrAdmin", policy => policy.RequireRole(RoleCodes.Provider, RoleCodes.Admin));
+});
 builder.Services.AddApiServices();
 builder.Services.AddHangfire(config =>
     config.UseSqlServerStorage(Environment.GetEnvironmentVariable("DATABASE_CONNECTION")));
