@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TouRest.Domain.Base;
+using TouRest.Domain.Enums;
 
 namespace TouRest.Domain.Entities
 {
@@ -15,7 +16,7 @@ namespace TouRest.Domain.Entities
         public Guid UserId { get; set; }
 
         [Required]
-        public bool IsPrimaryContact { get; set; }
+        public AgencyUserRole Role { get; set; }
         // Navigation properties
         public Agency Agency { get; set; } = null!;
         public User User { get; set; } = null!;

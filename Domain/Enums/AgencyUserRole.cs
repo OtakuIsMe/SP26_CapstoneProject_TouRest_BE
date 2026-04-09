@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace TouRest.Domain.Enums
 {
-    public enum ProviderStatus
+    public enum AgencyUserRole
     {
-        Inactive = 0,
-        Active = 1,
-        Suspended = 2,
-        Pening = 3
+        Manager = 0,
+        Staff = 1,
+        Coordinator = 2
     }
 }
