@@ -10,10 +10,12 @@ namespace TouRest.Application.DTOs.Agency
 {
     public class AgencyDTO
     {
+        public Guid Id { get; set; }
         [MaxLength(255)]
         public string Name { get; set; } = null!;
 
-        public string Status { get; set; } = null!;
+        public AgencyStatus Status { get; set; }
+        public string Description { get; set; } = null!;
 
         [MaxLength(255)]
         public string ContactEmail { get; set; } = null!;

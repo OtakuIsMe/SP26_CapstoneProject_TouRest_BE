@@ -85,5 +85,14 @@ namespace TouRest.Infrastructure.Repositories
         {
             throw new NotImplementedException();
         }
+        public async Task<List<User>> GetUsers(UserSearch search)
+        {
+            return await _context.Users.Where(u =>
+                (string.IsNullOrEmpty(search.Email) || u.Email.Contains(search.Email)) &&
+                (!search.Status.HasValue || u.Status == search.Status.Value) &&
+                (!search.MonthCreated.HasValue || u.CreatedAt.Month == search.MonthCreated.Value.Month) &&
+                (!search.DayCreated.HasValue || u.CreatedAt.Day == search.DayCreated.Value.Day)
+            ).ToListAsync();
+        }
     }
 }

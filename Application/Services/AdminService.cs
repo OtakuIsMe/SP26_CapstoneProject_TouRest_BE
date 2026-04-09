@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Agency;
 using TouRest.Application.DTOs.Provider;
+using TouRest.Application.DTOs.User;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Entities;
 using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
@@ -53,6 +55,11 @@ namespace TouRest.Application.Services
             return _mapper.Map<List<ProviderDTO>>(list);
         }
 
+        public async Task<List<UserDTO>> GetUsers(UserSearch search)
+        {
+            var list = await _adminRepository.GetUsers(search);
+            return _mapper.Map<List<UserDTO>>(list);
+        }
 
         public Task PromoteToAdminAsync(Guid userId)
         {
@@ -73,5 +80,6 @@ namespace TouRest.Application.Services
         {
             await _adminRepository.UnbanUserAsync(userId);
         }
+        
     }
 }

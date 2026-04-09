@@ -16,6 +16,9 @@ namespace TouRest.Domain.Entities
         public AgencyStatus Status { get; set; }
 
         [Required]
+        [MaxLength(1000)]
+        public string Description { get; set; } = null!;
+        [Required]
         [MaxLength(255)]
         public string ContactEmail { get; set; } = null!;
 

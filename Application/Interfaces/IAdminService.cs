@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using TouRest.Application.DTOs.Agency;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.DTOs.Service;
+using TouRest.Application.DTOs.User;
+using TouRest.Domain.Entities;
 using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
@@ -23,5 +25,6 @@ namespace TouRest.Application.Interfaces
         Task RejectProvider(Guid providerId);
         Task<List<AgencyDTO>> GetAgencies(AgencySearch search);
         Task<List<ProviderDTO>> GetProviders(ProviderSearch search);
+        Task<List<UserDTO>> GetUsers(UserSearch search);
     }
 }

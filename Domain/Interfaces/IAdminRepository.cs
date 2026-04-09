@@ -20,6 +20,7 @@ namespace TouRest.Domain.Interfaces
         Task RejectProvider(Guid providerId);
         Task<List<Agency>> GetAgencies(AgencySearch search);
         Task<List<Provider>> GetProviders(ProviderSearch search);
+        Task<List<User>> GetUsers(UserSearch search);
     }
     public class AgencySearch
     {
@@ -35,5 +36,12 @@ namespace TouRest.Domain.Interfaces
         public DateTime? MonthCreated { get; set; }
         public DateTime? DayCreated { get; set; }
 
+    }
+    public class UserSearch
+    {
+        public string? Email { get; set; }
+        public UserStatus? Status { get; set; }
+        public DateTime? MonthCreated { get; set; }
+        public DateTime? DayCreated { get; set; }
     }
 }
