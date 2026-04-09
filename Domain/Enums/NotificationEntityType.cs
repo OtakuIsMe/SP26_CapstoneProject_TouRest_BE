@@ -12,6 +12,7 @@ namespace TouRest.Domain.Enums
         Service = 1,
         Package = 2,
         Itinerary = 3,
-        Refund = 4
+        Refund = 4,
+        Other = 5
     }
 }

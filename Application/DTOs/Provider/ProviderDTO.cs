@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TouRest.Application.DTOs.Admin
+namespace TouRest.Application.DTOs.Provider
 {
-    public class ProviderSearch
+    public class ProviderDTO
     {
     }
 }

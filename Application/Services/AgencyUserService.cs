@@ -4,34 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Services
 {
     public class AgencyUserService : IAgencyUserService
     {
-        public Task AddUserToAgencyAsync(Guid agencyId, Guid userId)
+        private readonly IAgencyUserRepository _agencyRepository;
+        public AgencyUserService(IAgencyUserRepository agencyRepository)
         {
-            throw new NotImplementedException();
+            _agencyRepository = agencyRepository;
+        }
+        public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId)
+        {
+            await _agencyRepository.AddUserToAgencyAsync(agencyId, userId);
         }
 
-        public Task<List<Guid>> GetAgenciesForUserAsync(Guid userId)
+        public async Task<bool> IsUserInAgencyAsync(Guid agencyId, Guid userId)
         {
-            throw new NotImplementedException();
+           return  await _agencyRepository.IsUserInAgencyAsync(userId, agencyId);
         }
 
-        public Task<List<Guid>> GetUsersInAgencyAsync(Guid agencyId)
+        public async Task RemoveUserFromAgencyAsync(Guid agencyId, Guid userId)
         {
-            throw new NotImplementedException();
-        }
+            await _agencyRepository.RemoveUserFromAgencyAsync(agencyId, userId);
 
-        public Task<bool> IsUserInAgencyAsync(Guid agencyId, Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RemoveUserFromAgencyAsync(Guid agencyId, Guid userId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

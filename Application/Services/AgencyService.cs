@@ -50,9 +50,9 @@ namespace TouRest.Application.Services
             return _mapper.Map<AgencyDTO>(updatedAgency);
         }
 
-        public async Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId)
+        public async Task<List<AgencyUserDTO>> GetAgencyUsers(Guid agencyId)
         {
-            return await _agencyRepository.GetAgencyUsers(agencyId);
+            return _mapper.Map<List<AgencyUserDTO>>(await _agencyRepository.GetAgencyUsers(agencyId));
         }
     }
 

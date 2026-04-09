@@ -23,6 +23,12 @@ namespace TouRest.Application.Mappings
             CreateMap<AgencyUpdateRequestDTO, Agency>()
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
+            // Mapping for AgencyUserDTO
+            CreateMap<AgencyUser, AgencyUserDTO>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.AgencyName, opt => opt.MapFrom(src => src.Agency.Name))
+                .ForMember(dest => dest.IsPrimaryContact, opt => opt.MapFrom(src => src.IsPrimaryContact));
 
 
         }

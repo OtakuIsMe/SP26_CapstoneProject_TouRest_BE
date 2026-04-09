@@ -1,59 +1,77 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TouRest.Application.DTOs.Admin;
 using TouRest.Application.DTOs.Agency;
+using TouRest.Application.DTOs.Provider;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Enums;
+using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Services
 {
     public class AdminService : IAdminService
     {
-        public Task ApproveAgency(Guid agencyId)
+        private readonly IAdminRepository _adminRepository;
+        private readonly IMapper _mapper;
+        public AdminService(IAdminRepository adminRepository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _adminRepository = adminRepository;
+            _mapper = mapper;
+        }
+        public async Task ApproveAgency(Guid agencyId)
+        {
+            await _adminRepository.ApproveAgency(agencyId);
         }
 
-        public Task ApproveProvider(Guid providerId)
+        public async Task ApproveProvider(Guid providerId)
         {
-            throw new NotImplementedException();
+            await _adminRepository.ApproveProvider(providerId);
         }
 
-        public Task BanUserAsync(Guid userId)
+        public async Task BanUserAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            await _adminRepository.BanUserAsync(userId);
         }
 
-        public Task DemoteFromAdminAsync(Guid userId)
+        public async Task DemoteFromAdminAsync(Guid userId, Guid roleId, UserStatus? status)
         {
-            throw new NotImplementedException();
+            await _adminRepository.DemoteFromAdminAsync(userId, roleId, status);
         }
 
-        public Task<List<AgencyDTO>> GetAgencies(AgencySearch search)
+        public async Task<List<AgencyDTO>> GetAgencies(AgencySearch search)
         {
-            throw new NotImplementedException();
+            var list = await _adminRepository.GetAgencies(search);
+            return _mapper.Map<List<AgencyDTO>>(list);
         }
+
+        public async Task<List<ProviderDTO>> GetProviders(ProviderSearch search)
+        {
+            var list = await _adminRepository.GetProviders(search);
+            return _mapper.Map<List<ProviderDTO>>(list);
+        }
+
 
         public Task PromoteToAdminAsync(Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task RejectAgency(Guid agencyId)
+        public async Task RejectAgency(Guid agencyId)
         {
-            throw new NotImplementedException();
+            await _adminRepository.RejectAgency(agencyId);
         }
 
-        public Task RejectProvider(Guid providerId)
+        public async Task RejectProvider(Guid providerId)
         {
-            throw new NotImplementedException();
+            await _adminRepository.RejectProvider(providerId);
         }
 
-        public Task UnbanUserAsync(Guid userId)
+        public async Task UnbanUserAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            await _adminRepository.UnbanUserAsync(userId);
         }
     }
 }

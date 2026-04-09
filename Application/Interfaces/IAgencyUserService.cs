@@ -10,8 +10,6 @@ namespace TouRest.Application.Interfaces
     {
         Task<bool> IsUserInAgencyAsync(Guid userId, Guid agencyId);
         Task AddUserToAgencyAsync(Guid agencyId, Guid userId);
-        Task<List<Guid>> GetAgenciesForUserAsync(Guid userId);
-        Task<List<Guid>> GetUsersInAgencyAsync(Guid agencyId);
         Task RemoveUserFromAgencyAsync(Guid agencyId, Guid userId);
     }
 }
