@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,10 @@ namespace TouRest.Infrastructure.Repositories
     {
         public BookingRepository(AppDbContext context) : base(context)
         {
+        }
+        public async Task<List<Booking>> GetBookingsByUserIdAsync(Guid userId)
+        {
+            return await _context.Bookings.Where(b => b.UserId == userId).ToListAsync();
         }
     }
 }

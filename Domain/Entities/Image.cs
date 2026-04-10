@@ -14,10 +14,11 @@ namespace TouRest.Domain.Entities
 
         [Required]
         public ImageType Type { get; set; }
-        //[Required]
-        //public Guid TypeId { get; set; }
 
-        // Navigation
-        public User Users { get; set; } = null!;
+        [Required]
+        public Guid TypeId { get; set; }
+        [Required]
+        public int PicNumber { get; set; }
+        public User User { get; set; } = null!;
     }
 }

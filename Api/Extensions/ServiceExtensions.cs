@@ -11,12 +11,15 @@ namespace TouRest.Api.Extensions
         public static IServiceCollection AddApiServices(this IServiceCollection services)
         {
             //Add repositories to the DI container, count = 14
+            services.AddScoped<IAgencyRepository, AgencyRepository>();
+            services.AddScoped<IAgencyUserRepository, AgencyUserRepository>();
             services.AddScoped<IBookingItineraryRepository, BookingItineraryRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddScoped<IItineraryActivityRepository, ItineraryActivityRepository>();
             services.AddScoped<IItineraryRepository, ItineraryRepository>();
             services.AddScoped<IItineraryStopRepository, ItineraryStopRepository>();
+            services.AddScoped<NotificationRepository, NotificationRepository>();
             services.AddScoped<IPackageRepository, PackageRepository>();
             services.AddScoped<IPackageServiceRepository, PackageServiceRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();
@@ -25,6 +28,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();
+            services.AddScoped<VoucherRepository, VoucherRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
             //Add services to the DI container, count = 15
             services.AddScoped<IAuthService, AuthService>();

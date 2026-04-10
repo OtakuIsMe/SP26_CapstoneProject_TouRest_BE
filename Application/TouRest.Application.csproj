@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\Admin\**" />
+    <EmbeddedResource Remove="DTOs\Admin\**" />
+    <None Remove="DTOs\Admin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Domain\TouRest.Domain.csproj" />
   </ItemGroup>
 
@@ -14,10 +20,6 @@
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DTOs\Admin\" />
   </ItemGroup>
 
 </Project>
