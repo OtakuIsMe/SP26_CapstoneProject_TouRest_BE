@@ -16,7 +16,7 @@ namespace TouRest.Api.Controllers
         {
             _reportService = reportService;
         }
-        [HttpGet("{Guid:id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetReport(Guid id)
         {
             var report = await _reportService.GetReport(id);
@@ -26,13 +26,13 @@ namespace TouRest.Api.Controllers
             }
             return ApiResponseFactory.Ok(report);
         }
-        [HttpGet("/search")]
+        [HttpGet("search")]
         public async Task<IActionResult> GetReports([FromQuery] ReportSearch search)
         {
             var reports = await _reportService.GetReports(search);
             return ApiResponseFactory.Ok(reports);
         }
-        [HttpPut("{Guid:id}")]
+        [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateReport(Guid id, [FromBody] ReportUpdateRequest update)
         {
             var report = await _reportService.UpdateReport(id, update);
@@ -44,7 +44,7 @@ namespace TouRest.Api.Controllers
             var report = await _reportService.AddReport(create);
             return ApiResponseFactory.Ok(report);
         }
-        [HttpDelete("{Guid:id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteReport(Guid id)
         {
             var result = await _reportService.DeleteReport(id);

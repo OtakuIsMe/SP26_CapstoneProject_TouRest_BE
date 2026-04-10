@@ -7,7 +7,7 @@ using TouRest.Domain.Entities;
 
 namespace TouRest.Domain.Interfaces
 {
-    public interface INotificationRepository
+    public interface INotificationRepository : IBaseRepository<Notification>
     {
         Task<List<Notification>> GetByUserIdAsync(Guid userId);
         Task<int> GetUnreadCountAsync(Guid userId);
