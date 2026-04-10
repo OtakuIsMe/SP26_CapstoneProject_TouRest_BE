@@ -15,7 +15,7 @@ namespace TouRest.Api.Controllers
         {
             _bookingService = bookingService;
         }
-        [HttpGet("{Guid:id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetBooking(Guid id)
         {
             var booking = await _bookingService.GetBookingAsync(id);
@@ -36,7 +36,7 @@ namespace TouRest.Api.Controllers
             await _bookingService.CreateBookingAsync(create);
             return ApiResponseFactory.Created( new {}, "Booking was created");
         }
-        [HttpPut("{Guid:id}")]
+        [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateBooking(Guid id, [FromBody] BookingUpdateRequest update)
         {
             var booking = await _bookingService.UpdateBookingAsync(id, update);
@@ -46,7 +46,7 @@ namespace TouRest.Api.Controllers
             }
             return ApiResponseFactory.Ok(booking);
         }
-         [HttpDelete("{Guid:id}")]
+         [HttpDelete("{id:guid}")]
          public async Task<IActionResult> DeleteBooking(Guid id)
             {
                 var result = await _bookingService.DeleteBookingAsync(id);

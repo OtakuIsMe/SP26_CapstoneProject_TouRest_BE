@@ -16,7 +16,7 @@ namespace TouRest.Api.Controllers
         {
             _feedbackService = feedbackService;
         }
-        [HttpGet("{Guid:id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetFeedback(Guid id)
         {
             var feedback = await _feedbackService.GetFeedback(id);
@@ -26,13 +26,13 @@ namespace TouRest.Api.Controllers
             }
             return ApiResponseFactory.Ok(feedback);
         }
-        [HttpGet("/search")]
+        [HttpGet("search")]
         public async Task<IActionResult> GetFeedbacks([FromQuery] FeedbackSearch search)
         {
             var feedbacks = await _feedbackService.GetFeedbacks(search);
             return ApiResponseFactory.Ok(feedbacks);
         }
-        [HttpPut("{Guid:id}")]
+        [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateFeedback(Guid id, [FromBody] FeedbackUpdateRequest update)
         {
             var feedback = await _feedbackService.UpdateFeedback(id, update);
@@ -44,7 +44,7 @@ namespace TouRest.Api.Controllers
             var feedback = await _feedbackService.AddFeedback(create);
             return ApiResponseFactory.Ok(feedback);
         }
-        [HttpDelete("{Guid:id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteFeedback(Guid id)
         {
             var result = await _feedbackService.DeleteFeedback(id);
@@ -54,7 +54,7 @@ namespace TouRest.Api.Controllers
             }
             return ApiResponseFactory.Ok(result);
         }
-        [HttpGet("/bookingItinerary/{Guid:bookingItineraryId}")]
+        [HttpGet("bookingItinerary/{bookingItineraryId:guid}")]
         public async Task<IActionResult> GetFeedbacksByBookingItineraryId(Guid bookingItineraryId)
         {
             var feedbacks = await _feedbackService.GetFeedbacksByBookingItineraryId(bookingItineraryId);
