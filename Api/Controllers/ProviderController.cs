@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TouRest.Api.Common;
+using TouRest.Api.Extensions;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.Interfaces;
 
@@ -36,11 +38,12 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "PROVIDER")]
+        [Authorize(Roles = "CUSTOMER")]
         public async Task<IActionResult> Create([FromBody] CreateProviderRequest request)
         {
+            var userId = User.GetUserRole();
             var result = await _providerService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            return ApiResponseFactory.Created(result);
         }
 
         [HttpPut("{id:guid}")]

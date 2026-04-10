@@ -9,5 +9,6 @@ namespace TouRest.Domain.Interfaces
 {
     public interface IBookingRepository : IBaseRepository<Booking>
     {
+        Task<List<Booking>> GetBookingsByUserIdAsync(Guid userId);
     }
 }

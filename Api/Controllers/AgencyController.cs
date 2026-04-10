@@ -53,11 +53,11 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok(new { }, "User removed from agency");
         }
         [HttpPost]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> CreateAgency([FromBody] AgencyCreateRequestDTO request)
         {
             var result = await _agencyService.AddAgency(request);
-            return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to appr");
+            return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to approve");
         }
         [HttpPut]
         public async Task<IActionResult> UpdateAgency([FromBody] AgencyUpdateRequestDTO request)

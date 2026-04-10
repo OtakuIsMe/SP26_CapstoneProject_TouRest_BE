@@ -52,7 +52,7 @@ namespace TouRest.Infrastructure.Persistence
             // Configure User - Image relationship
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Image)
-                .WithOne(i => i.Users)
+                .WithOne(i => i.User)
                 .HasForeignKey<User>(u => u.ImageId)
                 .OnDelete(DeleteBehavior.SetNull);
 
@@ -75,6 +75,12 @@ namespace TouRest.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(au => au.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // Configure Agency - User relationship (CreateByUserId)
+            modelBuilder.Entity<Agency>()
+            .HasOne(a => a.User)
+             .WithMany()
+             .HasForeignKey(a => a.CreateByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Itinerary - Agency relationship
             modelBuilder.Entity<Itinerary>()
@@ -172,6 +178,12 @@ namespace TouRest.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(pu => pu.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // Configure Provider - User relationship (CreateByUserId)
+            modelBuilder.Entity<Provider>()
+                .HasOne(p => p.User)
+             .WithMany()
+             .HasForeignKey(p => p.CreateByUserId)
+             .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Feedback - BookingItinerary relationship
             modelBuilder.Entity<Feedback>()

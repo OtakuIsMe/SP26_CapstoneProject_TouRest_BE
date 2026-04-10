@@ -47,7 +47,7 @@ namespace TouRest.Application.Services
                 Name = request.Name,
                 ContactEmail = request.ContactEmail,
                 ContactPhone = request.ContactPhone,
-                Status = ProviderStatus.Active,
+                Status = ProviderStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
