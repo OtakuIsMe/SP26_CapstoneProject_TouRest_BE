@@ -17,5 +17,6 @@ namespace TouRest.Application.Interfaces
         Task LogoutAsync(string refreshToken, Guid userId);
         Task<MeDTO> GetMeAsync(Guid userId);
         Task RegisterProviderAccountAsync(Guid createdByUserId, RegisterProviderAccountRequest request);
+        Task RegisterAgencyAccountAsync(Guid createdByUserId, RegisterAgencyAccountRequest request);
     }
 }

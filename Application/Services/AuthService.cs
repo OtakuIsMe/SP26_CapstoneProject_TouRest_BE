@@ -19,6 +19,8 @@ namespace TouRest.Application.Services
         private readonly IRoleRepository _roleRepository;
         private readonly IProviderRepository _providerRepository;
         private readonly IProviderUserRepository _providerUserRepository;
+        private readonly IAgencyRepository _agencyRepository;
+        private readonly IAgencyUserRepository _agencyUserRepository;
 
         public AuthService(
             IUserRepository userRepository,
@@ -28,7 +30,9 @@ namespace TouRest.Application.Services
             IMapper mapper,
             IRoleRepository roleRepository,
             IProviderRepository providerRepository,
-            IProviderUserRepository providerUserRepository)
+            IProviderUserRepository providerUserRepository,
+            IAgencyRepository agencyRepository,
+            IAgencyUserRepository agencyUserRepository)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
@@ -38,6 +42,8 @@ namespace TouRest.Application.Services
             _roleRepository = roleRepository;
             _providerRepository = providerRepository;
             _providerUserRepository = providerUserRepository;
+            _agencyRepository = agencyRepository;
+            _agencyUserRepository = agencyUserRepository;
         }
 
         public async Task<(AuthResponseDTO auth, string refreshToken)> LoginAsync(LoginRequestDTO request)
@@ -239,6 +245,57 @@ namespace TouRest.Application.Services
 
             // Shared DbContext nên gọi 1 SaveChanges ở repo cuối là đủ
             await _providerRepository.SaveChangesAsync();
+        }
+
+        public async Task RegisterAgencyAccountAsync(Guid createdByUserId, RegisterAgencyAccountRequest request)
+        {
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
+                throw new InvalidOperationException("User with this email already exists");
+
+            var existingAgency = await _agencyRepository.GetByContactEmailAsync(request.ContactEmail);
+            if (existingAgency != null)
+                throw new InvalidOperationException("Agency with this contact email already exists");
+
+            var agencyRole = await _roleRepository.GetByCodeAsync(RoleCodes.Agency);
+            if (agencyRole == null)
+                throw new InvalidOperationException("Agency role not found in database");
+
+            var agencyAccount = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = request.Username,
+                Email = request.Email,
+                Phone = request.Phone,
+                PasswordHash = _passwordHasher.HashPassword(request.Password),
+                RoleId = agencyRole.Id,
+                Status = UserStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _userRepository.CreateAsync(agencyAccount);
+
+            var agency = new Agency
+            {
+                Id = Guid.NewGuid(),
+                Name = request.AgencyName,
+                Description = request.Description,
+                Address = request.Address,
+                ContactEmail = request.ContactEmail,
+                ContactPhone = request.ContactPhone,
+                Status = AgencyStatus.Pending,
+
+                // ĐÚNG theo yêu cầu mới của cậu:
+                CreateByUserId = agencyAccount.Id,
+
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _agencyRepository.CreateAsync(agency);
+
+            await _agencyUserRepository.AddUserToAgencyAsync(agency.Id, agencyAccount.Id);
         }
     }
 }
