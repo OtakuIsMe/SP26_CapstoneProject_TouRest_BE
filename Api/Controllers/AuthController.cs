@@ -129,12 +129,15 @@ namespace TouRest.Api.Controllers
         }
 
         /// Register a new provider account
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPost("register-provider")]
         public async Task<IActionResult> RegisterProvider([FromBody] RegisterProviderAccountRequest request)
         {
-            _logger.LogInformation("Register provider endpoint called for email: {Email}", request.Email);
+            _logger.LogInformation("Register provider endpoint called for customer userId: {UserId}", User.GetUserId());
 
-            await _authService.RegisterProviderAccountAsync(request);
+            var currentUserId = User.GetUserId();
+
+            await _authService.RegisterProviderAccountAsync(currentUserId, request);
 
             return ApiResponseFactory.Created(new { }, "Provider account registered successfully");
         }

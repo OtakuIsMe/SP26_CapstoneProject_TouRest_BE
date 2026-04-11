@@ -34,6 +34,7 @@ namespace TouRest.Application.DTOs.Auth
         public decimal Longitude { get; set; }
 
         [Required]
+        [MaxLength(500)]
         public string Address { get; set; } = null!;
 
         [Required]
@@ -45,7 +46,7 @@ namespace TouRest.Application.DTOs.Auth
         [Required, EmailAddress]
         public string ContactEmail { get; set; } = null!;
 
-        [Required]
+        [Required, MaxLength(20)]
         public string ContactPhone { get; set; } = null!;
     }
 }

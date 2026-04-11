@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using TouRest.Application.Common.Constants;
 using TouRest.Application.Common.Exceptions;
 using TouRest.Application.DTOs.Auth;
@@ -176,7 +176,7 @@ namespace TouRest.Application.Services
             };
         }
 
-        public async Task RegisterProviderAccountAsync(RegisterProviderAccountRequest request)
+        public async Task RegisterProviderAccountAsync(Guid createdByUserId, RegisterProviderAccountRequest request)
         {
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser != null)
@@ -190,7 +190,7 @@ namespace TouRest.Application.Services
             if (providerRole == null)
                 throw new InvalidOperationException("Provider role not found in database");
 
-            var user = new User
+            var providerUser = new User
             {
                 Id = Guid.NewGuid(),
                 Username = request.Username,
@@ -203,7 +203,7 @@ namespace TouRest.Application.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _userRepository.CreateAsync(user);
+            await _userRepository.CreateAsync(providerUser);
 
             var provider = new Provider
             {
@@ -218,25 +218,26 @@ namespace TouRest.Application.Services
                 ContactEmail = request.ContactEmail,
                 ContactPhone = request.ContactPhone,
                 Status = ProviderStatus.Pending,
-                CreateByUserId = user.Id,
+                CreateByUserId = createdByUserId, // customer đang login
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             await _providerRepository.AddAsync(provider);
 
-            var providerUser = new ProviderUser
+            var link = new ProviderUser
             {
                 Id = Guid.NewGuid(),
                 ProviderId = provider.Id,
-                UserId = user.Id,
+                UserId = providerUser.Id, // account provider mới
                 Role = ProviderUserRole.Manager,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _providerUserRepository.AddAsync(providerUser);
+            await _providerUserRepository.AddAsync(link);
 
+            // Shared DbContext nên gọi 1 SaveChanges ở repo cuối là đủ
             await _providerRepository.SaveChangesAsync();
         }
     }
