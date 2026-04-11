@@ -127,5 +127,16 @@ namespace TouRest.Api.Controllers
                 Expires = DateTime.UtcNow.AddDays(AuthConstants.RefreshTokenExpiryDays)
             });
         }
+
+        /// Register a new provider account
+        [HttpPost("register-provider")]
+        public async Task<IActionResult> RegisterProvider([FromBody] RegisterProviderAccountRequest request)
+        {
+            _logger.LogInformation("Register provider endpoint called for email: {Email}", request.Email);
+
+            await _authService.RegisterProviderAccountAsync(request);
+
+            return ApiResponseFactory.Created(new { }, "Provider account registered successfully");
+        }
     }
 }

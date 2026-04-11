@@ -17,6 +17,8 @@ namespace TouRest.Application.Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
         private readonly IRoleRepository _roleRepository;
+        private readonly IProviderRepository _providerRepository;
+        private readonly IProviderUserRepository _providerUserRepository;
 
         public AuthService(
             IUserRepository userRepository,
@@ -24,7 +26,9 @@ namespace TouRest.Application.Services
             IRefreshTokenRepository refreshTokenRepository,
             IPasswordHasher passwordHasher,
             IMapper mapper,
-            IRoleRepository roleRepository)
+            IRoleRepository roleRepository,
+            IProviderRepository providerRepository,
+            IProviderUserRepository providerUserRepository)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
@@ -32,6 +36,8 @@ namespace TouRest.Application.Services
             _passwordHasher = passwordHasher;
             _mapper = mapper;
             _roleRepository = roleRepository;
+            _providerRepository = providerRepository;
+            _providerUserRepository = providerUserRepository;
         }
 
         public async Task<(AuthResponseDTO auth, string refreshToken)> LoginAsync(LoginRequestDTO request)
@@ -168,6 +174,70 @@ namespace TouRest.Application.Services
                 Phone = user.Phone,
                 Role = user.Role.Code.ToLower()
             };
+        }
+
+        public async Task RegisterProviderAccountAsync(RegisterProviderAccountRequest request)
+        {
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
+                throw new InvalidOperationException("User with this email already exists");
+
+            var existingProvider = await _providerRepository.GetByContactEmailAsync(request.ContactEmail);
+            if (existingProvider != null)
+                throw new InvalidOperationException("Provider with this contact email already exists");
+
+            var providerRole = await _roleRepository.GetByCodeAsync(RoleCodes.Provider);
+            if (providerRole == null)
+                throw new InvalidOperationException("Provider role not found in database");
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = request.Username,
+                Email = request.Email,
+                Phone = request.Phone,
+                PasswordHash = _passwordHasher.HashPassword(request.Password),
+                RoleId = providerRole.Id,
+                Status = UserStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _userRepository.CreateAsync(user);
+
+            var provider = new Provider
+            {
+                Id = Guid.NewGuid(),
+                Name = request.ProviderName,
+                Description = request.Description,
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
+                Address = request.Address,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                ContactEmail = request.ContactEmail,
+                ContactPhone = request.ContactPhone,
+                Status = ProviderStatus.Pending,
+                CreateByUserId = user.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _providerRepository.AddAsync(provider);
+
+            var providerUser = new ProviderUser
+            {
+                Id = Guid.NewGuid(),
+                ProviderId = provider.Id,
+                UserId = user.Id,
+                Role = ProviderUserRole.Manager,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _providerUserRepository.AddAsync(providerUser);
+
+            await _providerRepository.SaveChangesAsync();
         }
     }
 }
