@@ -253,7 +253,6 @@ namespace TouRest.Application.Services
             if (existingUser != null)
                 throw new InvalidOperationException("User with this email already exists");
 
-            // Nếu Agency có contact email unique thì check
             var existingAgency = await _agencyRepository.GetByContactEmailAsync(request.ContactEmail);
             if (existingAgency != null)
                 throw new InvalidOperationException("Agency with this contact email already exists");
@@ -280,28 +279,21 @@ namespace TouRest.Application.Services
             var agency = new Agency
             {
                 Id = Guid.NewGuid(),
-                Name = request.AgencyName,              // đổi theo entity thật nếu khác
-                Description = request.Description,      // đổi theo entity thật nếu khác
-                Address = request.Address,              // đổi theo entity thật nếu khác
-                ContactEmail = request.ContactEmail,    // đổi theo entity thật nếu khác
-                ContactPhone = request.ContactPhone,    // đổi theo entity thật nếu khác
+                Name = request.AgencyName,
+                Description = request.Description,
+                Address = request.Address,
+                ContactEmail = request.ContactEmail,
+                ContactPhone = request.ContactPhone,
                 Status = AgencyStatus.Pending,
-                CreateByUserId = createdByUserId,
+
+                // ĐÚNG theo yêu cầu mới của cậu:
+                CreateByUserId = agencyAccount.Id,
+
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             await _agencyRepository.CreateAsync(agency);
-
-            var agencyUser = new AgencyUser
-            {
-                Id = Guid.NewGuid(),
-                AgencyId = agency.Id,
-                UserId = agencyAccount.Id,
-                Role = AgencyUserRole.Manager, // thay bằng role cao nhất mà enum của cậu có
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
 
             await _agencyUserRepository.AddUserToAgencyAsync(agency.Id, agencyAccount.Id);
         }
