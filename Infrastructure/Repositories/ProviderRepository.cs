@@ -38,6 +38,12 @@ namespace TouRest.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.ContactEmail == contactEmail);
         }
 
+        public async Task<Provider?> GetByCreateByUserIdAsync(Guid userId)
+        {
+            return await _context.Providers
+                .FirstOrDefaultAsync(x => x.CreateByUserId == userId);
+        }
+
         public async Task<bool> ExistsByContactEmailAsync(string contactEmail)
         {
             return await _context.Providers
