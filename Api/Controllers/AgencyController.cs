@@ -15,11 +15,14 @@ namespace TouRest.Api.Controllers
         private readonly ILogger<AgencyController> _logger;
         private readonly IAgencyService _agencyService;
         private readonly IAgencyUserService _agencyUserService;
-        public AgencyController(ILogger<AgencyController> logger, IAgencyService agencyService, IAgencyUserService agencyUserService)
+        private readonly IAuthService _authService;
+        public AgencyController(ILogger<AgencyController> logger, IAgencyService agencyService,
+            IAgencyUserService agencyUserService, IAuthService authService)
         {
             _logger = logger;
             _agencyService = agencyService;
             _agencyUserService = agencyUserService;
+            _authService = authService;
         }
         [HttpGet("{id:guid}")]
         [Authorize(Roles = "ADMIN, AGENCY")]
@@ -35,14 +38,16 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = "ADMIN, AGENCY")]
         public async Task<IActionResult> GetAgencyUsers(Guid agencyId)
         {
-            var users = await _agencyService.GetAgencyUsers(agencyId);
+            var users = await _agencyUserService.GetAgencyUsers(agencyId);
             return ApiResponseFactory.Ok(users);
         }
         [HttpPost("{id:guid}/add-user")]
-        [Authorize(Roles = "ADMIN, AGENCY")]
-        public async Task<IActionResult> AddUserToAgency(Guid id, [FromBody] Guid userId)
+        [Authorize(Roles = "AGENCY")]
+        public async Task<IActionResult> AddUserToAgency()
         {
-            await _agencyUserService.AddUserToAgencyAsync(id, userId);
+            var id = User.GetUserId();
+            var agency = await _agencyService.GetAgencyByUserId(id);
+            await _agencyUserService.AddUserToAgencyAsync(id);
             return ApiResponseFactory.Ok(new { }, "User added to agency");
         }
         [HttpPost("{id:guid}/remove-user")]

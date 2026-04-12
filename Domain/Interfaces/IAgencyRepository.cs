@@ -9,6 +9,6 @@ namespace TouRest.Domain.Interfaces
 {
     public interface IAgencyRepository : IBaseRepository<Agency>
     {
-        Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId);
+        
     }
 }

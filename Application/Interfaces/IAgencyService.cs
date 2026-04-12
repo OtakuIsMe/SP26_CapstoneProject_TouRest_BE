@@ -10,7 +10,7 @@ namespace TouRest.Application.Interfaces
 {
     public interface IAgencyService
     {
-        Task<List<AgencyUserDTO>> GetAgencyUsers(Guid agencyId);
+
         Task<AgencyDTO> GetAgencyById(Guid id);
         Task<AgencyDTO> AddAgency(AgencyCreateRequestDTO create);
         Task<AgencyDTO> UpdateAgency(Guid id, AgencyUpdateRequestDTO update);

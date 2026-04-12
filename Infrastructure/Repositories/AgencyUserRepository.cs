@@ -36,5 +36,22 @@ namespace TouRest.Infrastructure.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId)
+        {
+            return await _context.AgencyUsers
+                .Where(au => au.AgencyId == agencyId)
+                .ToListAsync();
+        }
+        public async Task<List<AgencyUser>> SearchUsersByAgency(Guid id, SearchUserByAgency search)
+        {
+            return await _context.AgencyUsers.Include(au => au.User)
+                .Where(au => au.AgencyId == id && (string.IsNullOrEmpty(search.FullName) || au.User.FullName.Contains(search.FullName)))
+                .ToListAsync();
+        }
+        public async Task<AgencyUser?> GetAgencyUserByUserId(Guid userId)
+        {
+            return await _context.AgencyUsers.Include(au => au.User)
+                .FirstOrDefaultAsync(au => au.UserId == userId);
+        }
     }
 }
