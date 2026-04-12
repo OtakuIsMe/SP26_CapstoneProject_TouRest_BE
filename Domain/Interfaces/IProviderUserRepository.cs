@@ -7,9 +7,8 @@ using TouRest.Domain.Entities;
 
 namespace TouRest.Domain.Interfaces
 {
-    public interface IAgencyRepository : IBaseRepository<Agency>
+    public interface IProviderUserRepository
     {
-        Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId);
-        Task<Agency?> GetByContactEmailAsync(string contactEmail);
+        Task AddAsync(ProviderUser providerUser);
     }
 }

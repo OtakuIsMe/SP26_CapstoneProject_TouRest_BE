@@ -16,5 +16,7 @@ namespace TouRest.Application.Interfaces
         Task<(AuthResponseDTO auth, string refreshToken)> RefreshTokenAsync(string refreshToken, Guid userId);
         Task LogoutAsync(string refreshToken, Guid userId);
         Task<MeDTO> GetMeAsync(Guid userId);
+        Task RegisterProviderAccountAsync(Guid createdByUserId, RegisterProviderAccountRequest request);
+        Task RegisterAgencyAccountAsync(Guid createdByUserId, RegisterAgencyAccountRequest request);
     }
 }

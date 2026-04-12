@@ -13,5 +13,18 @@ namespace TouRest.Infrastructure.Repositories
     public class AgencyRepository : BaseRepository<Agency>, IAgencyRepository
     {
         public AgencyRepository(AppDbContext context) : base(context) { }
+
+        public async Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId)
+        {
+            return await _context.AgencyUsers
+                .Where(au => au.AgencyId == agencyId)
+                .ToListAsync();
+        }
+
+        public async Task<Agency?> GetByContactEmailAsync(string contactEmail)
+        {
+            return await _context.Agencies
+                .FirstOrDefaultAsync(a => a.ContactEmail == contactEmail);
+        }
     }
 }

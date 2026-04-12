@@ -23,6 +23,9 @@ namespace TouRest.Infrastructure
             services.AddScoped<IPackageServiceRepository, PackageServiceRepository>();
             services.AddScoped<IVoucherRepository, VoucherRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
+            services.AddScoped<IProviderUserRepository, ProviderUserRepository>();
+            services.AddScoped<IAgencyRepository, AgencyRepository>();
+            services.AddScoped<IAgencyUserRepository, AgencyUserRepository>();
 
             // Register Services
             services.AddScoped<IJwtService, JwtService>();

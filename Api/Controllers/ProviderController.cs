@@ -41,8 +41,8 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = "CUSTOMER")]
         public async Task<IActionResult> Create([FromBody] CreateProviderRequest request)
         {
-            var userId = User.GetUserRole();
-            var result = await _providerService.CreateAsync(request);
+            var userId = User.GetUserId();
+            var result = await _providerService.CreateAsync(userId, request);
             return ApiResponseFactory.Created(result);
         }
 

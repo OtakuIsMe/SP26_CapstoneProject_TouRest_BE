@@ -12,6 +12,7 @@ namespace TouRest.Domain.Interfaces
         Task<List<Provider>> GetAllAsync();
         Task<Provider?> GetByIdAsync(Guid id);
         Task<Provider?> GetByContactEmailAsync(string contactEmail);
+        Task<Provider?> GetByCreateByUserIdAsync(Guid userId);
         Task<bool> ExistsByContactEmailAsync(string contactEmail);
         Task AddAsync(Provider provider);
         void Update(Provider provider);

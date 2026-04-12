@@ -127,5 +127,33 @@ namespace TouRest.Api.Controllers
                 Expires = DateTime.UtcNow.AddDays(AuthConstants.RefreshTokenExpiryDays)
             });
         }
+
+        /// Register a new provider account
+        [Authorize(Roles = "CUSTOMER")]
+        [HttpPost("register-provider")]
+        public async Task<IActionResult> RegisterProvider([FromBody] RegisterProviderAccountRequest request)
+        {
+            _logger.LogInformation("Register provider endpoint called for customer userId: {UserId}", User.GetUserId());
+
+            var currentUserId = User.GetUserId();
+
+            await _authService.RegisterProviderAccountAsync(currentUserId, request);
+
+            return ApiResponseFactory.Created(new { }, "Provider account registered successfully");
+        }
+
+        /// Register a new agency account
+        [Authorize(Roles = "CUSTOMER")]
+        [HttpPost("register-agency")]
+        public async Task<IActionResult> RegisterAgency([FromBody] RegisterAgencyAccountRequest request)
+        {
+            _logger.LogInformation("Register agency endpoint called for customer userId: {UserId}", User.GetUserId());
+
+            var currentUserId = User.GetUserId();
+
+            await _authService.RegisterAgencyAccountAsync(currentUserId, request);
+
+            return ApiResponseFactory.Created(new { }, "Agency account registered successfully");
+        }
     }
 }
