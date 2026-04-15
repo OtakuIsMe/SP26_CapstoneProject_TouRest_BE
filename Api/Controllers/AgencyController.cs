@@ -43,17 +43,19 @@ namespace TouRest.Api.Controllers
         }
         [HttpPost("{id:guid}/add-user")]
         [Authorize(Roles = "AGENCY")]
-        public async Task<IActionResult> AddUserToAgency()
+        public async Task<IActionResult> AddUserToAgency(Guid userId, Guid agencyId)
         {
-            var id = User.GetUserId();
-            var agency = await _agencyService.GetAgencyByUserId(id);
-            await _agencyUserService.AddUserToAgencyAsync(id);
+            var user = User.GetUserId();
+            _logger.LogInformation("User {UserId} is adding user {AddedUserId} to agency {AgencyId}", user, userId, agencyId);
+            await _agencyUserService.AddUserToAgencyAsync(agencyId, userId);
             return ApiResponseFactory.Ok(new { }, "User added to agency");
         }
         [HttpPost("{id:guid}/remove-user")]
         [Authorize(Roles = "ADMIN, AGENCY")]
         public async Task<IActionResult> RemoveUserFromAgency(Guid id, [FromBody] Guid userId)
         {
+            var user = User.GetUserId();
+            _logger.LogInformation("User {UserId} is removing user {RemovedUserId} from agency {AgencyId}", user, userId, id);
             await _agencyUserService.RemoveUserFromAgencyAsync(id, userId);
             return ApiResponseFactory.Ok(new { }, "User removed from agency");
         }
@@ -61,13 +63,16 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> CreateAgency([FromBody] AgencyCreateRequestDTO request)
         {
+            var user = User.GetUserId();
+            _logger.LogInformation("User {UserId} is creating an agency with name {AgencyName}", user, request.Name);
             var result = await _agencyService.AddAgency(request);
             return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to approve");
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateAgency([FromBody] AgencyUpdateRequestDTO request)
+        public async Task<IActionResult> UpdateAgency(Guid agencyId, [FromBody] AgencyUpdateRequestDTO request)
         {
-            var agencyId = User.GetUserId();
+            var user = User.GetUserId();
+            _logger.LogInformation("User {UserId} is updating agency {AgencyId}", user, agencyId);
             var result = await _agencyService.UpdateAgency(agencyId, request);
             return ApiResponseFactory.Ok(result, "Agency updated");
         }

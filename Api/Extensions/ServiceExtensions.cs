@@ -32,6 +32,8 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IWishListRepository, WishListRepository>();
             //Add services to the DI container, count = 15
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAgencyService, AgencyService>();
+            services.AddScoped<IAgencyUserService, AgencyUserService>();    
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IBookingItineraryService, BookingItineraryService>();
             services.AddScoped<IFeedbackService, FeedbackService>();

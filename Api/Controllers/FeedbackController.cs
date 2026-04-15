@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TouRest.Application.DTOs.Feedback;
 using TouRest.Application.Interfaces;
@@ -28,6 +29,7 @@ namespace TouRest.Api.Controllers
 
         // GET: api/feedback/{id}
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> GetFeedback(Guid id)
         {
             var result = await _feedbackService.GetFeedback(id);
@@ -54,7 +56,8 @@ namespace TouRest.Api.Controllers
 
         // PUT: api/feedback/{id}
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateFeedback(Guid id, [FromBody] FeedbackUpdateRequest request)
+        [Authorize]
+        public async Task<IActionResult> UpdateFeedback(Guid id, [FromBody] FeedbackUpdateRequest update)
         {
             if (!ModelState.IsValid)
             {
@@ -63,7 +66,7 @@ namespace TouRest.Api.Controllers
 
             try
             {
-                var result = await _feedbackService.UpdateFeedback(id, request);
+                var result = await _feedbackService.UpdateFeedback(id, update);
                 return Ok(result);
             }
             catch (Exception ex)

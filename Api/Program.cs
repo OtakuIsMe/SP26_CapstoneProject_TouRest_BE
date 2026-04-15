@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using TouRest.Api.Extensions;
+using TouRest.Api.Hubs;
 using TouRest.Api.Middlewares;
 using TouRest.Application;
 using TouRest.Application.Common.Constants;
@@ -123,6 +124,7 @@ builder.Services.AddApiServices();
 builder.Services.AddHangfire(config =>
     config.UseSqlServerStorage(Environment.GetEnvironmentVariable("DATABASE_CONNECTION")));
 builder.Services.AddHangfireServer();
+builder.Services.AddSignalR();
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandler>();
 
@@ -139,5 +141,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<AppHub>("/appHub");
 
 app.Run();
