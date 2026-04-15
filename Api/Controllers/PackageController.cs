@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TouRest.Application.DTOs.Package;
 using TouRest.Application.Interfaces;
 
@@ -35,6 +36,7 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN, PROVIDER")]
         public async Task<IActionResult> Create([FromBody] PackageCreateRequest request)
         {
             var result = await _packageService.CreateAsync(request);
@@ -42,6 +44,7 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "ADMIN, PROVIDER")]
         public async Task<IActionResult> Update(Guid id, [FromBody] PackageUpdateRequest request)
         {
             var result = await _packageService.UpdateAsync(id, request);
@@ -54,6 +57,7 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "ADMIN, PROVIDER")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var deleted = await _packageService.DeleteAsync(id);

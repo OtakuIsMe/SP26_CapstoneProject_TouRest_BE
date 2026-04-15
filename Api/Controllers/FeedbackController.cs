@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
 using TouRest.Application.DTOs.Feedback;
@@ -17,6 +18,7 @@ namespace TouRest.Api.Controllers
             _feedbackService = feedbackService;
         }
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> GetFeedback(Guid id)
         {
             var feedback = await _feedbackService.GetFeedback(id);
@@ -27,12 +29,14 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok(feedback);
         }
         [HttpGet("search")]
+        [Authorize]
         public async Task<IActionResult> GetFeedbacks([FromQuery] FeedbackSearch search)
         {
             var feedbacks = await _feedbackService.GetFeedbacks(search);
             return ApiResponseFactory.Ok(feedbacks);
         }
         [HttpPut("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> UpdateFeedback(Guid id, [FromBody] FeedbackUpdateRequest update)
         {
             var feedback = await _feedbackService.UpdateFeedback(id, update);

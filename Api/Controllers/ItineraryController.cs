@@ -24,14 +24,12 @@ namespace TouRest.Api.Controllers
         }
         // API endpoints for Itinerary
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetItineraries([FromQuery] ItinerarySearch search)
         {
             var itineraries = await _itineraryService.GetItineraries(search);
             return ApiResponseFactory.Ok(itineraries);
         }
         [HttpGet("{id:guid}")]
-        [Authorize]
         public async Task<IActionResult> GetItineraryById(Guid id)
         {
             var itinerary = await _itineraryService.GetItineraryById(id);

@@ -22,7 +22,6 @@ namespace TouRest.Api.Controllers
             _itineraryStopService = itineraryStopService;
         }
         [HttpGet("{id:guid}")]
-        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> GetItineraryActivityById(Guid id)
         {
             var activity = await _itineraryActivityService.GetItineraryActivity(id);
@@ -40,6 +39,7 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok(activities);
         }
         [HttpPost]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> AddItineraryActivity(Guid stopId, [FromBody] ItineraryActivityCreateRequest create)
         {
             var agencyId = User.GetUserId();
@@ -53,6 +53,7 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Created(result);
         }
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> DeleteItineraryActivity(Guid id)
         {
             var agencyId = User.GetUserId();
@@ -70,6 +71,7 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok("Itinerary activity deleted successfully");
         }
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> UpdateItineraryActivity(Guid id, [FromBody] ItineraryActivityUpdateRequest update)
         {
             var agencyId = User.GetUserId();
