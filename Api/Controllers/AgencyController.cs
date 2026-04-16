@@ -51,11 +51,11 @@ namespace TouRest.Api.Controllers
         }
         [HttpPost("{id:guid}/add-user")]
         [Authorize(Roles = "AGENCY")]
-        public async Task<IActionResult> AddUserToAgency(Guid userId, Guid agencyId)
+        public async Task<IActionResult> AddUserToAgency(Guid userId, Guid agencyId, string role)
         {
             var user = User.GetUserId();
             _logger.LogInformation("User {UserId} is adding user {AddedUserId} to agency {AgencyId}", user, userId, agencyId);
-            await _agencyUserService.AddUserToAgencyAsync(agencyId, userId);
+            await _agencyUserService.AddUserToAgencyAsync(agencyId, userId, role);
             return ApiResponseFactory.Ok(new { }, "User added to agency");
         }
         [HttpPost("{id:guid}/remove-user")]

@@ -81,7 +81,7 @@ namespace TouRest.Application.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _providerUserRepository.AddAsync(providerUser);
+            await _providerUserRepository.CreateAsync(providerUser);
             await _providerRepository.SaveChangesAsync();
 
             return MapToResponse(provider);

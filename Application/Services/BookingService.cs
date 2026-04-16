@@ -13,11 +13,12 @@ namespace TouRest.Application.Services
     public class BookingService : IBookingService
     {
         private readonly IBookingRepository _bookingRepository;
-        private readonly INotificationRepository notificationRepository;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IMapper _mapper;
-        public BookingService(IBookingRepository bookingRepository, IMapper mapper)
+        public BookingService(IBookingRepository bookingRepository, INotificationRepository notificationRepository, IMapper mapper)
         {
             _bookingRepository = bookingRepository;
+            _notificationRepository = notificationRepository;
             _mapper = mapper;
         }
         public async Task<BookingDTO> GetBookingAsync(Guid id)

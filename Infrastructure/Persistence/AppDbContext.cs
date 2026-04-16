@@ -34,6 +34,7 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<Wishlist> Wishlists => Set<Wishlist>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
@@ -226,7 +227,18 @@ namespace TouRest.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(rt => rt.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
+            // Configure AuditLog - User relationship
+            modelBuilder.Entity<AuditLog>()
+                .HasOne(al => al.Actor)
+                .WithMany()
+                .HasForeignKey(al => al.ActorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // Configure AuditLog - Target User relationship
+            modelBuilder.Entity<AuditLog>()
+                .HasOne(al => al.TargetUser)
+                .WithMany()
+                .HasForeignKey(al => al.TargetUserId)
+                .OnDelete(DeleteBehavior.SetNull);
             // ============= UNIQUE CONSTRAINTS =============
 
             // Unique constraint for Role Code

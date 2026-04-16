@@ -8,7 +8,7 @@ using TouRest.Domain.Enums;
 
 namespace TouRest.Domain.Interfaces
 {
-    public interface IProviderUserRepository
+    public interface IProviderUserRepository :IBaseRepository<ProviderUser>
     {
         Task AddUserIntoProvider(Guid providerId, Guid userId, ProviderUserRole role);
     }

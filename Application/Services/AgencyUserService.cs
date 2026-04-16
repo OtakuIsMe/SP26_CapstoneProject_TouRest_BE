@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Agency;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Services
@@ -34,10 +35,12 @@ namespace TouRest.Application.Services
             if (await _userRepository.GetByIdAsync(userId) == null)
                 throw new KeyNotFoundException("User not found");
         }
-        public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId)
+        public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId, string role)
         {
             await ValidateAgencyAndUser(agencyId, userId);
-            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, userId);
+                if (!Enum.TryParse<AgencyUserRole>(role, true, out var agencyUserRole))
+                    throw new ArgumentException("Invalid role", nameof(role));
+            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, userId, agencyUserRole);
         }
 
         public async Task<bool> IsUserInAgencyAsync(Guid agencyId, Guid userId)

@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Agency;
 
+
 namespace TouRest.Application.Interfaces
 {
     public interface IAgencyUserService
     {
         Task<bool> IsUserInAgencyAsync(Guid userId, Guid agencyId);
-        Task AddUserToAgencyAsync(Guid agencyId, Guid userId);
+        Task AddUserToAgencyAsync(Guid agencyId, Guid userId, string role);
         Task RemoveUserFromAgencyAsync(Guid agencyId, Guid userId);
         Task<List<AgencyUserDTO>> GetAgencyUsers(Guid agencyId);
     }

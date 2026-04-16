@@ -10,13 +10,10 @@ using TouRest.Infrastructure.Persistence;
 
 namespace TouRest.Infrastructure.Repositories
 {
-    public class ProviderUserRepository : IProviderUserRepository
+    public class ProviderUserRepository : BaseRepository<ProviderUser>, IProviderUserRepository
     {
-        private readonly AppDbContext _context;
-
-        public ProviderUserRepository(AppDbContext context)
+        public ProviderUserRepository(AppDbContext context) : base(context)
         {
-            _context = context;
         }
 
         public async Task AddUserIntoProvider(Guid providerId, Guid userId, ProviderUserRole role)

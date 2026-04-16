@@ -241,7 +241,7 @@ namespace TouRest.Application.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _providerUserRepository.AddAsync(link);
+            await _providerUserRepository.CreateAsync(link);
 
             // Shared DbContext nên gọi 1 SaveChanges ở repo cuối là đủ
             await _providerRepository.SaveChangesAsync();
@@ -285,17 +285,14 @@ namespace TouRest.Application.Services
                 ContactEmail = request.ContactEmail,
                 ContactPhone = request.ContactPhone,
                 Status = AgencyStatus.Pending,
-
-                // ĐÚNG theo yêu cầu mới của cậu:
                 CreateByUserId = agencyAccount.Id,
-
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             await _agencyRepository.CreateAsync(agency);
 
-            await _agencyUserRepository.AddUserToAgencyAsync(agency.Id, agencyAccount.Id);
+            await _agencyUserRepository.AddUserToAgencyAsync(agency.Id, agencyAccount.Id, AgencyUserRole.Manager);
         }
     }
 }
