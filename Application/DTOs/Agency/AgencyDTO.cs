@@ -11,16 +11,18 @@ namespace TouRest.Application.DTOs.Agency
     public class AgencyDTO
     {
         public Guid Id { get; set; }
-        [MaxLength(255)]
         public string Name { get; set; } = null!;
 
         public AgencyStatus Status { get; set; }
         public string Description { get; set; } = null!;
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
+        public string Address { get; set; } = null!;
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
-        [MaxLength(255)]
         public string ContactEmail { get; set; } = null!;
 
-        [MaxLength(20)]
         public string ContactPhone { get; set; } = null!;
     }
 }

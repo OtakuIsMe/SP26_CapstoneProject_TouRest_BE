@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouRest.Domain.Entities;
+using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 using TouRest.Infrastructure.Persistence;
 
@@ -13,15 +14,15 @@ namespace TouRest.Infrastructure.Repositories
     public class AgencyUserRepository : BaseRepository<AgencyUser>, IAgencyUserRepository
     {
         public AgencyUserRepository(AppDbContext context) : base(context) { }
-        public async Task<bool> IsUserInAgencyAsync(Guid userId, Guid agencyId)
+        public async Task<bool> IsUserInAgencyAsync(Guid agencyId, Guid userId)
         {
             return await _context.AgencyUsers.AnyAsync(au => au.UserId == userId && au.AgencyId == agencyId);
         }
-        public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId)
+        public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId, AgencyUserRole role)
         {
-            if (!await IsUserInAgencyAsync(userId, agencyId))
+            if (!await IsUserInAgencyAsync(agencyId, userId))
             {
-                var agencyUser = new AgencyUser { AgencyId = agencyId, UserId = userId };
+                var agencyUser = new AgencyUser { AgencyId = agencyId, UserId = userId, Role = role };
                 await _context.AgencyUsers.AddAsync(agencyUser);
                 await _context.SaveChangesAsync();
             }
@@ -38,14 +39,14 @@ namespace TouRest.Infrastructure.Repositories
         }
         public async Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId)
         {
-            return await _context.AgencyUsers
+            return await _context.AgencyUsers.Include(au => au.User).Include(au => au.Agency)
                 .Where(au => au.AgencyId == agencyId)
                 .ToListAsync();
         }
         public async Task<List<AgencyUser>> SearchUsersByAgency(Guid id, SearchUserByAgency search)
         {
             return await _context.AgencyUsers.Include(au => au.User)
-                .Where(au => au.AgencyId == id && (string.IsNullOrEmpty(search.FullName) || au.User.FullName.Contains(search.FullName)))
+                .Where(au => au.AgencyId == id && (string.IsNullOrEmpty(search.FullName) || au.User.FullName.ToLower().Contains(search.FullName)))
                 .ToListAsync();
         }
         public async Task<AgencyUser?> GetAgencyUserByUserId(Guid userId)
@@ -53,5 +54,6 @@ namespace TouRest.Infrastructure.Repositories
             return await _context.AgencyUsers.Include(au => au.User)
                 .FirstOrDefaultAsync(au => au.UserId == userId);
         }
+       
     }
 }

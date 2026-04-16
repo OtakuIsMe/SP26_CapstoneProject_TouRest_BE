@@ -28,9 +28,10 @@ namespace TouRest.Application.Services
         {
             return _mapper.Map<IEnumerable<ServiceDTO>>(await _serviceRepository.GetAllAsync());
         }
-        public async Task<ServiceDTO> CreateService(Service service)
+        public async Task<ServiceDTO> CreateService(ServiceCreateRequest service)
         {
-            var create = await _serviceRepository.CreateAsync(service);
+            var serviceEntity = _mapper.Map<Service>(service);
+            var create = await _serviceRepository.CreateAsync(serviceEntity);
             return _mapper.Map<ServiceDTO>(create);
         }
         public async Task<ServiceDTO?> UpdateService(Guid id, ServiceUpdateRequest updatedService)

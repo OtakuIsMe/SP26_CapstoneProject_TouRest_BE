@@ -12,31 +12,51 @@ namespace TouRest.Application.Services
 {
     public class AgencyUserService : IAgencyUserService
     {
-        private readonly IAgencyUserRepository _agencyRepository;
+        private readonly IAgencyUserRepository _agencyUserRepository;
+        private readonly IAgencyRepository _agencyRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public AgencyUserService(IAgencyUserRepository agencyRepository, IMapper mapper)
+        public AgencyUserService(IAgencyUserRepository agencyUserRepository, IAgencyRepository agencyRepository, IUserRepository userRepository, IMapper mapper)
         {
+             _agencyUserRepository = agencyUserRepository;
             _agencyRepository = agencyRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
+        }
+        private async Task ValidateAgencyAndUser(Guid agencyId, Guid userId)
+        {
+            if (agencyId == Guid.Empty)
+                throw new ArgumentException("AgencyId cannot be empty", nameof(agencyId));
+            if (userId == Guid.Empty)
+                throw new ArgumentException("UserId cannot be empty", nameof(userId));
+            if (await _agencyRepository.GetByIdAsync(agencyId) == null)
+                throw new KeyNotFoundException("Agency not found");
+            if (await _userRepository.GetByIdAsync(userId) == null)
+                throw new KeyNotFoundException("User not found");
         }
         public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId)
         {
-            await _agencyRepository.AddUserToAgencyAsync(agencyId, userId);
+            await ValidateAgencyAndUser(agencyId, userId);
+            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, userId);
         }
 
         public async Task<bool> IsUserInAgencyAsync(Guid agencyId, Guid userId)
         {
-           return  await _agencyRepository.IsUserInAgencyAsync(userId, agencyId);
+            await ValidateAgencyAndUser(agencyId, userId);
+            return  await _agencyUserRepository.IsUserInAgencyAsync(agencyId, userId);
         }
 
         public async Task RemoveUserFromAgencyAsync(Guid agencyId, Guid userId)
         {
-            await _agencyRepository.RemoveUserFromAgencyAsync(agencyId, userId);
+            await ValidateAgencyAndUser(agencyId, userId);
+            await _agencyUserRepository.RemoveUserFromAgencyAsync(agencyId, userId);
 
         }
         public async Task<List<AgencyUserDTO>> GetAgencyUsers(Guid agencyId)
         {
-            return _mapper.Map<List<AgencyUserDTO>>(await _agencyRepository.GetAgencyUsers(agencyId));
+            if (agencyId == Guid.Empty)
+                throw new ArgumentException("AgencyId cannot be empty", nameof(agencyId));
+            return _mapper.Map<List<AgencyUserDTO>>(await _agencyUserRepository.GetAgencyUsers(agencyId));
         }
     }
 }

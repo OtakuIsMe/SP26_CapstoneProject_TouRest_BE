@@ -12,6 +12,9 @@ namespace TouRest.Application.DTOs.Agency
     {
         [Required]
         public string Name { get; set; } = null!;
+        [MaxLength(1000)]
+        [Required]
+        public string Description { get; set; } = null!;
         [Required]
         public decimal Latitude { get; set; }
         [Required]
@@ -20,15 +23,17 @@ namespace TouRest.Application.DTOs.Agency
         public string Address { get; set; } = null!;
 
         [Required]
-        public TimeOnly StartTime { get; set; }
+        public string StartTime { get; set; } = null!;
         [Required]
-        public TimeOnly EndTime { get; set; }
+        public string EndTime { get; set; } = null!;
         [Required]
         [MaxLength(255)]
+        [EmailAddress]
         public string ContactEmail { get; set; } = null!;
 
         [Required]
         [MaxLength(20)]
+        [Phone]
         public string ContactPhone { get; set; } = null!;
     }
 }

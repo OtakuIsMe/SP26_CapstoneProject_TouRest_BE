@@ -9,7 +9,7 @@ namespace TouRest.Domain.Interfaces
 {
     public interface IAgencyRepository : IBaseRepository<Agency>
     {
-        Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId);
         Task<Agency?> GetByContactEmailAsync(string contactEmail);
+        Task<Agency?> GetMyAgency(Guid userId);
     }
 }

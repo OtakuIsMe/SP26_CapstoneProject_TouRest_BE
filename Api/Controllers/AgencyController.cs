@@ -41,6 +41,14 @@ namespace TouRest.Api.Controllers
             var users = await _agencyUserService.GetAgencyUsers(agencyId);
             return ApiResponseFactory.Ok(users);
         }
+        [HttpGet("me")]
+        [Authorize(Roles = "AGENCY")]
+        public async Task<IActionResult> GetMyAgency()
+        {
+            var user = User.GetUserId();
+            var result = await _agencyService.GetMyAgency(user);
+            return ApiResponseFactory.Ok(result);
+        }
         [HttpPost("{id:guid}/add-user")]
         [Authorize(Roles = "AGENCY")]
         public async Task<IActionResult> AddUserToAgency(Guid userId, Guid agencyId)
@@ -52,7 +60,7 @@ namespace TouRest.Api.Controllers
         }
         [HttpPost("{id:guid}/remove-user")]
         [Authorize(Roles = "ADMIN, AGENCY")]
-        public async Task<IActionResult> RemoveUserFromAgency(Guid id, [FromBody] Guid userId)
+        public async Task<IActionResult> RemoveUserFromAgency(Guid id, Guid userId)
         {
             var user = User.GetUserId();
             _logger.LogInformation("User {UserId} is removing user {RemovedUserId} from agency {AgencyId}", user, userId, id);
@@ -61,11 +69,11 @@ namespace TouRest.Api.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "AGENCY")]
-        public async Task<IActionResult> CreateAgency([FromBody] AgencyCreateRequestDTO request)
+        public async Task<IActionResult> CreateAgency(AgencyCreateRequestDTO request)
         {
             var user = User.GetUserId();
             _logger.LogInformation("User {UserId} is creating an agency with name {AgencyName}", user, request.Name);
-            var result = await _agencyService.AddAgency(request);
+            var result = await _agencyService.AddAgency(user, request);
             return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to approve");
         }
         [HttpPut]
@@ -76,6 +84,8 @@ namespace TouRest.Api.Controllers
             var result = await _agencyService.UpdateAgency(agencyId, request);
             return ApiResponseFactory.Ok(result, "Agency updated");
         }
+
+
 
     }
 }

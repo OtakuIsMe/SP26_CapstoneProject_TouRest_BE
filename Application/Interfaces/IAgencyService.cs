@@ -12,7 +12,8 @@ namespace TouRest.Application.Interfaces
     {
 
         Task<AgencyDTO> GetAgencyById(Guid id);
-        Task<AgencyDTO> AddAgency(AgencyCreateRequestDTO create);
+        Task<AgencyDTO> GetMyAgency(Guid userId);
+        Task<AgencyDTO> AddAgency(Guid userCreateId, AgencyCreateRequestDTO create);
         Task<AgencyDTO> UpdateAgency(Guid id, AgencyUpdateRequestDTO update);
         Task<bool> DeleteAgency(Guid id);
     }

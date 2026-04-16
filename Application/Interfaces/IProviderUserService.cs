@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TouRest.Application.DTOs.Agency
+namespace TouRest.Application.Interfaces
 {
-    public class AgencySearchUser
+    public interface IProviderUserService
     {
     }
 }

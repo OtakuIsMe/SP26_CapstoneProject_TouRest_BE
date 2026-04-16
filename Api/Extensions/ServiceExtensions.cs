@@ -11,6 +11,7 @@ namespace TouRest.Api.Extensions
         public static IServiceCollection AddApiServices(this IServiceCollection services)
         {
             //Add repositories to the DI container, count = 14
+            services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddScoped<IAgencyRepository, AgencyRepository>();
             services.AddScoped<IAgencyUserRepository, AgencyUserRepository>();
             services.AddScoped<IBookingItineraryRepository, BookingItineraryRepository>();
@@ -23,6 +24,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IPackageRepository, PackageRepository>();
             services.AddScoped<IPackageServiceRepository, PackageServiceRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();
+            services.AddScoped<IProviderUserRepository, ProviderUserRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
@@ -31,6 +33,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<VoucherRepository, VoucherRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
             //Add services to the DI container, count = 15
+            services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAgencyService, AgencyService>();
             services.AddScoped<IAgencyUserService, AgencyUserService>();    
@@ -43,6 +46,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IPackageService, PackageService>();
             services.AddScoped<IPackageServiceService, PackageServiceService>();
             services.AddScoped<IProviderService, ProviderService>();
+            services.AddScoped<IProviderUserService, ProviderUserService>();
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWishListService, WishListService>();
