@@ -26,5 +26,7 @@ namespace TouRest.Application.Interfaces
         Task<List<AgencyDTO>> GetAgencies(AgencySearch search);
         Task<List<ProviderDTO>> GetProviders(ProviderSearch search);
         Task<List<UserDTO>> GetUsers(UserSearch search);
+        Task CreateAgencyAccount(Guid agencyId, CreateAgencyAccountRequest request);
+        Task CreateProviderAccount(Guid providerId, CreateProviderAccountRequest request);
     }
 }

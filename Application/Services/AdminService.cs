@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using TouRest.Application.Common.Constants;
 using TouRest.Application.DTOs.Agency;
+using TouRest.Application.DTOs.Auth;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.DTOs.User;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Entities;
 using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
@@ -12,22 +15,34 @@ namespace TouRest.Application.Services
     {
         private readonly IAdminRepository _adminRepository;
         private readonly IAgencyRepository _agencyRepository;
+        private readonly IAgencyUserRepository _agencyUserRepository;
         private readonly IProviderRepository _providerRepository;
+        private readonly IProviderUserRepository _providerUserRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository _roleRepository;
+        private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
 
         public AdminService(
             IAdminRepository adminRepository,
             IAgencyRepository agencyRepository,
+            IAgencyUserRepository agencyUserRepository,
             IProviderRepository providerRepository,
-            IMapper mapper,
-            IUserRepository userRepository)
+            IProviderUserRepository providerUserRepository,
+            IUserRepository userRepository,
+            IRoleRepository roleRepository,
+            IPasswordHasher passwordHasher,
+            IMapper mapper)
         {
             _adminRepository = adminRepository;
             _agencyRepository = agencyRepository;
+            _agencyUserRepository = agencyUserRepository;
             _providerRepository = providerRepository;
-            _mapper = mapper;
+            _providerUserRepository = providerUserRepository;
             _userRepository = userRepository;
+            _roleRepository = roleRepository;
+            _passwordHasher = passwordHasher;
+            _mapper = mapper;
         }
 
         private async Task Validate(Guid id, string type)
@@ -71,6 +86,82 @@ namespace TouRest.Application.Services
                 throw new InvalidOperationException("Only pending providers can be approved");
 
             await _adminRepository.ApproveProvider(providerId);
+        }
+
+        public async Task CreateAgencyAccount(Guid agencyId, CreateAgencyAccountRequest request)
+        {
+            await Validate(agencyId, "agency");
+
+            var agency = await _agencyRepository.GetByIdAsync(agencyId);
+            if (agency == null)
+                throw new KeyNotFoundException("Agency not found");
+
+            if (agency.Status != AgencyStatus.Active)
+                throw new InvalidOperationException("Only approved agencies can have accounts created");
+
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
+                throw new InvalidOperationException("User with this email already exists");
+
+            var existingAgencyUsers = await _agencyUserRepository.GetAgencyUsers(agencyId);
+            if (existingAgencyUsers.Any(u => u.Role == AgencyUserRole.Manager))
+                throw new InvalidOperationException("Agency already has a manager account");
+
+            var agencyRole = await _roleRepository.GetByCodeAsync(RoleCodes.Agency);
+            if (agencyRole == null)
+                throw new InvalidOperationException("Agency role not found in database");
+
+            var agencyAccount = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = request.Username,
+                Email = request.Email,
+                Phone = request.Phone,
+                PasswordHash = _passwordHasher.HashPassword(request.Password),
+                RoleId = agencyRole.Id,
+                Status = UserStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _userRepository.CreateAsync(agencyAccount);
+            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, agencyAccount.Id, AgencyUserRole.Manager);
+        }
+
+        public async Task CreateProviderAccount(Guid providerId, CreateProviderAccountRequest request)
+        {
+            await Validate(providerId, "provider");
+
+            var provider = await _providerRepository.GetByIdAsync(providerId);
+            if (provider == null)
+                throw new KeyNotFoundException("Provider not found");
+
+            if (provider.Status != ProviderStatus.Active)
+                throw new InvalidOperationException("Only approved providers can have accounts created");
+
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
+                throw new InvalidOperationException("User with this email already exists");
+
+            var providerRole = await _roleRepository.GetByCodeAsync(RoleCodes.Provider);
+            if (providerRole == null)
+                throw new InvalidOperationException("Provider role not found in database");
+
+            var providerAccount = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = request.Username,
+                Email = request.Email,
+                Phone = request.Phone,
+                PasswordHash = _passwordHasher.HashPassword(request.Password),
+                RoleId = providerRole.Id,
+                Status = UserStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _userRepository.CreateAsync(providerAccount);
+            await _providerUserRepository.AddUserIntoProvider(providerId, providerAccount.Id, ProviderUserRole.Manager);
         }
 
         public async Task BanUserAsync(Guid userId)

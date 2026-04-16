@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
 using TouRest.Api.Extensions;
 using TouRest.Application.DTOs.Agency;
+using TouRest.Application.DTOs.Auth;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.Interfaces;
 using TouRest.Domain.Enums;
@@ -26,9 +26,9 @@ namespace TouRest.Api.Controllers
 
         [HttpPut("agency/{id:guid}/approve")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> ApproveAgency(Guid id, [FromBody] ApproveAgencyAccountRequest request)
+        public async Task<IActionResult> ApproveAgency(Guid id)
         {
-            var userId = User.GetUserId();
+            var userId = User.GetUserRole();
             _logger.LogInformation("Admin {AdminId} is approving agency {AgencyId}", userId, id);
 
             await _adminService.ApproveAgency(id);
@@ -39,7 +39,7 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> RejectAgency(Guid id)
         {
-            var userId = User.GetUserId();
+            var userId = User.GetUserRole();
             _logger.LogInformation("Admin {AdminId} is rejecting agency {AgencyId}", userId, id);
 
             await _adminService.RejectAgency(id);
@@ -48,9 +48,9 @@ namespace TouRest.Api.Controllers
 
         [HttpPut("provider/{id:guid}/approve")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> ApproveProvider(Guid id, [FromBody] ApproveProviderAccountRequest request)
+        public async Task<IActionResult> ApproveProvider(Guid id)
         {
-            var userId = User.GetUserId();
+            var userId = User.GetUserRole();
             _logger.LogInformation("Admin {AdminId} is approving provider {ProviderId}", userId, id);
 
             await _adminService.ApproveProvider(id);
@@ -61,18 +61,40 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> RejectProvider(Guid id)
         {
-            var userId = User.GetUserId();
+            var userId = User.GetUserRole();
             _logger.LogInformation("Admin {AdminId} is rejecting provider {ProviderId}", userId, id);
 
             await _adminService.RejectProvider(id);
             return ApiResponseFactory.Ok(new { }, "Provider rejected successfully");
         }
 
+        [HttpPost("agency/{id:guid}/create-account")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> CreateAgencyAccount(Guid id, [FromBody] CreateAgencyAccountRequest request)
+        {
+            var userId = User.GetUserRole();
+            _logger.LogInformation("Admin {AdminId} is creating account for agency {AgencyId}", userId, id);
+
+            await _adminService.CreateAgencyAccount(id, request);
+            return ApiResponseFactory.Ok(new { }, "Agency account created successfully");
+        }
+
+        [HttpPost("provider/{id:guid}/create-account")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> CreateProviderAccount(Guid id, [FromBody] CreateProviderAccountRequest request)
+        {
+            var userId = User.GetUserRole();
+            _logger.LogInformation("Admin {AdminId} is creating account for provider {ProviderId}", userId, id);
+
+            await _adminService.CreateProviderAccount(id, request);
+            return ApiResponseFactory.Ok(new { }, "Provider account created successfully");
+        }
+
         [HttpPut("user/{id:guid}/ban")]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> BanUser(Guid id)
         {
-            var userId = User.GetUserId();
+            var userId = User.GetUserRole();
             _logger.LogInformation("Admin {AdminId} is banning user {UserId}", userId, id);
 
             await _adminService.BanUserAsync(id);
@@ -83,7 +105,7 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UnbanUser(Guid id)
         {
-            var userId = User.GetUserId();
+            var userId = User.GetUserRole();
             _logger.LogInformation("Admin {AdminId} is unbanning user {UserId}", userId, id);
 
             await _adminService.UnbanUserAsync(id);
