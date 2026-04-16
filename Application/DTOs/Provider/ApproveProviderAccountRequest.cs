@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TouRest.Application.DTOs.Provider
+{
+    public class ApproveProviderAccountRequest
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = null!;
+
+        [Required, MinLength(6)]
+        public string Password { get; set; } = null!;
+
+        [Required, MaxLength(50)]
+        public string Username { get; set; } = null!;
+
+        [Phone]
+        public string? Phone { get; set; }
+    }
+}

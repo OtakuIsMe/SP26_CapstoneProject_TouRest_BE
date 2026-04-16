@@ -85,6 +85,16 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok(result, "Agency updated");
         }
 
+        [HttpPost("register-request")]
+        [Authorize(Roles = "CUSTOMER")]
+        public async Task<IActionResult> RegisterAgencyRequest([FromBody] RegisterAgencyAccountRequest request)
+        {
+            var currentUserId = User.GetUserId();
+
+            await _authService.RegisterAgencyAccountAsync(currentUserId, request);
+
+            return ApiResponseFactory.Created(new { }, "Agency request registered successfully");
+        }
 
 
     }

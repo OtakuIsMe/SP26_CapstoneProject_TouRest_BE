@@ -6,6 +6,8 @@ using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
 using TouRest.Domain.Interfaces;
 using TouRest.Domain.Enums;
+using TouRest.Application.DTOs.Agency;
+using TouRest.Application.DTOs.Provider;
 
 namespace TouRest.Application.Services
 {
@@ -184,32 +186,9 @@ namespace TouRest.Application.Services
 
         public async Task RegisterProviderAccountAsync(Guid createdByUserId, RegisterProviderAccountRequest request)
         {
-            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
-            if (existingUser != null)
-                throw new InvalidOperationException("User with this email already exists");
-
             var existingProvider = await _providerRepository.GetByContactEmailAsync(request.ContactEmail);
             if (existingProvider != null)
                 throw new InvalidOperationException("Provider with this contact email already exists");
-
-            var providerRole = await _roleRepository.GetByCodeAsync(RoleCodes.Provider);
-            if (providerRole == null)
-                throw new InvalidOperationException("Provider role not found in database");
-
-            var providerUser = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = request.Username,
-                Email = request.Email,
-                Phone = request.Phone,
-                PasswordHash = _passwordHasher.HashPassword(request.Password),
-                RoleId = providerRole.Id,
-                Status = UserStatus.Active,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _userRepository.CreateAsync(providerUser);
 
             var provider = new Provider
             {
@@ -224,75 +203,40 @@ namespace TouRest.Application.Services
                 ContactEmail = request.ContactEmail,
                 ContactPhone = request.ContactPhone,
                 Status = ProviderStatus.Pending,
-                CreateByUserId = createdByUserId, // customer đang login
+                CreateByUserId = createdByUserId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             await _providerRepository.AddAsync(provider);
-
-            var link = new ProviderUser
-            {
-                Id = Guid.NewGuid(),
-                ProviderId = provider.Id,
-                UserId = providerUser.Id, // account provider mới
-                Role = ProviderUserRole.Manager,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _providerUserRepository.CreateAsync(link);
-
-            // Shared DbContext nên gọi 1 SaveChanges ở repo cuối là đủ
             await _providerRepository.SaveChangesAsync();
         }
 
         public async Task RegisterAgencyAccountAsync(Guid createdByUserId, RegisterAgencyAccountRequest request)
         {
-            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
-            if (existingUser != null)
-                throw new InvalidOperationException("User with this email already exists");
-
             var existingAgency = await _agencyRepository.GetByContactEmailAsync(request.ContactEmail);
             if (existingAgency != null)
                 throw new InvalidOperationException("Agency with this contact email already exists");
-
-            var agencyRole = await _roleRepository.GetByCodeAsync(RoleCodes.Agency);
-            if (agencyRole == null)
-                throw new InvalidOperationException("Agency role not found in database");
-
-            var agencyAccount = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = request.Username,
-                Email = request.Email,
-                Phone = request.Phone,
-                PasswordHash = _passwordHasher.HashPassword(request.Password),
-                RoleId = agencyRole.Id,
-                Status = UserStatus.Active,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _userRepository.CreateAsync(agencyAccount);
 
             var agency = new Agency
             {
                 Id = Guid.NewGuid(),
                 Name = request.AgencyName,
                 Description = request.Description,
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
                 Address = request.Address,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
                 ContactEmail = request.ContactEmail,
                 ContactPhone = request.ContactPhone,
                 Status = AgencyStatus.Pending,
-                CreateByUserId = agencyAccount.Id,
+                CreateByUserId = createdByUserId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             await _agencyRepository.CreateAsync(agency);
-
-            await _agencyUserRepository.AddUserToAgencyAsync(agency.Id, agencyAccount.Id, AgencyUserRole.Manager);
         }
     }
 }

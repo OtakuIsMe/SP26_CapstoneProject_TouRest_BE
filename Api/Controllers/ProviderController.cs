@@ -4,6 +4,7 @@ using TouRest.Api.Common;
 using TouRest.Api.Extensions;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.Interfaces;
+using TouRest.Application.Services;
 
 namespace TouRest.Api.Controllers
 {
@@ -12,10 +13,12 @@ namespace TouRest.Api.Controllers
     public class ProviderController : ControllerBase
     {
         private readonly IProviderService _providerService;
+        private readonly IAuthService _authService;
 
-        public ProviderController(IProviderService providerService)
+        public ProviderController(IProviderService providerService, IAuthService authService)
         {
             _providerService = providerService;
+            _authService = authService;
         }
 
         [HttpGet]
@@ -57,6 +60,17 @@ namespace TouRest.Api.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpPost("register-request")]
+        [Authorize(Roles = "CUSTOMER")]
+        public async Task<IActionResult> RegisterProviderRequest([FromBody] RegisterProviderAccountRequest request)
+        {
+            var currentUserId = User.GetUserId();
+
+            await _authService.RegisterProviderAccountAsync(currentUserId, request);
+
+            return ApiResponseFactory.Created(new { }, "Provider request registered successfully");
         }
 
         //[HttpDelete("{id:guid}")]
