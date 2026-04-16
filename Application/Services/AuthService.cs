@@ -6,6 +6,8 @@ using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
 using TouRest.Domain.Interfaces;
 using TouRest.Domain.Enums;
+using TouRest.Application.DTOs.Agency;
+using TouRest.Application.DTOs.Provider;
 
 namespace TouRest.Application.Services
 {

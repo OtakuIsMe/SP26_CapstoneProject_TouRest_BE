@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Application.DTOs.Agency;
 using TouRest.Application.DTOs.Auth;
+using TouRest.Application.DTOs.Provider;
 
 namespace TouRest.Application.Interfaces
 {

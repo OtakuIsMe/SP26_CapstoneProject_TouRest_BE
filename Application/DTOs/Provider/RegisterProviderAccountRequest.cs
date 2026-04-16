@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TouRest.Application.DTOs.Auth
+namespace TouRest.Application.DTOs.Provider
 {
     public class RegisterProviderAccountRequest
     {
