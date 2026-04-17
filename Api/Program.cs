@@ -125,6 +125,16 @@ builder.Services.AddHangfire(config =>
     config.UseSqlServerStorage(Environment.GetEnvironmentVariable("DATABASE_CONNECTION")));
 builder.Services.AddHangfireServer();
 builder.Services.AddSignalR();
+var emailSettings = new EmailSettings
+{
+    Host = Environment.GetEnvironmentVariable("EMAIL_HOST")!,
+    Port = int.Parse(Environment.GetEnvironmentVariable("EMAIL_PORT")!),
+    Username = Environment.GetEnvironmentVariable("EMAIL_USERNAME")!,
+    Password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD")!,
+    FromName = Environment.GetEnvironmentVariable("EMAIL_FROM_NAME")!
+};
+
+builder.Services.AddSingleton(emailSettings);
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandler>();
 

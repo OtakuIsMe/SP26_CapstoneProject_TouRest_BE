@@ -35,6 +35,7 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+        public DbSet<Payment> Payments => Set<Payment>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
@@ -62,7 +63,7 @@ namespace TouRest.Infrastructure.Persistence
                 .HasOne(b => b.User)
                 .WithMany()
                 .HasForeignKey(b => b.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Agency - AgencyUser relationship
             modelBuilder.Entity<AgencyUser>()
@@ -193,12 +194,17 @@ namespace TouRest.Infrastructure.Persistence
                 .HasForeignKey(f => f.BookingItineraryId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure Refund - Booking relationship
+            modelBuilder.Entity<Refund>()
+                .HasOne(r => r.Payment)
+                .WithOne(p => p.Refund)
+                .HasForeignKey<Refund>(r => r.PaymentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Refund>()
                 .HasOne(r => r.Booking)
                 .WithMany()
                 .HasForeignKey(r => r.BookingId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Wishlist - User relationship
             modelBuilder.Entity<Wishlist>()
@@ -239,8 +245,22 @@ namespace TouRest.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(al => al.TargetUserId)
                 .OnDelete(DeleteBehavior.SetNull);
+            // Payment - Booking (one booking, many payments)
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Booking)
+                .WithMany(b => b.Payments)
+                .HasForeignKey(p => p.BookingId)
+                .OnDelete(DeleteBehavior.Restrict); // don't delete payments if booking deleted
+
+
             // ============= UNIQUE CONSTRAINTS =============
 
+            modelBuilder.Entity<Payment>()
+                .HasIndex(p => p.BookingId);
+            // Unique constraint on OrderCode
+            modelBuilder.Entity<Payment>()
+                .HasIndex(p => p.OrderCode)
+                .IsUnique();
             // Unique constraint for Role Code
             modelBuilder.Entity<Role>()
                 .HasIndex(r => r.Code)

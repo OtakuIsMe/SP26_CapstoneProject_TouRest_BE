@@ -39,6 +39,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IAgencyUserService, AgencyUserService>();    
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IBookingItineraryService, BookingItineraryService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IItineraryActivityService, ItineraryActivityService>();
             services.AddScoped<IItineraryService, ItineraryService>();

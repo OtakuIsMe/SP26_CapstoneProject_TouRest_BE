@@ -6,6 +6,7 @@ using TouRest.Application.DTOs.Agency;
 using TouRest.Application.DTOs.Auth;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Entities;
 using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
@@ -17,21 +18,58 @@ namespace TouRest.Api.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IAdminService _adminService;
+        private readonly IAgencyService _agencyService;
+        private readonly IAuthService _authService;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public AdminController(ILogger<AdminController> logger, IAdminService adminService)
+        public AdminController(ILogger<AdminController> logger, IAdminService adminService, IAuthService authService, IAgencyService agencyService, IUserService userService, IEmailService emailService)
         {
             _logger = logger;
             _adminService = adminService;
+            _authService = authService;
+            _agencyService = agencyService;
+            _userService = userService;
+            _emailService = emailService;
         }
 
         [HttpPut("agency/{id:guid}/approve")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> ApproveAgency(Guid id)
+        public async Task<IActionResult> ApproveAgency(Guid id, [FromBody] RegisterRequestDTO createAccount)
         {
-            var userId = User.GetUserRole();
+
+            var userId = User.GetUserId();
             _logger.LogInformation("Admin {AdminId} is approving agency {AgencyId}", userId, id);
 
+            var agency = await _agencyService.GetAgencyById(id);
+            if (agency == null)
+            {
+                return NotFound("Agency not found");
+            }
+
+
+            var agencyCreatorId = agency.CreatedByUserId;
+            var agencyCreator = await _userService.GetByIdAsync(agencyCreatorId);
+            var email = agencyCreator.Email;
+
+            await _authService.RegisterAsync(createAccount);
             await _adminService.ApproveAgency(id);
+            try
+            {
+                await _emailService.SendAsync(
+                    email,
+        "Your Agency Has Been Approved — Account Details",
+        $@"<h1>Congratulations!</h1>
+       <p>Your agency <strong>{agency.Name}</strong> has been approved.</p>
+       <h3>Your login credentials:</h3>
+       <p>Email: <strong>{createAccount.Email}</strong></p>
+       <p>Password: <strong>{createAccount.Password}</strong></p>
+       <p>Please log in and change your password immediately.</p>");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send approval email to {Email}", email);
+            }
             return ApiResponseFactory.Ok(new { }, "Agency approved successfully");
         }
 
