@@ -36,6 +36,9 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
         public DbSet<Payment> Payments => Set<Payment>();
+        public DbSet<Wallet> Wallets => Set<Wallet>();
+        public DbSet<WalletTransaction> WalletTransactions => Set<WalletTransaction>();
+        public DbSet<Payout> Payouts => Set<Payout>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
@@ -251,6 +254,40 @@ namespace TouRest.Infrastructure.Persistence
                 .WithMany(b => b.Payments)
                 .HasForeignKey(p => p.BookingId)
                 .OnDelete(DeleteBehavior.Restrict); // don't delete payments if booking deleted
+                                                    // Wallet - User
+            modelBuilder.Entity<Wallet>()
+                .HasOne(w => w.User)
+                .WithOne()
+                .HasForeignKey<Wallet>(w => w.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Wallet - Agency
+            modelBuilder.Entity<Wallet>()
+                .HasOne(w => w.Agency)
+                .WithOne()
+                .HasForeignKey<Wallet>(w => w.AgencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Wallet - Provider
+            modelBuilder.Entity<Wallet>()
+                .HasOne(w => w.Provider)
+                .WithOne()
+                .HasForeignKey<Wallet>(w => w.ProviderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // WalletTransaction - Wallet
+            modelBuilder.Entity<WalletTransaction>()
+                .HasOne(wt => wt.Wallet)
+                .WithMany()
+                .HasForeignKey(wt => wt.WalletId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payout - Wallet
+            modelBuilder.Entity<Payout>()
+                .HasOne(p => p.Wallet)
+                .WithMany()
+                .HasForeignKey(p => p.WalletId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             // ============= UNIQUE CONSTRAINTS =============
@@ -315,7 +352,21 @@ namespace TouRest.Infrastructure.Persistence
             modelBuilder.Entity<ItineraryActivity>()
                 .HasIndex(ia => new { ia.ItineraryStopId, ia.ActivityOrder })
                 .IsUnique();
+            // Only one wallet per user/agency/provider
+            modelBuilder.Entity<Wallet>()
+                .HasIndex(w => w.UserId)
+                .IsUnique()
+                .HasFilter("[UserId] IS NOT NULL");
 
+            modelBuilder.Entity<Wallet>()
+                .HasIndex(w => w.AgencyId)
+                .IsUnique()
+                .HasFilter("[AgencyId] IS NOT NULL");
+
+            modelBuilder.Entity<Wallet>()
+                .HasIndex(w => w.ProviderId)
+                .IsUnique()
+                .HasFilter("[ProviderId] IS NOT NULL");
             // ============= SEED DATA =============
 
             // Seed default roles
