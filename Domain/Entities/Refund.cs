@@ -16,8 +16,12 @@ namespace TouRest.Domain.Entities
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "TotalRefundAmount must be greater than 0")]
-        public int TotalRefundAmount { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalRefundAmount { get; set; }
         public RefundInitinator InitiatedBy { get; set; }
+        public string? CustomerBankAccount { get; set; }
+        public string? CustomerBankName { get; set; }
+        public string? CustomerAccountHolder { get; set; }
 
         [MaxLength(500)]
         public string? Reason { get; set; }

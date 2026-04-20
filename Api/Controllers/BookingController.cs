@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
+using TouRest.Api.Extensions;
 using TouRest.Application.DTOs.Booking;
 using TouRest.Application.Interfaces;
 
@@ -21,45 +22,29 @@ namespace TouRest.Api.Controllers
         public async Task<IActionResult> GetBooking(Guid id)
         {
             var booking = await _bookingService.GetBookingAsync(id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
             return ApiResponseFactory.Ok(booking);
         }
-        //    [HttpGet("/search")]
-        //public async Task<IActionResult> GetBookings([FromQuery] BookingSearch search)
-        //{
-
-        //}
         [HttpPost]
-        [Authorize(Roles = "ADMIN, USER")]
+        [Authorize(Roles = "ADMIN, CUSTOMER")]
         public async Task<IActionResult> AddBooking([FromBody] BookingCreateRequest create)
         {
-            await _bookingService.CreateBookingAsync(create);
+            var userId = User.GetUserId();
+            await _bookingService.CreateBookingAsync(create, userId);
             return ApiResponseFactory.Created( new {}, "Booking was created");
         }
         [HttpPut("{id:guid}")]
-        [Authorize(Roles = "ADMIN, USER")]
+        [Authorize(Roles = "ADMIN, CUSTOMER")]
         public async Task<IActionResult> UpdateBooking(Guid id, [FromBody] BookingUpdateRequest update)
         {
             var booking = await _bookingService.UpdateBookingAsync(id, update);
-            if (booking == null)
-            {
-                return NotFound();
-            }
             return ApiResponseFactory.Ok(booking);
         }
          [HttpDelete("{id:guid}")]
-        [Authorize(Roles = "ADMIN, USER")]
+        [Authorize(Roles = "ADMIN, CUSTOMER")]
          public async Task<IActionResult> DeleteBooking(Guid id)
             {
-                var result = await _bookingService.DeleteBookingAsync(id);
-                if (!result)
-                {
-                    return NotFound();
-                }
-                return ApiResponseFactory.Ok(result);
+            await _bookingService.DeleteBookingAsync(id);
+            return ApiResponseFactory.Ok(new { }, "Booking deleted");
         }
        
     }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PayOS;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
@@ -133,7 +134,12 @@ var emailSettings = new EmailSettings
     Password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD")!,
     FromName = Environment.GetEnvironmentVariable("EMAIL_FROM_NAME")!
 };
-
+var payOS = new PayOSClient(
+    Environment.GetEnvironmentVariable("PAYOS_CLIENT_ID")!,
+    Environment.GetEnvironmentVariable("PAYOS_API_KEY")!,
+    Environment.GetEnvironmentVariable("PAYOS_CHECKSUM_KEY")!
+);
+builder.Services.AddSingleton(payOS);
 builder.Services.AddSingleton(emailSettings);
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandler>();

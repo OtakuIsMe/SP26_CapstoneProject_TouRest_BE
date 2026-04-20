@@ -20,7 +20,9 @@ namespace TouRest.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal FinalAmount { get; set; }
         public PaymentStatus Status { get; set; }         
-        public string? PayOSPaymentLinkId { get; set; }  
+        public string? PayOSPaymentLinkId { get; set; }
+        public string? CheckoutUrl { get; set; }
+        public string? CancelledReason { get; set; }
         public string? TransactionReference { get; set; } 
         public DateTime? PaidAt { get; set; }
         public DateTime ExpiredAt { get; set; }

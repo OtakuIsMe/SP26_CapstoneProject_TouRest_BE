@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Booking;
 using TouRest.Application.Interfaces;
+using TouRest.Domain.Entities;
+using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Services
@@ -23,43 +25,48 @@ namespace TouRest.Application.Services
         }
         public async Task<BookingDTO> GetBookingAsync(Guid id)
         {
-            var booking = await _bookingRepository.GetByIdAsync(id);
-            if (booking == null)
-            {
-               throw new Exception("Booking not found");
-            }
+            var booking = await CheckBooking(id);
             return _mapper.Map<BookingDTO>(booking);
         }
-        public async Task<BookingDTO> CreateBookingAsync(BookingCreateRequest request)
+        public async Task<BookingDTO> CreateBookingAsync(BookingCreateRequest request, Guid userId)
         {
-            var booking = _mapper.Map<Domain.Entities.Booking>(request);
+            var booking = _mapper.Map<Booking>(request);
+            booking.Id = Guid.NewGuid();
+            booking.UserId = userId;
+            booking.Code = $"BK-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..8].ToUpper()}";
+            booking.Status = BookingStatus.Pending;
+            booking.CreatedAt = DateTime.UtcNow;
+            booking.UpdatedAt = DateTime.UtcNow;
             var createdBooking = await _bookingRepository.CreateAsync(booking);
             return _mapper.Map<BookingDTO>(createdBooking);
         }
         public async Task<BookingDTO> UpdateBookingAsync(Guid id, BookingUpdateRequest request)
         {
-            var existingBooking = await _bookingRepository.GetByIdAsync(id);
-            if (existingBooking == null)
-            {
-                throw new Exception("Booking not found");
-            }
+            var existingBooking = await CheckBooking(id);
             _mapper.Map(request, existingBooking);
             var updatedBooking = await _bookingRepository.UpdateAsync(existingBooking);
             return _mapper.Map<BookingDTO>(updatedBooking);
         }
-        public async Task<bool> DeleteBookingAsync(Guid id)
+        public async Task DeleteBookingAsync(Guid id)
         {
-            var existingBooking = await _bookingRepository.GetByIdAsync(id);
-            if (existingBooking == null)
-            {
-                throw new Exception("Booking not found");
-            }
-            return await _bookingRepository.DeleteAsync(id);
+            var existingBooking = await CheckBooking(id);
+            existingBooking.Status = BookingStatus.Cancelled;
+            existingBooking.UpdatedAt = DateTime.UtcNow;
+            await _bookingRepository.UpdateAsync(existingBooking);
         }
         public async Task<List<BookingDTO>> GetBookingsByUserIdAsync(Guid userId)
         {
             var bookings = await _bookingRepository.GetBookingsByUserIdAsync(userId);
             return _mapper.Map<List<BookingDTO>>(bookings);
         }
+        private async Task<Booking> CheckBooking(Guid bookingId)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null)
+            {
+                throw new KeyNotFoundException("Booking not found");
+            }
+            return booking;
         }
     }
+}

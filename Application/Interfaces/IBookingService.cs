@@ -10,9 +10,9 @@ namespace TouRest.Application.Interfaces
     public interface IBookingService
     {
         Task<BookingDTO> GetBookingAsync(Guid id);
-        Task<BookingDTO> CreateBookingAsync(BookingCreateRequest request);
+        Task<BookingDTO> CreateBookingAsync(BookingCreateRequest request, Guid userId);
         Task<BookingDTO> UpdateBookingAsync(Guid id, BookingUpdateRequest request);
-        Task<bool> DeleteBookingAsync(Guid id);
+        Task DeleteBookingAsync(Guid id);
         Task<List<BookingDTO>> GetBookingsByUserIdAsync(Guid userId);
     }
 }

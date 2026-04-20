@@ -7,9 +7,9 @@ using TouRest.Domain.Entities;
 
 namespace TouRest.Domain.Interfaces
 {
-    public interface IBookingRepository : IBaseRepository<Booking>
+    public interface IRefundRepository : IBaseRepository<Refund>
     {
-        Task<List<Booking>> GetBookingsByUserIdAsync(Guid userId);
-        Task<Booking?> GetBookingWithItineraries(Guid bookingId);
+        Task<Refund?> GetByBookingIdAsync(Guid bookingId);
+        Task<Refund?> GetByPaymentIdAsync(Guid paymentId);
     }
 }
