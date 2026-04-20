@@ -19,6 +19,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddScoped<IItineraryActivityRepository, ItineraryActivityRepository>();
             services.AddScoped<IItineraryRepository, ItineraryRepository>();
+            services.AddScoped<IItineraryScheduleRepository, ItineraryScheduleRepository>();
             services.AddScoped<IItineraryStopRepository, ItineraryStopRepository>();
             services.AddScoped<NotificationRepository, NotificationRepository>();
             services.AddScoped<IPackageRepository, PackageRepository>();
@@ -41,6 +42,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IBookingItineraryService, BookingItineraryService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IItineraryActivityService, ItineraryActivityService>();
+            services.AddScoped<IItineraryScheduleService, ItineraryScheduleService>();
             services.AddScoped<IItineraryService, ItineraryService>();
             services.AddScoped<IItineraryStopService, ItineraryStopService>();
             services.AddScoped<IPackageService, PackageService>();

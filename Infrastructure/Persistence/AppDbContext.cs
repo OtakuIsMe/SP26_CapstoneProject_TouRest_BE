@@ -107,14 +107,22 @@ namespace TouRest.Infrastructure.Persistence
             // Configure ItineraryStop - Itinerary relationship
             modelBuilder.Entity<ItineraryStop>()
                 .HasOne(s => s.Itinerary)
-                .WithMany()
+                .WithMany(i => i.Stops)
                 .HasForeignKey(s => s.ItineraryId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure ItineraryStop - Provider relationship (nullable)
+            modelBuilder.Entity<ItineraryStop>()
+                .HasOne(s => s.Provider)
+                .WithMany()
+                .HasForeignKey(s => s.ProviderId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
 
             // Configure ItineraryActivity - ItineraryStop relationship
             modelBuilder.Entity<ItineraryActivity>()
                 .HasOne(a => a.ItineraryStop)
-                .WithMany()
+                .WithMany(s => s.Activities)
                 .HasForeignKey(a => a.ItineraryStopId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -157,7 +165,7 @@ namespace TouRest.Infrastructure.Persistence
 
             modelBuilder.Entity<PackageService>()
                 .HasOne(ps => ps.Package)
-                .WithMany()
+                .WithMany(p => p.PackageServices)
                 .HasForeignKey(ps => ps.PackageId)
                 .OnDelete(DeleteBehavior.Cascade);
 

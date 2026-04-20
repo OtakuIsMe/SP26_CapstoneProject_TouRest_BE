@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TouRest.Api.Common;
 using TouRest.Application.DTOs.Package;
 using TouRest.Application.Interfaces;
 
@@ -20,7 +21,14 @@ namespace TouRest.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _packageService.GetAllAsync();
-            return Ok(result);
+            return ApiResponseFactory.Ok(result);
+        }
+
+        [HttpGet("provider/{providerId:guid}")]
+        public async Task<IActionResult> GetByProvider(Guid providerId)
+        {
+            var result = await _packageService.GetByProviderIdAsync(providerId);
+            return ApiResponseFactory.Ok(result);
         }
 
         [HttpGet("{id:guid}")]
@@ -28,23 +36,20 @@ namespace TouRest.Api.Controllers
         {
             var result = await _packageService.GetByIdAsync(id);
             if (result == null)
-            {
                 return NotFound(new { message = "Package not found." });
-            }
-
-            return Ok(result);
+            return ApiResponseFactory.Ok(result);
         }
 
         [HttpPost]
-        [Authorize(Roles = "ADMIN, PROVIDER")]
+        [Authorize(Roles = "ADMIN,PROVIDER")]
         public async Task<IActionResult> Create([FromBody] PackageCreateRequest request)
         {
             var result = await _packageService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            return ApiResponseFactory.Created(result, "Package created successfully");
         }
 
         [HttpPut("{id:guid}")]
-        [Authorize(Roles = "ADMIN, PROVIDER")]
+        [Authorize(Roles = "ADMIN,PROVIDER")]
         public async Task<IActionResult> Update(Guid id, [FromBody] PackageUpdateRequest request)
         {
             var result = await _packageService.UpdateAsync(id, request);
@@ -57,7 +62,7 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        [Authorize(Roles = "ADMIN, PROVIDER")]
+        [Authorize(Roles = "ADMIN,PROVIDER")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var deleted = await _packageService.DeleteAsync(id);

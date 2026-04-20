@@ -10,6 +10,8 @@ namespace TouRest.Application.DTOs.Service
 {
     public class ServiceDTO
     {
+        [Required]
+        public Guid Id { get; set; }
 
         [Required]
         public Guid ProviderId { get; set; }

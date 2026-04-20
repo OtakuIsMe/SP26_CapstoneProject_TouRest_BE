@@ -113,6 +113,58 @@ namespace TouRest.Infrastructure.Migrations
                     b.ToTable("agency_users");
                 });
 
+            modelBuilder.Entity("TouRest.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ActorUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("EntityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("TargetUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorUserId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("TouRest.Domain.Entities.Booking", b =>
                 {
                     b.Property<Guid>("Id")
@@ -415,6 +467,9 @@ namespace TouRest.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<Guid?>("ProviderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StopOrder")
                         .HasColumnType("int");
 
@@ -422,6 +477,8 @@ namespace TouRest.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProviderId");
 
                     b.HasIndex("ItineraryId", "StopOrder")
                         .IsUnique();
@@ -1071,6 +1128,24 @@ namespace TouRest.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TouRest.Domain.Entities.AuditLog", b =>
+                {
+                    b.HasOne("TouRest.Domain.Entities.User", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TouRest.Domain.Entities.User", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("TargetUser");
+                });
+
             modelBuilder.Entity("TouRest.Domain.Entities.Booking", b =>
                 {
                     b.HasOne("TouRest.Domain.Entities.User", "User")
@@ -1163,12 +1238,19 @@ namespace TouRest.Infrastructure.Migrations
             modelBuilder.Entity("TouRest.Domain.Entities.ItineraryStop", b =>
                 {
                     b.HasOne("TouRest.Domain.Entities.Itinerary", "Itinerary")
-                        .WithMany()
+                        .WithMany("Stops")
                         .HasForeignKey("ItineraryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TouRest.Domain.Entities.Provider", "Provider")
+                        .WithMany()
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Itinerary");
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ItineraryTracking", b =>
@@ -1196,7 +1278,7 @@ namespace TouRest.Infrastructure.Migrations
             modelBuilder.Entity("TouRest.Domain.Entities.PackageService", b =>
                 {
                     b.HasOne("TouRest.Domain.Entities.Package", "Package")
-                        .WithMany()
+                        .WithMany("PackageServices")
                         .HasForeignKey("PackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1319,6 +1401,16 @@ namespace TouRest.Infrastructure.Migrations
                 {
                     b.Navigation("User")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TouRest.Domain.Entities.Itinerary", b =>
+                {
+                    b.Navigation("Stops");
+                });
+
+            modelBuilder.Entity("TouRest.Domain.Entities.Package", b =>
+                {
+                    b.Navigation("PackageServices");
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Role", b =>

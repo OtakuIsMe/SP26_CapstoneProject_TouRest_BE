@@ -22,7 +22,18 @@ namespace TouRest.Infrastructure.Repositories
         }
         public async Task<Agency?> GetMyAgency(Guid userId)
         {
-            return await _context.Agencies.FirstOrDefaultAsync(a => a.CreateByUserId == userId);
+            return await _context.AgencyUsers
+                .Where(au => au.UserId == userId)
+                .Select(au => au.Agency)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<(List<Agency> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
+        {
+            var query = _context.Agencies.OrderByDescending(a => a.CreatedAt);
+            var total = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return (items, total);
         }
     }
 }

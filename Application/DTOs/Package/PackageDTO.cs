@@ -16,5 +16,6 @@ namespace TouRest.Application.DTOs.Package
         public PackageStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public List<Guid> ServiceIds { get; set; } = [];
     }
 }

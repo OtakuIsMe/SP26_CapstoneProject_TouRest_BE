@@ -28,7 +28,11 @@ namespace TouRest.Domain.Entities
         [MaxLength(500)]
         public string? Address { get; set; }
 
+        public Guid? ProviderId { get; set; }
+
         // Navigation properties
         public Itinerary Itinerary { get; set; } = null!;
+        public Provider? Provider { get; set; }
+        public ICollection<ItineraryActivity> Activities { get; set; } = [];
     }
 }
