@@ -91,8 +91,8 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = ("ADMIN, AGENCY"))]
         public async Task<IActionResult> UpdateItinerary(Guid id, [FromBody] ItineraryUpdateRequest update)
         {
-            var agencyId = User.GetUserId();
-            _logger.LogInformation("Updating itinerary {ItineraryId} for agency {AgencyId}", id, agencyId);
+            var userId = User.GetUserId();
+            _logger.LogInformation("Updating itinerary {ItineraryId} by user {userId}", id, userId);
             var result = await _itineraryService.UpdateItinerary(id, update);
             return ApiResponseFactory.Ok(result,"itinerary updated");
         }
@@ -102,8 +102,8 @@ namespace TouRest.Api.Controllers
         {
             try
             {
-                var agencyId = User.GetUserId();
-                _logger.LogInformation("Updating itinerary {ItineraryId} status for agency {AgencyId}", id, agencyId);
+                var userId = User.GetUserId();
+                _logger.LogInformation("Updating itinerary {ItineraryId} status by user {userId}", id, userId);
                 var result = await _itineraryService.UpdateItineraryStatus(id, status);
                 return ApiResponseFactory.NoContent();
             }
@@ -116,8 +116,8 @@ namespace TouRest.Api.Controllers
         [Authorize(Roles = ("ADMIN, AGENCY"))]
         public async Task<IActionResult> DeleteItinerary(Guid id)
         {
-            var agencyId = User.GetUserId();
-            _logger.LogInformation("Deleting itinerary {ItineraryId} for agency {AgencyId}", id, agencyId);
+            var userId = User.GetUserId();
+            _logger.LogInformation("Deleting itinerary {ItineraryId} by user {userId}", id, userId);
             try
             {
                 await _itineraryService.DeleteItinerary(id);

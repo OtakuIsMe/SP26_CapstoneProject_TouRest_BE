@@ -1808,16 +1808,18 @@ namespace TouRest.Infrastructure.Migrations
             modelBuilder.Entity("TouRest.Domain.Entities.Package", b =>
                 {
                     b.Navigation("PackageServices");
-            modelBuilder.Entity("TouRest.Domain.Entities.Payment", b =>
-                {
-                    b.Navigation("Refund");
+
                 });
+            modelBuilder.Entity("TouRest.Domain.Entities.Payment", b =>
+            {
+                b.Navigation("Refund");
+            });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Role", b =>
-                {
-                    b.Navigation("Users");
-                });
-#pragma warning restore 612, 618
+            {
+                b.Navigation("Users");
+            });
         }
+#pragma warning restore 612, 618
     }
 }

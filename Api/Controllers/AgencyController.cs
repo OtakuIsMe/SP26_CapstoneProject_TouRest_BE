@@ -94,6 +94,7 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to approve");
         }
         [HttpPut]
+        [Authorize(Roles = "CUSTOMER, AGENCY, ADMIN")]
         public async Task<IActionResult> UpdateAgency(Guid agencyId, [FromBody] AgencyUpdateRequestDTO request)
         {
             var user = User.GetUserId();

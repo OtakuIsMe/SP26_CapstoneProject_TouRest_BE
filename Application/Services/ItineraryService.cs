@@ -88,7 +88,6 @@ namespace TouRest.Application.Services
                 Page = search.Page,
                 PageSize = search.Limit ?? search.PageSize,
             };
-            return _mapper.Map<List<ItineraryDTO>>(list);
         }
 
         public async Task<ItineraryDTO> UpdateItinerary(Guid id, ItineraryUpdateRequest update)
