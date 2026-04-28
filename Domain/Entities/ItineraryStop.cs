@@ -31,7 +31,11 @@ namespace TouRest.Domain.Entities
         public Guid VehicleId { get; set; }
         public Vehicle Vehicle { get; set; } = null!;
 
+        public Guid? ProviderId { get; set; }
+
         // Navigation properties
         public Itinerary Itinerary { get; set; } = null!;
+        public Provider? Provider { get; set; }
+        public ICollection<ItineraryActivity> Activities { get; set; } = [];
     }
 }

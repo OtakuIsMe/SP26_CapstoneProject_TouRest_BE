@@ -5,6 +5,8 @@ namespace TouRest.Domain.Enums
         User = 0,
         Itinerary = 1,
         Service = 2,
-        Vehicle = 3,
+        Agency = 3,
+       Provider = 4,
+        Vehicle = 5,
     }
 }

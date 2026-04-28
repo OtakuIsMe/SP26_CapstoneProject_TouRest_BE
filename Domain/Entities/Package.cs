@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TouRest.Domain.Base;
 using TouRest.Domain.Enums;
@@ -23,5 +22,7 @@ namespace TouRest.Domain.Entities
 
         [Required]
         public PackageStatus Status { get; set; }
+
+        public ICollection<PackageService> PackageServices { get; set; } = [];
     }
 }

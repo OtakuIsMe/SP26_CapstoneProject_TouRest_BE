@@ -12,7 +12,16 @@ namespace TouRest.Infrastructure.Repositories
 {
     public class ItineraryScheduleRepository : BaseRepository<ItinerarySchedule>, IItineraryScheduleRepository
     {
-        public ItineraryScheduleRepository(AppDbContext appDbContext) : base(appDbContext) { }
+        public ItineraryScheduleRepository(AppDbContext context) : base(context) { }
+
+        public async Task<List<ItinerarySchedule>> GetByItineraryIdAsync(Guid itineraryId)
+        {
+            return await _context.ItinerarySchedules
+                .Where(s => s.ItineraryId == itineraryId)
+                .OrderBy(s => s.StartTime)
+                .AsNoTracking()
+                .ToListAsync();
+        }
         public async Task<ItinerarySchedule?> GetScheduleWithDetails(Guid scheduleId)
         {
             return await _context.ItinerarySchedules

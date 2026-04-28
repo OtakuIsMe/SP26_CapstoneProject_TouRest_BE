@@ -21,6 +21,7 @@ namespace TouRest.Application
             services.AddScoped<IPackageServiceService, PackageServiceService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IWishListService, WishListService>();
+            services.AddScoped<IAgencyService, AgencyService>();
             return services;
         }
     }

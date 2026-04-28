@@ -30,6 +30,7 @@ namespace TouRest.Infrastructure
 
             // Register Services
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IStorageService, StorageService>();
 
             return services;
         }

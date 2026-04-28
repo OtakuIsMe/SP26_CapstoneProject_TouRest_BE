@@ -17,6 +17,13 @@ namespace TouRest.Api.Controllers
             _logger = logger;
             _serviceService = serviceService;
         }
+        [HttpGet("provider/{providerId:guid}")]
+        public async Task<IActionResult> GetServicesByProvider(Guid providerId)
+        {
+            var services = await _serviceService.GetServicesByProviderId(providerId);
+            return ApiResponseFactory.Ok(services);
+        }
+
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetServiceById(Guid id)
         {

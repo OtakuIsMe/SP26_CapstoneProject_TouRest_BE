@@ -22,6 +22,17 @@ namespace TouRest.Infrastructure.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        public async Task<List<ItineraryStop>> GetWithActivitiesByItineraryIdAsync(Guid itineraryId)
+        {
+            return await _context.ItineraryStops
+                .Where(s => s.ItineraryId == itineraryId)
+                .Include(s => s.Activities.OrderBy(a => a.ActivityOrder))
+                    .ThenInclude(a => a.Service)
+                .OrderBy(s => s.StopOrder)
+                .AsNoTracking()
+                .ToListAsync();
+        }
         public async Task<ItineraryStop?> GetItineraryStop(Guid id)
         {
             return await _context.ItineraryStops

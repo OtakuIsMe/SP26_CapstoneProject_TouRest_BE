@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Application.DTOs.Image;
 using TouRest.Application.DTOs.Itinerary;
 using TouRest.Application.DTOs.ItineraryActivity;
 using TouRest.Application.DTOs.ItineraryStop;
@@ -16,8 +17,13 @@ namespace TouRest.Application.Mappings
     {
         public ItineraryProfile()
         {
+            CreateMap<Image, ImageDTO>();
             // Map Itinerary entity to ItineraryDTO for responses
-            CreateMap<Itinerary,ItineraryDTO>();
+            CreateMap<Itinerary, ItineraryDTO>()
+                .ForMember(dest => dest.StopCount, opt => opt.MapFrom(src => src.Stops.Count))
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            // Map ItinerarySchedule entity to ItineraryScheduleDTO
+            CreateMap<ItinerarySchedule, ItineraryScheduleDTO>();
             //Map ItineraryCreateDTO to Itinerary entity for creating new itineraries
             CreateMap<ItineraryCreateRequest, Itinerary>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
@@ -53,7 +59,12 @@ namespace TouRest.Application.Mappings
             CreateMap<Itinerary, ItinerarySummaryDTO>();
             //Map ItineraryStop to ItineraryStopSummaryDTO for summary responses
             CreateMap<ItineraryStop, ItineraryStopSummaryDTO>();
-
+            // Map ItineraryActivity to StopActivityDTO
+            CreateMap<ItineraryActivity, StopActivityDTO>()
+                .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.Name))
+                .ForMember(dest => dest.ServiceDescription, opt => opt.MapFrom(src => src.Service.Description));
+            // Map ItineraryStop to ItineraryStopWithActivitiesDTO
+            CreateMap<ItineraryStop, ItineraryStopWithActivitiesDTO>();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TouRest.Domain.Entities;
 using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using TouRest.Infrastructure.Persistence;
 
 namespace TouRest.Infrastructure.Repositories
@@ -21,6 +22,12 @@ namespace TouRest.Infrastructure.Repositories
             var providerUser = new ProviderUser { ProviderId = providerId, UserId = userId, Role = role };
             await _context.ProviderUsers.AddAsync(providerUser);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<ProviderUser?> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.ProviderUsers
+                .FirstOrDefaultAsync(pu => pu.UserId == userId);
         }
     }
 }

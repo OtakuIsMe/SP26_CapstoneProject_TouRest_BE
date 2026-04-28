@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TouRest.Application.DTOs.PackageService;
 using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Package
 {
-    public class PackageDTO
+    public class PackageWithServicesDTO
     {
         public Guid Id { get; set; }
         public string Code { get; set; } = null!;
@@ -16,6 +12,6 @@ namespace TouRest.Application.DTOs.Package
         public PackageStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public List<Guid> ServiceIds { get; set; } = [];
+        public List<PackageServiceDTO> Services { get; set; } = [];
     }
 }

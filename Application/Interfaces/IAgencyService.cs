@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Application.Common.Models;
 using TouRest.Application.DTOs.Agency;
 using TouRest.Domain.Entities;
 
@@ -11,6 +12,7 @@ namespace TouRest.Application.Interfaces
     public interface IAgencyService
     {
 
+        Task<PagedResult<AgencyDTO>> GetAllAsync(int page, int pageSize);
         Task<AgencyDTO> GetAgencyById(Guid id);
         Task<AgencyDTO> GetMyAgency(Guid userId);
         Task<Agency?> GetAgencyByIdWithCreator(Guid agencyId);

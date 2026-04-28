@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Package;
+using TouRest.Application.DTOs.PackageService;
 using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
+using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 
 namespace TouRest.Application.Services
@@ -13,10 +15,14 @@ namespace TouRest.Application.Services
     public class PackageService : IPackageService
     {
         private readonly IPackageRepository _packageRepository;
+        private readonly IPackageServiceRepository _packageServiceRepository;
 
-        public PackageService(IPackageRepository packageRepository)
+        public PackageService(
+            IPackageRepository packageRepository,
+            IPackageServiceRepository packageServiceRepository)
         {
             _packageRepository = packageRepository;
+            _packageServiceRepository = packageServiceRepository;
         }
 
         public async Task<IEnumerable<PackageSummaryDTO>> GetAllAsync()
@@ -33,6 +39,33 @@ namespace TouRest.Application.Services
             return MapToDTO(package);
         }
 
+        public async Task<List<PackageWithServicesDTO>> GetByProviderIdAsync(Guid providerId)
+        {
+            var packages = await _packageRepository.GetByProviderIdWithServicesAsync(providerId);
+            return packages.Select(p => new PackageWithServicesDTO
+            {
+                Id = p.Id,
+                Code = p.Code,
+                Name = p.Name,
+                BasePrice = p.BasePrice,
+                Status = p.Status,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt,
+                Services = p.PackageServices.Select(ps => new PackageServiceDTO
+                {
+                    PackageId = ps.PackageId,
+                    ServiceId = ps.ServiceId,
+                    SortOrder = ps.SortOrder,
+                    ServiceName = ps.Service.Name,
+                    ServiceDescription = ps.Service.Description,
+                    ServicePrice = ps.Service.Price,
+                    ServiceDurationMinutes = ps.Service.DurationMinutes,
+                    ServiceStatus = ps.Service.Status,
+                    ServiceBasePrice = ps.Service.BasePrice,
+                }).ToList()
+            }).ToList();
+        }
+
         public async Task<PackageDTO> CreateAsync(PackageCreateRequest request)
         {
             var existing = await _packageRepository.GetByCodeAsync(request.Code.Trim());
@@ -45,12 +78,26 @@ namespace TouRest.Application.Services
                 Code = request.Code.Trim(),
                 Name = request.Name.Trim(),
                 BasePrice = request.BasePrice,
-                Status = request.Status,
+                Status = PackageStatus.Archived,
                 CreatedAt = DateTime.UtcNow
             };
 
             var result = await _packageRepository.CreateAsync(package);
-            return MapToDTO(result);
+
+            var serviceIds = request.ServiceIds ?? [];
+            for (int i = 0; i < serviceIds.Count; i++)
+            {
+                await _packageServiceRepository.CreateAsync(new Domain.Entities.PackageService
+                {
+                    PackageId = result.Id,
+                    ServiceId = serviceIds[i],
+                    SortOrder = i,
+                });
+            }
+
+            var dto = MapToDTO(result);
+            dto.ServiceIds = serviceIds;
+            return dto;
         }
 
         public async Task<PackageDTO?> UpdateAsync(Guid id, PackageUpdateRequest request)

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TouRest.Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace TouRest.Application.DTOs.Agency
 {
@@ -35,6 +30,7 @@ namespace TouRest.Application.DTOs.Agency
         [MaxLength(20)]
         [Phone]
         public string ContactPhone { get; set; } = null!;
+        public List<IFormFile>? Images { get; set; }
     }
 }
 

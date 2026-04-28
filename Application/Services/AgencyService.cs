@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.Common.Helpers;
+using TouRest.Application.Common.Models;
 using TouRest.Application.DTOs.Agency;
 using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
@@ -17,11 +18,33 @@ namespace TouRest.Application.Services
     {
         private readonly IMapper _mapper;
         private readonly IAgencyRepository _agencyRepository;
-        public AgencyService(IAgencyRepository agencyRepository, IMapper mapper)
+        private readonly IImageRepository _imageRepository;
+        private readonly IStorageService _storageService;
+
+        public AgencyService(
+            IAgencyRepository agencyRepository,
+            IMapper mapper,
+            IImageRepository imageRepository,
+            IStorageService storageService)
         {
             _mapper = mapper;
             _agencyRepository = agencyRepository;
+            _imageRepository = imageRepository;
+            _storageService = storageService;
         }
+
+        public async Task<PagedResult<AgencyDTO>> GetAllAsync(int page, int pageSize)
+        {
+            var (items, total) = await _agencyRepository.GetPagedAsync(page, pageSize);
+            return new PagedResult<AgencyDTO>
+            {
+                Items      = _mapper.Map<List<AgencyDTO>>(items),
+                TotalCount = total,
+                Page       = page,
+                PageSize   = pageSize,
+            };
+        }
+
         public async Task<AgencyDTO> AddAgency(Guid userCreateId, AgencyCreateRequestDTO create)
         {
             ArgumentNullException.ThrowIfNull(create);
@@ -40,7 +63,25 @@ namespace TouRest.Application.Services
             agency.Status = AgencyStatus.Pending;
             agency.CreatedAt = DateTime.UtcNow;
             agency.UpdatedAt = DateTime.UtcNow;
+
             var createdAgency = await _agencyRepository.CreateAsync(agency);
+
+            if (create.Images != null && create.Images.Count > 0)
+            {
+                var urls = await _storageService.UploadManyAsync(create.Images);
+                for (int i = 0; i < urls.Count; i++)
+                {
+                    await _imageRepository.CreateAsync(new Image
+                    {
+                        Id        = Guid.NewGuid(),
+                        Url       = urls[i],
+                        Type      = ImageType.Agency,
+                        TypeId    = createdAgency.Id,
+                        PicNumber = i + 1,
+                    });
+                }
+            }
+
             return _mapper.Map<AgencyDTO>(createdAgency);
         }
 

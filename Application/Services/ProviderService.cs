@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using TouRest.Application.Common.Models;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
@@ -16,13 +18,22 @@ namespace TouRest.Application.Services
     {
         private readonly IProviderRepository _providerRepository;
         private readonly IProviderUserRepository _providerUserRepository;
+        private readonly IImageRepository _imageRepository;
+        private readonly IStorageService _storageService;
+        private readonly IMapper _mapper;
 
         public ProviderService(
             IProviderRepository providerRepository,
-            IProviderUserRepository providerUserRepository)
+            IProviderUserRepository providerUserRepository,
+            IImageRepository imageRepository,
+            IStorageService storageService,
+            IMapper mapper)
         {
             _providerRepository = providerRepository;
             _providerUserRepository = providerUserRepository;
+            _imageRepository = imageRepository;
+            _storageService = storageService;
+            _mapper = mapper;
         }
 
         public async Task<List<ProviderResponse>> GetAllAsync()
@@ -31,9 +42,46 @@ namespace TouRest.Application.Services
             return providers.Select(MapToResponse).ToList();
         }
 
+        public async Task<PagedResult<ProviderDTO>> GetAllPagedAsync(int page, int pageSize)
+        {
+            var (items, total) = await _providerRepository.GetPagedAsync(page, pageSize);
+            return new PagedResult<ProviderDTO>
+            {
+                Items      = _mapper.Map<List<ProviderDTO>>(items),
+                TotalCount = total,
+                Page       = page,
+                PageSize   = pageSize,
+            };
+        }
+
         public async Task<ProviderResponse?> GetByIdAsync(Guid id)
         {
             var provider = await _providerRepository.GetByIdAsync(id);
+            return provider == null ? null : MapToResponse(provider);
+        }
+
+        public async Task<List<ProviderMapDTO>> GetMapMarkersAsync()
+        {
+            var providers = await _providerRepository.GetAllAsync();
+            return providers
+                .Where(p => p.Latitude != 0 && p.Longitude != 0)
+                .Select(p => new ProviderMapDTO
+                {
+                    Id           = p.Id,
+                    Name         = p.Name,
+                    Latitude     = p.Latitude,
+                    Longitude    = p.Longitude,
+                    Address      = p.Address,
+                    ContactPhone = p.ContactPhone,
+                })
+                .ToList();
+        }
+
+        public async Task<ProviderResponse?> GetByUserIdAsync(Guid userId)
+        {
+            var providerUser = await _providerUserRepository.GetByUserIdAsync(userId);
+            if (providerUser == null) return null;
+            var provider = await _providerRepository.GetByIdAsync(providerUser.ProviderId);
             return provider == null ? null : MapToResponse(provider);
         }
 
@@ -83,6 +131,22 @@ namespace TouRest.Application.Services
 
             await _providerUserRepository.CreateAsync(providerUser);
             await _providerRepository.SaveChangesAsync();
+
+            if (request.Images != null && request.Images.Count > 0)
+            {
+                var urls = await _storageService.UploadManyAsync(request.Images);
+                for (int i = 0; i < urls.Count; i++)
+                {
+                    await _imageRepository.CreateAsync(new Image
+                    {
+                        Id        = Guid.NewGuid(),
+                        Url       = urls[i],
+                        Type      = ImageType.Provider,
+                        TypeId    = provider.Id,
+                        PicNumber = i + 1,
+                    });
+                }
+            }
 
             return MapToResponse(provider);
         }

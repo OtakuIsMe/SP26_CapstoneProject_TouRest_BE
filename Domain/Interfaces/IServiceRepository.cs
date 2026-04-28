@@ -9,5 +9,6 @@ namespace TouRest.Domain.Interfaces
 {
     public interface IServiceRepository : IBaseRepository<Service>
     {
+        Task<IEnumerable<Service>> GetByProviderIdAsync(Guid providerId);
     }
 }

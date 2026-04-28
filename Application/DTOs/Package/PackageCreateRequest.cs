@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Package
 {
@@ -22,7 +17,7 @@ namespace TouRest.Application.DTOs.Package
         [Range(1, int.MaxValue, ErrorMessage = "BasePrice must be greater than 0")]
         public int BasePrice { get; set; }
 
-        [Required]
-        public PackageStatus Status { get; set; }
+        [MinLength(1, ErrorMessage = "At least one service is required.")]
+        public List<Guid> ServiceIds { get; set; } = [];
     }
 }
