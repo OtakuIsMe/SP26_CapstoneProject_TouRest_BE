@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace TouRest.Application.DTOs.Provider
 {
@@ -57,5 +53,7 @@ namespace TouRest.Application.DTOs.Provider
         [Required]
         [MaxLength(20)]
         public string ContactPhone { get; set; } = null!;
+
+        public List<IFormFile>? Images { get; set; }
     }
 }

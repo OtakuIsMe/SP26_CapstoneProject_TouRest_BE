@@ -24,6 +24,14 @@ namespace TouRest.Api.Controllers
             _agencyUserService = agencyUserService;
             _authService = authService;
         }
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetAllAgencies([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _agencyService.GetAllAsync(page, pageSize);
+            return ApiResponseFactory.Ok(result);
+        }
+
         [HttpGet("{id:guid}")]
         [Authorize(Roles = "ADMIN, AGENCY")]
         public async Task<IActionResult> GetAgencyById(Guid id)
@@ -32,7 +40,6 @@ namespace TouRest.Api.Controllers
             if (agency == null)
                 return NotFound();
             return ApiResponseFactory.Ok(agency);
-
         }
         [HttpGet("user-list")]
         [Authorize(Roles = "ADMIN, AGENCY")]
@@ -68,8 +75,8 @@ namespace TouRest.Api.Controllers
             return ApiResponseFactory.Ok(new { }, "User removed from agency");
         }
         [HttpPost]
-        [Authorize(Roles = "AGENCY")]
-        public async Task<IActionResult> CreateAgency(AgencyCreateRequestDTO request)
+        [Authorize(Roles = "CUSTOMER")]
+        public async Task<IActionResult> CreateAgency([FromForm] AgencyCreateRequestDTO request)
         {
             var user = User.GetUserId();
             _logger.LogInformation("User {UserId} is creating an agency with name {AgencyName}", user, request.Name);

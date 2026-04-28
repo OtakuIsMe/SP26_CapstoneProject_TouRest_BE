@@ -26,6 +26,14 @@ namespace TouRest.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<(List<Provider> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
+        {
+            var query = _context.Providers.OrderByDescending(x => x.CreatedAt);
+            var total = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return (items, total);
+        }
+
         public async Task<Provider?> GetByIdAsync(Guid id)
         {
             return await _context.Providers

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Application.DTOs.Image;
 using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Itinerary
@@ -30,5 +31,10 @@ namespace TouRest.Application.DTOs.Itinerary
         [Required]
         public ItineraryStatus Status { get; set; }
 
+        public int StopCount { get; set; }
+
+        public List<ImageDTO> Images { get; set; } = [];
+
+        public List<ItineraryScheduleDTO> Schedules { get; set; } = [];
     }
 }

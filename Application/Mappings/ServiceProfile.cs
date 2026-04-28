@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Service;
 using TouRest.Domain.Entities;
+using TouRest.Domain.Enums;
 
 namespace TouRest.Application.Mappings
 {
@@ -20,6 +21,7 @@ namespace TouRest.Application.Mappings
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src=> Guid.NewGuid()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ServiceStatus.Active))
                 .ForMember(dest => dest.Provider, opt => opt.Ignore());
             // For updating service, we want to ignore Id, CreatedAt, and Provider navigation property
             CreateMap<ServiceUpdateRequest, Service>()

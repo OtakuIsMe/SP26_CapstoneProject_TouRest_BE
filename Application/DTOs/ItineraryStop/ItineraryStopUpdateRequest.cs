@@ -20,5 +20,6 @@ namespace TouRest.Application.DTOs.ItineraryStop
         public double Latitude { get; set; }
 
         public string? Address { get; set; }
+        public Guid? ProviderId { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace TouRest.Domain.Interfaces
     public interface IProviderRepository
     {
         Task<List<Provider>> GetAllAsync();
+        Task<(List<Provider> Items, int TotalCount)> GetPagedAsync(int page, int pageSize);
         Task<Provider?> GetByIdAsync(Guid id);
         Task<Provider?> GetByContactEmailAsync(string contactEmail);
         Task<Provider?> GetByCreateByUserIdAsync(Guid userId);

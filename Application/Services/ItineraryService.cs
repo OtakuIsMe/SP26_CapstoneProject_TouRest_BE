@@ -16,10 +16,28 @@ namespace TouRest.Application.Services
     public class ItineraryService : IItineraryService
     {
         private readonly IItineraryRepository _itineraryRepository;
+        private readonly IItineraryStopRepository _stopRepository;
+        private readonly IItineraryActivityRepository _activityRepository;
+        private readonly IImageRepository _imageRepository;
+        private readonly IItineraryScheduleRepository _scheduleRepository;
+        private readonly IStorageService _storageService;
         private readonly IMapper _mapper;
-        public ItineraryService(IItineraryRepository itineraryRepository, IMapper mapper)
+
+        public ItineraryService(
+            IItineraryRepository itineraryRepository,
+            IItineraryStopRepository stopRepository,
+            IItineraryActivityRepository activityRepository,
+            IImageRepository imageRepository,
+            IItineraryScheduleRepository scheduleRepository,
+            IStorageService storageService,
+            IMapper mapper)
         {
             _itineraryRepository = itineraryRepository;
+            _stopRepository = stopRepository;
+            _activityRepository = activityRepository;
+            _imageRepository = imageRepository;
+            _scheduleRepository = scheduleRepository;
+            _storageService = storageService;
             _mapper = mapper;
         }
 
@@ -38,14 +56,28 @@ namespace TouRest.Application.Services
             return result;
         }
 
-        public async Task<List<ItineraryDTO>> GetItineraries(ItinerarySearch search)
+        public async Task<DTOs.Common.PagedResult<ItineraryDTO>> GetItineraries(ItinerarySearch search)
         {
+            var total = search.Limit == null
+                ? await _itineraryRepository.CountItineraries(search)
+                : 0;
+
             var list = await _itineraryRepository.GetItineraries(search);
-            if(list == null)
+            var dtos = _mapper.Map<List<ItineraryDTO>>(list ?? []);
+
+            foreach (var dto in dtos)
             {
-                return new List<ItineraryDTO>();
+                var images = await _imageRepository.GetByTypeAsync(Domain.Enums.ImageType.Itinerary, dto.Id);
+                dto.Images = _mapper.Map<List<DTOs.Image.ImageDTO>>(images);
             }
-            return _mapper.Map<List<ItineraryDTO>>(list);
+
+            return new DTOs.Common.PagedResult<ItineraryDTO>
+            {
+                Items = dtos,
+                Total = search.Limit == null ? total : dtos.Count,
+                Page = search.Page,
+                PageSize = search.Limit ?? search.PageSize,
+            };
         }
 
         public async Task<ItineraryDTO> UpdateItinerary(Guid id, ItineraryUpdateRequest update)
@@ -65,7 +97,12 @@ namespace TouRest.Application.Services
             var itinerary = await _itineraryRepository.GetByIdAsync(id);
             if (itinerary == null)
                 return null;
-            return _mapper.Map<ItineraryDTO>(itinerary);
+            var dto = _mapper.Map<ItineraryDTO>(itinerary);
+            var images = await _imageRepository.GetByTypeAsync(Domain.Enums.ImageType.Itinerary, id);
+            dto.Images = _mapper.Map<List<DTOs.Image.ImageDTO>>(images);
+            var schedules = await _scheduleRepository.GetByItineraryIdAsync(id);
+            dto.Schedules = _mapper.Map<List<ItineraryScheduleDTO>>(schedules);
+            return dto;
         }
         public async Task<ItineraryDTO?> UpdateItineraryStatus(Guid id, ItineraryUpdateStatusRequest request)
         {
@@ -78,6 +115,94 @@ namespace TouRest.Application.Services
             itinerary.Status = request.Status;
             var result = await _itineraryRepository.UpdateAsync(itinerary);
             return _mapper.Map<ItineraryDTO>(result);
+        }
+
+        public async Task<ItineraryDTO> CreateFullAsync(Guid agencyId, ItineraryFullCreateRequest request)
+        {
+            var itinerary = new Itinerary
+            {
+                Id = Guid.NewGuid(),
+                AgencyId = agencyId,
+                Name = request.Name.Trim(),
+                Description = request.Description?.Trim(),
+                Price = request.Price,
+                DurationDays = request.Duration,
+                Status = ItineraryStatus.Draft,
+                CreatedAt = DateTime.UtcNow,
+            };
+            var saved = await _itineraryRepository.CreateAsync(itinerary);
+
+            foreach (var stopReq in request.Stops)
+            {
+                var stop = new ItineraryStop
+                {
+                    Id = Guid.NewGuid(),
+                    ItineraryId = saved.Id,
+                    StopOrder = stopReq.StopOrder,
+                    Name = stopReq.Name.Trim(),
+                    Longitude = stopReq.Longitude,
+                    Latitude = stopReq.Latitude,
+                    Address = stopReq.Address?.Trim(),
+                    ProviderId = stopReq.ProviderId,
+                    CreatedAt = DateTime.UtcNow,
+                };
+                var savedStop = await _stopRepository.CreateAsync(stop);
+
+                int actOrder = 0;
+                foreach (var actReq in stopReq.Activities)
+                {
+                    if (actReq.ServiceId == null || actReq.ServiceId == Guid.Empty) continue;
+
+                    var activity = new ItineraryActivity
+                    {
+                        Id = Guid.NewGuid(),
+                        ItineraryStopId = savedStop.Id,
+                        ServiceId = actReq.ServiceId.Value,
+                        ActivityOrder = actReq.ActivityOrder > 0 ? actReq.ActivityOrder : actOrder,
+                        StartTime = ParseTime(actReq.StartTime),
+                        EndTime = ParseTime(actReq.EndTime),
+                        Price = actReq.Price > 0 ? actReq.Price : 1,
+                        Note = actReq.Note,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+                    await _activityRepository.CreateAsync(activity);
+                    actOrder++;
+                }
+            }
+
+            if (request.Images != null && request.Images.Count > 0)
+            {
+                var urls = await _storageService.UploadManyAsync(request.Images);
+                for (int i = 0; i < urls.Count; i++)
+                {
+                    await _imageRepository.CreateAsync(new Image
+                    {
+                        Id        = Guid.NewGuid(),
+                        Url       = urls[i],
+                        Type      = ImageType.Itinerary,
+                        TypeId    = saved.Id,
+                        PicNumber = i + 1,
+                    });
+                }
+            }
+
+            return _mapper.Map<ItineraryDTO>(saved);
+        }
+
+        public async Task<List<ItineraryDTO>> GetMyItinerariesAsync(Guid agencyId)
+        {
+            var list = await _itineraryRepository.GetByAgencyIdAsync(agencyId);
+            return _mapper.Map<List<ItineraryDTO>>(list);
+        }
+
+        private static DateTime ParseTime(string? timeStr)
+        {
+            if (string.IsNullOrWhiteSpace(timeStr)) return DateTime.UtcNow;
+            if (TimeSpan.TryParseExact(timeStr, @"hh\:mm", null, out var ts))
+                return DateTime.UtcNow.Date.Add(ts);
+            if (DateTime.TryParse(timeStr, out var dt))
+                return dt;
+            return DateTime.UtcNow;
         }
     }
 }

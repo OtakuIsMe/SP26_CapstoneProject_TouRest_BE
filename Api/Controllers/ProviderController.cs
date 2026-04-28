@@ -22,10 +22,30 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _providerService.GetAllAsync();
-            return Ok(result);
+            var result = await _providerService.GetAllPagedAsync(page, pageSize);
+            return ApiResponseFactory.Ok(result);
+        }
+
+        [HttpGet("map")]
+        public async Task<IActionResult> GetMapMarkers()
+        {
+            var result = await _providerService.GetMapMarkersAsync();
+            return ApiResponseFactory.Ok(result);
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetMe()
+        {
+            var userId = User.GetUserId();
+            Console.WriteLine(userId);
+            var result = await _providerService.GetByUserIdAsync(userId);
+            if (result == null)
+                return NotFound(new { message = "Provider not found." });
+            return ApiResponseFactory.Ok(result);
         }
 
         [HttpGet("{id:guid}")]
@@ -42,7 +62,7 @@ namespace TouRest.Api.Controllers
 
         [HttpPost]
         [Authorize(Roles = "CUSTOMER")]
-        public async Task<IActionResult> Create([FromBody] CreateProviderRequest request)
+        public async Task<IActionResult> Create([FromForm] CreateProviderRequest request)
         {
             var userId = User.GetUserId();
             var result = await _providerService.CreateAsync(userId, request);

@@ -22,5 +22,15 @@ namespace TouRest.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Code == code);
         }
+
+        public async Task<List<Package>> GetByProviderIdWithServicesAsync(Guid providerId)
+        {
+            return await _context.Packages
+                .AsNoTracking()
+                .Include(p => p.PackageServices.OrderBy(ps => ps.SortOrder))
+                    .ThenInclude(ps => ps.Service)
+                .Where(p => p.PackageServices.Any(ps => ps.Service.ProviderId == providerId))
+                .ToListAsync();
+        }
     }
 }

@@ -2,7 +2,7 @@ namespace TouRest.Application.Common.Constants
 {
     public static class AuthConstants
     {
-        public const int AccessTokenExpiryMinutes = 15;
+        public const int AccessTokenExpiryMinutes = 200000;
         public const int RefreshTokenExpiryDays = 7;
 
         public const string JwtIssuer = "TouRest";

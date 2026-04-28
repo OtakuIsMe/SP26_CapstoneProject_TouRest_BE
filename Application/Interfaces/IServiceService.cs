@@ -12,6 +12,7 @@ namespace TouRest.Application.Interfaces
     {
         Task<ServiceDTO?> GetServiceById(Guid id);
         Task<IEnumerable<ServiceDTO>> GetAllServices();
+        Task<IEnumerable<ServiceDTO>> GetServicesByProviderId(Guid providerId);
         Task<ServiceDTO> CreateService(ServiceCreateRequest request);
         Task<ServiceDTO?> UpdateService(Guid id, ServiceUpdateRequest request);
             Task<bool> DeleteService(Guid id);

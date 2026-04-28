@@ -10,6 +10,7 @@ namespace TouRest.Domain.Interfaces
     public interface IItineraryStopRepository : IBaseRepository<ItineraryStop>
     {
         Task<List<ItineraryStop>> GetByItineraryIdAsync(Guid itineraryId);
+        Task<List<ItineraryStop>> GetWithActivitiesByItineraryIdAsync(Guid itineraryId);
         Task<ItineraryStop?> GetItineraryStop(Guid id);
         Task UpdateRangeAsync(List<ItineraryStop> ordered);
     }

@@ -11,5 +11,6 @@ namespace TouRest.Domain.Interfaces
     public interface IProviderUserRepository :IBaseRepository<ProviderUser>
     {
         Task AddUserIntoProvider(Guid providerId, Guid userId, ProviderUserRole role);
+        Task<ProviderUser?> GetByUserIdAsync(Guid userId);
     }
 }
