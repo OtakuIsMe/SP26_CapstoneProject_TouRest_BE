@@ -18,13 +18,11 @@ namespace TouRest.Domain.Entities
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "TotalAmount must be greater than 0")]
-        public int TotalAmount { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalAmount { get; set; }
 
         [Required]
         public BookingStatus Status { get; set; }
-
-        [Required]
-        public PaymentStatus PaymentStatus { get; set; }
 
         [MaxLength(500)]
         public string? CustomerNote { get; set; }
@@ -34,5 +32,7 @@ namespace TouRest.Domain.Entities
 
         // Navigation properties
         public User User { get; set; } = null!;
+        public ICollection<BookingItinerary> BookingItineraries { get; set; } = [];
+        public ICollection<Payment> Payments { get; set; } = [];
     }
 }

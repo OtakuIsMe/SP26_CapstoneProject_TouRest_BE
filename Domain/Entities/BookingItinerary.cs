@@ -19,8 +19,11 @@ namespace TouRest.Domain.Entities
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0")]
-        public int Price { get; set; }
-
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal FinalPrice { get; set; }
         [Required]
         public BookingItineraryStatus Status { get; set; }
 

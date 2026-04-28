@@ -33,6 +33,8 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IProviderRepository, ProviderRepository>();
             services.AddScoped<VoucherRepository, VoucherRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IRefundRepository, RefundRepository>();
             //Add services to the DI container, count = 15
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IAuthService, AuthService>();
@@ -40,6 +42,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IAgencyUserService, AgencyUserService>();    
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IBookingItineraryService, BookingItineraryService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IItineraryActivityService, ItineraryActivityService>();
             services.AddScoped<IItineraryScheduleService, ItineraryScheduleService>();
@@ -53,6 +56,8 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWishListService, WishListService>();
             services.AddScoped<IServiceService, ServiceService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IRefundService, RefundService>();
             services.AddScoped<IRouteOptimizerService, RouteOptimizerService>();
             return services;
         }

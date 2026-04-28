@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TouRest.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using TouRest.Infrastructure.Persistence;
 namespace TouRest.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260417102534_20260417")]
+    partial class _20260417
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -472,9 +475,6 @@ namespace TouRest.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<Guid?>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("StopOrder")
                         .HasColumnType("int");
 
@@ -482,8 +482,6 @@ namespace TouRest.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProviderId");
 
                     b.HasIndex("ItineraryId", "StopOrder")
                         .IsUnique();
@@ -629,12 +627,6 @@ namespace TouRest.Infrastructure.Migrations
                     b.Property<Guid>("BookingId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CancelledReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CheckoutUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -673,55 +665,6 @@ namespace TouRest.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("TouRest.Domain.Entities.Payout", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AccountHolder")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdminNote")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("BankAccount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BankName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PayOSTransferId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("WalletId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("payouts");
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Provider", b =>
@@ -874,15 +817,6 @@ namespace TouRest.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerAccountHolder")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerBankAccount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerBankName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("InitiatedBy")
                         .HasColumnType("int");
 
@@ -899,8 +833,8 @@ namespace TouRest.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalRefundAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalRefundAmount")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1203,88 +1137,6 @@ namespace TouRest.Infrastructure.Migrations
                     b.ToTable("vouchers");
                 });
 
-            modelBuilder.Entity("TouRest.Domain.Entities.Wallet", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AgencyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("PendingBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid?>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgencyId")
-                        .IsUnique()
-                        .HasFilter("[AgencyId] IS NOT NULL");
-
-                    b.HasIndex("ProviderId")
-                        .IsUnique()
-                        .HasFilter("[ProviderId] IS NOT NULL");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("wallets");
-                });
-
-            modelBuilder.Entity("TouRest.Domain.Entities.WalletTransaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Note")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Reason")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("ReferenceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("WalletId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("wallet_transactions");
-                });
-
             modelBuilder.Entity("TouRest.Domain.Entities.Wishlist", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1460,19 +1312,12 @@ namespace TouRest.Infrastructure.Migrations
             modelBuilder.Entity("TouRest.Domain.Entities.ItineraryStop", b =>
                 {
                     b.HasOne("TouRest.Domain.Entities.Itinerary", "Itinerary")
-                        .WithMany("Stops")
+                        .WithMany()
                         .HasForeignKey("ItineraryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TouRest.Domain.Entities.Provider", "Provider")
-                        .WithMany()
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Itinerary");
-
-                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ItineraryTracking", b =>
@@ -1500,7 +1345,7 @@ namespace TouRest.Infrastructure.Migrations
             modelBuilder.Entity("TouRest.Domain.Entities.PackageService", b =>
                 {
                     b.HasOne("TouRest.Domain.Entities.Package", "Package")
-                        .WithMany("PackageServices")
+                        .WithMany()
                         .HasForeignKey("PackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1525,17 +1370,6 @@ namespace TouRest.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Booking");
-                });
-
-            modelBuilder.Entity("TouRest.Domain.Entities.Payout", b =>
-                {
-                    b.HasOne("TouRest.Domain.Entities.Wallet", "Wallet")
-                        .WithMany()
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Provider", b =>
@@ -1638,41 +1472,6 @@ namespace TouRest.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TouRest.Domain.Entities.Wallet", b =>
-                {
-                    b.HasOne("TouRest.Domain.Entities.Agency", "Agency")
-                        .WithOne()
-                        .HasForeignKey("TouRest.Domain.Entities.Wallet", "AgencyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("TouRest.Domain.Entities.Provider", "Provider")
-                        .WithOne()
-                        .HasForeignKey("TouRest.Domain.Entities.Wallet", "ProviderId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("TouRest.Domain.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("TouRest.Domain.Entities.Wallet", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Agency");
-
-                    b.Navigation("Provider");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TouRest.Domain.Entities.WalletTransaction", b =>
-                {
-                    b.HasOne("TouRest.Domain.Entities.Wallet", "Wallet")
-                        .WithMany()
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Wallet");
-                });
-
             modelBuilder.Entity("TouRest.Domain.Entities.Wishlist", b =>
                 {
                     b.HasOne("TouRest.Domain.Entities.User", "User")
@@ -1697,14 +1496,6 @@ namespace TouRest.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TouRest.Domain.Entities.Itinerary", b =>
-                {
-                    b.Navigation("Stops");
-                });
-
-            modelBuilder.Entity("TouRest.Domain.Entities.Package", b =>
-                {
-                    b.Navigation("PackageServices");
             modelBuilder.Entity("TouRest.Domain.Entities.Payment", b =>
                 {
                     b.Navigation("Refund");

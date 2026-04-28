@@ -11,18 +11,28 @@ namespace TouRest.Domain.Entities
     {
         [Required]
         public Guid BookingId { get; set; }
+        [Required]
+        public Guid PaymentId { get; set; }
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "TotalRefundAmount must be greater than 0")]
-        public int TotalRefundAmount { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalRefundAmount { get; set; }
+        public RefundInitinator InitiatedBy { get; set; }
+        public string? CustomerBankAccount { get; set; }
+        public string? CustomerBankName { get; set; }
+        public string? CustomerAccountHolder { get; set; }
 
         [MaxLength(500)]
         public string? Reason { get; set; }
+        public string? AdminNote { get; set; }
+        public DateTime? RefundedAt { get; set; }
 
         [Required]
         public RefundStatus Status { get; set; }
 
         // Navigation properties
+        public Payment Payment { get; set; } = null!;
         public Booking Booking { get; set; } = null!;
     }
 }

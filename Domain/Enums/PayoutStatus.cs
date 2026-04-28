@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace TouRest.Domain.Enums
 {
-    public enum PaymentStatus
+    public enum PayoutStatus
     {
         Pending = 0,
-        Paid = 1,
-        Failed = 2,
-        Refunded = 3,
-        Cancelled = 4
-
+        Approved = 1,
+        Rejected = 2,
+        Completed = 3
     }
 }
