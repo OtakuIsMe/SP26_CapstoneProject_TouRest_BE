@@ -24,6 +24,6 @@ namespace TouRest.Application.DTOs.Agency
         public string ContactEmail { get; set; } = null!;
 
         public string ContactPhone { get; set; } = null!;
-        public Guid CreatedByUserId { get; set; }
+        public Guid CreateByUserId { get; set; }
     }
 }

@@ -24,5 +24,10 @@ namespace TouRest.Infrastructure.Repositories
         {
             return await _context.Agencies.FirstOrDefaultAsync(a => a.CreateByUserId == userId);
         }
+        public async Task<Agency?> GetAgencyByIdWithCreator(Guid agencyId)
+        {
+            return await _context.Agencies.Include(x=>x.User).AsNoTracking().FirstOrDefaultAsync(x=>x.Id == agencyId);
+        }
+
     }
 }

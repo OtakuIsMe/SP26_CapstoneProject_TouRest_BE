@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Application.DTOs.Feedback;
 using TouRest.Domain.Entities;
+using TouRest.Domain.Enums;
 using TouRest.Domain.Interfaces;
 using TouRest.Infrastructure.Persistence;
 
@@ -18,23 +20,60 @@ namespace TouRest.Infrastructure.Repositories
         public async Task<List<Feedback>> GetFeedbacksByBookingItineraryIdAsync(Guid bookingItineraryId)
         {
             return await _context.Feedbacks
-                .Where(f => f.BookingItineraryId == bookingItineraryId)
+                .Where(f => f.BookingItineraryId == bookingItineraryId && f.Status == FeedbackStatus.Active)
                 .Include(x => x.BookingItinerary)
+                .ThenInclude(x=>x.Booking)
+                .ThenInclude(x=>x.User)
                 .AsNoTracking()
                 .ToListAsync();
         }
+        public async Task<Guid?> GetItineraryAgencyIdByFeedbackId(Guid feedbackId)
+        {
+            return await _context.Feedbacks
+                .Where(f => f.Id == feedbackId)
+                .Select(f => f.BookingItinerary
+                    .ItinerarySchedule
+                    .Itinerary.AgencyId)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<RatingSummaryDTO> GetRatingSummaryAsync(Guid itineraryId)
+        {
+            var feedbacks = await _context.Feedbacks
+                .Include(f => f.BookingItinerary)
+                    .ThenInclude(bi => bi.ItinerarySchedule)
+                .Where(f => f.BookingItinerary.ItinerarySchedule.ItineraryId == itineraryId
+                    && f.Status == FeedbackStatus.Active)
+                .AsNoTracking()
+                .ToListAsync();
+
+            if (!feedbacks.Any())
+                return new RatingSummaryDTO();
+
+            return new RatingSummaryDTO
+            {
+                AverageRating = Math.Round(feedbacks.Average(f => f.Rating), 1),
+                TotalReviews = feedbacks.Count,
+                RatingCounts = feedbacks
+                    .GroupBy(f => f.Rating)
+                    .ToDictionary(g => g.Key, g => g.Count())
+            };
+        }
+        public async Task<List<Feedback>> GetFeedbacksByItineraryIdAsync(Guid itineraryId)
+        {
+            return await _context.Feedbacks
+                .Include(x => x.BookingItinerary)
+                    .ThenInclude(bi => bi.Booking)
+                        .ThenInclude(b => b.User)
+                .Where(f => f.BookingItinerary.ItinerarySchedule.ItineraryId == itineraryId && f.Status == FeedbackStatus.Active)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<Feedback?> GetFeedback(Guid id)
         {
             return await _context.Feedbacks
                 .Include(x => x.BookingItinerary)
                 .FirstOrDefaultAsync(f => f.Id == id);
-        }
-        public async Task<List<Feedback>> GetFeedbacks()
-        {
-            return await _context.Feedbacks
-                .Include(x => x.BookingItinerary)
-                .AsNoTracking()
-                .ToListAsync();
         }
         public async Task<List<Feedback>> GetFeedbacks(FeedbackSearch search)
         {

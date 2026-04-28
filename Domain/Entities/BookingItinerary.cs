@@ -18,12 +18,13 @@ namespace TouRest.Domain.Entities
         public Guid? VoucherId { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Price { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal FinalPrice { get; set; }
+        [Range(1, long.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        public long Price { get; set; }
+        [Required]
+        [Range(1, long.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        public long FinalPrice { get; set; }
+        [Required]
+        public int NumberOfGuests { get; set; }
         [Required]
         public BookingItineraryStatus Status { get; set; }
 
@@ -31,5 +32,6 @@ namespace TouRest.Domain.Entities
         public Booking Booking { get; set; } = null!;
         public ItinerarySchedule ItinerarySchedule { get; set; } = null!;
         public Voucher? Voucher { get; set; }
+        public Feedback? Feedback { get; set; }
     }
 }

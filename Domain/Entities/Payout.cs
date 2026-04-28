@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -13,9 +14,8 @@ namespace TouRest.Domain.Entities
     public class Payout : BaseEntity
     {
         public Guid WalletId { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Amount { get; set; }
+        [Range(1, long.MaxValue, ErrorMessage = "Amount need to be larger than 0")]
+        public long Amount { get; set; }
 
         public PayoutStatus Status { get; set; } 
         public string? AdminNote { get; set; }

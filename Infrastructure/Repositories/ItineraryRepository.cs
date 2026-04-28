@@ -17,9 +17,9 @@ namespace TouRest.Infrastructure.Repositories
         {
         }
 
-        public async Task<List<Itinerary>> GetItineraries(ItinerarySearch search)
+     public async Task<List<Itinerary>> GetItineraries(ItinerarySearch search)
         {
-            var query = _context.Itineraries.Include(x => x.Agency).AsNoTracking().AsQueryable();
+            var query = _context.Itineraries.Include(x => x.Agency).Include(x=>x.ItineraryStops).ThenInclude(x=>x.Vehicle).AsNoTracking().AsQueryable();
 
             if (search.AgencyName != null)
                 query = query.Where(x => x.Agency.Name == search.AgencyName);
@@ -39,9 +39,15 @@ namespace TouRest.Infrastructure.Repositories
                 query = query.Where(x => x.DurationDays >= search.LowDurationDay);
             if (search.HighDurationDay != null)
                 query = query.Where(x => x.DurationDays <= search.HighDurationDay);
-
+            if(search.VehicleType != null){
+                query = query.Where(x => x.ItineraryStops.Any(s=>s.Vehicle.Type == search.VehicleType));
+            }
+            if (!string.IsNullOrWhiteSpace(search.Destination))
+            {
+                query = query.Where(x => x.ItineraryStops.Any(s => s.Address != null && s.Address.Contains(search.Destination)));
+            }
             return await query.ToListAsync();
-        }
+        }   
         public override async Task<Itinerary?> GetByIdAsync(Guid id)
         {
             return await _context.Itineraries

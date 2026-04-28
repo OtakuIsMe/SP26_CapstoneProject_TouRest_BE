@@ -27,6 +27,9 @@ namespace TouRest.Domain.Entities
 
         [MaxLength(500)]
         public string? Address { get; set; }
+        [Required]
+        public Guid VehicleId { get; set; }
+        public Vehicle Vehicle { get; set; } = null!;
 
         // Navigation properties
         public Itinerary Itinerary { get; set; } = null!;

@@ -20,15 +20,22 @@ namespace TouRest.Domain.Entities
         public string? Description { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public long Price { get; set; }
 
         [Required]
         public int DurationDays { get; set; }
+        [Required]
+        public int MaxCapacity { get; set; }
+        [Required]
+        public int SpotLeft { get; set; }
 
         [Required]
         public ItineraryStatus Status { get; set; }
+        public Guid? TourGuideId { get; set; }
+        public AgencyUser? TourGuide { get; set; }
 
         // Navigation properties
         public Agency Agency { get; set; } = null!;
+        public ICollection<ItineraryStop> ItineraryStops { get; set; } = [];
     }
 }

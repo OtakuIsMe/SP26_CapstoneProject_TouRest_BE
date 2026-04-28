@@ -8,7 +8,7 @@ using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-    [Route("api/agency")]
+    [Route("api/agencies")]
     [ApiController]
     public class AgencyController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace TouRest.Api.Controllers
             _authService = authService;
         }
         [HttpGet("{id:guid}")]
-        [Authorize(Roles = "ADMIN, AGENCY")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAgencyById(Guid id)
         {
             var agency = await _agencyService.GetAgencyById(id);
@@ -49,34 +49,34 @@ namespace TouRest.Api.Controllers
             var result = await _agencyService.GetMyAgency(user);
             return ApiResponseFactory.Ok(result);
         }
-        [HttpPost("{id:guid}/add-user")]
+        [HttpPost("{agencyId:guid}/add-user")]
         [Authorize(Roles = "AGENCY")]
-        public async Task<IActionResult> AddUserToAgency(Guid userId, Guid agencyId, string role)
+        public async Task<IActionResult> AddUserToAgency(Guid agencyId, [FromBody] AddUserIntoAgencyRequest request)
         {
             var user = User.GetUserId();
-            _logger.LogInformation("User {UserId} is adding user {AddedUserId} to agency {AgencyId}", user, userId, agencyId);
-            await _agencyUserService.AddUserToAgencyAsync(agencyId, userId, role);
+            _logger.LogInformation("User {UserId} is adding user {AddedUserId} to agency {AgencyId}", user, request.AddUserId, agencyId);
+            await _agencyUserService.AddUserToAgencyAsync(agencyId, request.AddUserId, request.Role);
             return ApiResponseFactory.Ok(new { }, "User added to agency");
         }
-        [HttpPost("{id:guid}/remove-user")]
+        [HttpPost("{agencyId:guid}/remove-user")]
         [Authorize(Roles = "ADMIN, AGENCY")]
-        public async Task<IActionResult> RemoveUserFromAgency(Guid id, Guid userId)
+        public async Task<IActionResult> RemoveUserFromAgency(Guid agencyId, [FromBody] RemoveUserRequest request)
         {
             var user = User.GetUserId();
-            _logger.LogInformation("User {UserId} is removing user {RemovedUserId} from agency {AgencyId}", user, userId, id);
-            await _agencyUserService.RemoveUserFromAgencyAsync(id, userId);
+            _logger.LogInformation("User {UserId} is removing user {RemovedUserId} from agency {AgencyId}", user, request.UserId, agencyId);
+            await _agencyUserService.RemoveUserFromAgencyAsync(agencyId, request.UserId);
             return ApiResponseFactory.Ok(new { }, "User removed from agency");
         }
-        [HttpPost]
-        [Authorize(Roles = "AGENCY")]
-        public async Task<IActionResult> CreateAgency(AgencyCreateRequestDTO request)
-        {
-            var user = User.GetUserId();
-            _logger.LogInformation("User {UserId} is creating an agency with name {AgencyName}", user, request.Name);
-            var result = await _agencyService.AddAgency(user, request);
-            return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to approve");
-        }
-        [HttpPut]
+        //[HttpPost]
+        //[Authorize(Roles = "AGENCY")]
+        //public async Task<IActionResult> CreateAgency([FromBody] AgencyCreateRequestDTO request)
+        //{
+        //    var user = User.GetUserId();
+        //    _logger.LogInformation("User {UserId} is creating an agency with name {AgencyName}", user, request.Name);
+        //    var result = await _agencyService.AddAgency(user, request);
+        //    return ApiResponseFactory.Created(result, "Agency created. Please wait for Administrator to approve");
+        //}
+        [HttpPut("{agencyId:guid}")]
         public async Task<IActionResult> UpdateAgency(Guid agencyId, [FromBody] AgencyUpdateRequestDTO request)
         {
             var user = User.GetUserId();

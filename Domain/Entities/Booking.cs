@@ -17,9 +17,8 @@ namespace TouRest.Domain.Entities
         public string Code { get; set; } = null!;
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "TotalAmount must be greater than 0")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal TotalAmount { get; set; }
+        [Range(1, long.MaxValue, ErrorMessage = "TotalAmount must be greater than 0")]
+        public long TotalAmount { get; set; }
 
         [Required]
         public BookingStatus Status { get; set; }

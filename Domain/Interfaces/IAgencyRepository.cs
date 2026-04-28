@@ -11,5 +11,6 @@ namespace TouRest.Domain.Interfaces
     {
         Task<Agency?> GetByContactEmailAsync(string contactEmail);
         Task<Agency?> GetMyAgency(Guid userId);
+        Task<Agency?> GetAgencyByIdWithCreator(Guid agencyId);
     }
 }

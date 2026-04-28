@@ -10,9 +10,7 @@ namespace TouRest.Application.DTOs.Agency
     public class AgencyUpdateRequestDTO
     {
         public string? Description { get; set; }
-        [RegularExpression(@"^\d{2}:\d{2}:\d{2}$")]
-        public string? StartTime { get; set; }
-        [RegularExpression(@"^\d{2}:\d{2}:\d{2}$")]
-        public string? EndTime { get; set; }
+        public TimeOnly? StartTime { get; set; }
+        public TimeOnly? EndTime { get; set; }
     }
 }

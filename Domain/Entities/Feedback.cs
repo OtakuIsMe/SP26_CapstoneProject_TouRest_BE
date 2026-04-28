@@ -34,6 +34,11 @@ namespace TouRest.Domain.Entities
 
         [Required]
         public FeedbackStatus Status { get; set; }
+        public string? AgencyReply { get; set; }
+        public DateTime? RepliedAt { get; set; }
+        public Guid? RepliedByUserId { get; set; }
+        public User? RepliedBy { get; set; }
+
 
         // Navigation properties
         public BookingItinerary BookingItinerary { get; set; } = null!;

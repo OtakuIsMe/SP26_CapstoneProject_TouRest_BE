@@ -16,7 +16,12 @@ namespace TouRest.Application.DTOs.Feedback
         public int Rating { get; set; }
         public string Title { get; set; } = null!;
         public string? Comment { get; set; }
+        public string? AgencyReply { get; set; }
+        public DateTime? RepliedAt { get; set; }
+        public string? Username { get; set; }
+        public string? UserAvatar { get; set; }
         public bool IsAnonymous { get; set; } 
         public FeedbackStatus Status { get; set; }
+        public DateTime CreateAt { get; set; }
     }
 }

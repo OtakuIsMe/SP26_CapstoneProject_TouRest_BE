@@ -7,7 +7,7 @@ using TouRest.Domain.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/reports")]
     [ApiController]
     public class ReportController : ControllerBase
     {

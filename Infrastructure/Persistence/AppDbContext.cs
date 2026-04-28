@@ -39,7 +39,7 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<Wallet> Wallets => Set<Wallet>();
         public DbSet<WalletTransaction> WalletTransactions => Set<WalletTransaction>();
         public DbSet<Payout> Payouts => Set<Payout>();
-
+        public DbSet<Vehicle> Vehicles => Set<Vehicle>();
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
 
@@ -93,6 +93,11 @@ namespace TouRest.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(i => i.AgencyId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Itinerary>()
+                .HasOne(i => i.TourGuide)
+                .WithMany()
+                .HasForeignKey(i => i.TourGuideId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Configure ItinerarySchedule - Itinerary relationship
             modelBuilder.Entity<ItinerarySchedule>()
@@ -132,7 +137,7 @@ namespace TouRest.Infrastructure.Persistence
             // Configure BookingItinerary relationships
             modelBuilder.Entity<BookingItinerary>()
                 .HasOne(bi => bi.Booking)
-                .WithMany()
+                .WithMany(b => b.BookingItineraries)  // add collection reference
                 .HasForeignKey(bi => bi.BookingId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -289,6 +294,22 @@ namespace TouRest.Infrastructure.Persistence
                 .HasForeignKey(p => p.WalletId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(v => v.Agency)
+                .WithMany()
+                .HasForeignKey(v => v.AgencyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ItineraryStop>()
+                .HasOne(s => s.Vehicle)
+                .WithMany()
+                .HasForeignKey(s => s.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Feedback>()
+                  .HasOne(f => f.RepliedBy)
+                 .WithMany()
+                .HasForeignKey(f => f.RepliedByUserId)
+                 .OnDelete(DeleteBehavior.SetNull);
 
             // ============= UNIQUE CONSTRAINTS =============
 
@@ -367,6 +388,14 @@ namespace TouRest.Infrastructure.Persistence
                 .HasIndex(w => w.ProviderId)
                 .IsUnique()
                 .HasFilter("[ProviderId] IS NOT NULL");
+            modelBuilder.Entity<Itinerary>()
+                .HasIndex(i => i.AgencyId);
+
+            modelBuilder.Entity<ItineraryStop>()
+                .HasIndex(s => s.VehicleId);
+
+            modelBuilder.Entity<Booking>()
+                .HasIndex(b => b.UserId);
             // ============= SEED DATA =============
 
             // Seed default roles

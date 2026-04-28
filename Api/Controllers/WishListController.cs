@@ -7,7 +7,7 @@ using TouRest.Application.Interfaces;
 namespace TouRest.Api.Controllers
 {
     [ApiController]
-    [Route("api/wishlist")]
+    [Route("api/wishlists")]
     public class WishListController : ControllerBase
     {
         private readonly IWishListService _wishListService;

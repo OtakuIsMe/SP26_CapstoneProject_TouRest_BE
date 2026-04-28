@@ -10,12 +10,14 @@ namespace TouRest.Application.Interfaces
 {
     public interface IFeedbackService
     {
-        Task<List<FeedbackDTO>> GetFeedbacks();
         Task<List<FeedbackDTO>> GetFeedbacks(FeedbackSearch search);
         Task<List<FeedbackDTO>> GetFeedbacksByBookingItineraryId(Guid bookingItineraryId);
+        Task<List<FeedbackDTO>> GetFeedbacksByItineraryId(Guid itineraryId);
         Task<FeedbackDTO?> GetFeedback(Guid id);
         Task<FeedbackDTO> AddFeedback(FeedbackCreateRequest create);
-        Task<FeedbackDTO> UpdateFeedback(Guid id, FeedbackUpdateRequest update);
-        Task<bool> DeleteFeedback(Guid id);
+        Task<FeedbackDTO> UpdateFeedback(Guid id, Guid userId, FeedbackUpdateRequest update);
+        Task CreateReplyToFeedback(Guid id, Guid staffId, FeedbackReplyRequest replyRequest);
+        Task DeleteFeedback(Guid id);
+        Task<RatingSummaryDTO> RatingSummary(Guid itineraryId);
     }
 }

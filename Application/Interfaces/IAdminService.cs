@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouRest.Application.DTOs.Agency;
+using TouRest.Application.DTOs.Feedback;
 using TouRest.Application.DTOs.Provider;
 using TouRest.Application.DTOs.Service;
 using TouRest.Application.DTOs.User;
@@ -28,5 +29,8 @@ namespace TouRest.Application.Interfaces
         Task<List<UserDTO>> GetUsers(UserSearch search);
         Task CreateAgencyAccount(Guid agencyId, CreateAgencyAccountRequest request);
         Task CreateProviderAccount(Guid providerId, CreateProviderAccountRequest request);
+        Task<List<FeedbackDTO>> GetFeedbacks(FeedbackSearch search);
+        Task HideFeedback(Guid feedbackId);
+        Task DeleteFeedback(Guid feedbackId);
     }
 }

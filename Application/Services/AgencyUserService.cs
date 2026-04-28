@@ -35,12 +35,10 @@ namespace TouRest.Application.Services
             if (await _userRepository.GetByIdAsync(userId) == null)
                 throw new KeyNotFoundException("User not found");
         }
-        public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId, string role)
+        public async Task AddUserToAgencyAsync(Guid agencyId, Guid userId, AgencyUserRole role)
         {
             await ValidateAgencyAndUser(agencyId, userId);
-                if (!Enum.TryParse<AgencyUserRole>(role, true, out var agencyUserRole))
-                    throw new ArgumentException("Invalid role", nameof(role));
-            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, userId, agencyUserRole);
+            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, userId, role);
         }
 
         public async Task<bool> IsUserInAgencyAsync(Guid agencyId, Guid userId)

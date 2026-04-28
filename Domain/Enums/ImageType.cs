@@ -4,6 +4,7 @@ namespace TouRest.Domain.Enums
     {
         User = 0,
         Itinerary = 1,
-        Service = 2
+        Service = 2,
+        Vehicle = 3,
     }
 }

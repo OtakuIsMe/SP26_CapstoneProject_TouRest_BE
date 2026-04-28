@@ -14,9 +14,8 @@ namespace TouRest.Domain.Entities
     public class WalletTransaction : BaseEntity
     {
         public Guid WalletId { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Amount { get; set; }
+        [Range(1, long.MaxValue)]
+        public long Amount { get; set; }
 
         public WalletTransactionType Type { get; set; }  // Credit, Debit
         public WalletTransactionReason Reason { get; set; } // BookingEarning, Refund, Payout

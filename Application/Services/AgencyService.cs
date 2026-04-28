@@ -59,6 +59,10 @@ namespace TouRest.Application.Services
             var agency = await _agencyRepository.GetMyAgency(userId);
             return _mapper.Map<AgencyDTO>(agency);
         }
+        public async Task<Agency?> GetAgencyByIdWithCreator(Guid agencyId)
+        {
+            return await _agencyRepository.GetAgencyByIdWithCreator(agencyId);
+        }
         public async Task<AgencyDTO> UpdateAgency(Guid id, AgencyUpdateRequestDTO update)
         {
             var existing = await _agencyRepository.GetByIdAsync(id);
@@ -69,10 +73,10 @@ namespace TouRest.Application.Services
             var newStart = existing.StartTime;
             var newEnd = existing.EndTime;
 
-            if(update.StartTime != null)
-                newStart = ParseTimeHelper.ParseTime(update.StartTime);
-            if(update.EndTime != null)
-                newEnd = ParseTimeHelper.ParseTime(update.EndTime);
+            if (update.StartTime != null)
+                newStart = update.StartTime.Value;
+            if (update.EndTime != null)
+                newEnd = update.EndTime.Value;
             if (newStart >= newEnd)
                 throw new Exception("StartTime must be earlier than EndTime");
 

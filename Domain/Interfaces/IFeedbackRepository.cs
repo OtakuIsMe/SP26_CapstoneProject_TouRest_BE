@@ -13,8 +13,10 @@ namespace TouRest.Domain.Interfaces
     {
         Task<List<Feedback>> GetFeedbacksByBookingItineraryIdAsync(Guid bookingItineraryId);
         Task<Feedback?> GetFeedback(Guid id);
-        Task<List<Feedback>> GetFeedbacks();
         Task<List<Feedback>> GetFeedbacks(FeedbackSearch search);
+        Task<List<Feedback>> GetFeedbacksByItineraryIdAsync(Guid itineraryId);
+        Task<RatingSummaryDTO> GetRatingSummaryAsync(Guid itineraryId);
+        Task<Guid?> GetItineraryAgencyIdByFeedbackId(Guid feedbackId);
     }
     public class FeedbackSearch
     {
@@ -24,5 +26,11 @@ namespace TouRest.Domain.Interfaces
         public string? Title { get; set; }
         public bool? IsAnonymous { get; set; }
         public FeedbackStatus? Status { get; set; }
+    }
+    public class RatingSummaryDTO
+    {
+        public double AverageRating { get; set; }
+        public int TotalReviews { get; set; }
+        public Dictionary<int, int> RatingCounts { get; set; } = new();
     }
 }

@@ -11,7 +11,7 @@ using TouRest.Domain.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-    [Route("api/itinerary")]
+    [Route("api/itineraries")]
     [ApiController]
     public class ItineraryController : ControllerBase
     {
@@ -77,11 +77,16 @@ namespace TouRest.Api.Controllers
         {
             var agencyId = User.GetUserId();
             _logger.LogInformation("Deleting itinerary {ItineraryId} for agency {AgencyId}", id, agencyId);
-            var result = await _itineraryService.DeleteItinerary(id);
-            if (result)
+            try
+            {
+                await _itineraryService.DeleteItinerary(id);
                 return ApiResponseFactory.NoContent();
-            else
-                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
     }
     }
