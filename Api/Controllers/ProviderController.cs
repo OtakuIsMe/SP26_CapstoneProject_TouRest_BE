@@ -53,11 +53,17 @@ namespace TouRest.Api.Controllers
         {
             var result = await _providerService.GetByIdAsync(id);
             if (result == null)
-            {
                 return NotFound(new { message = "Provider not found." });
-            }
-
             return Ok(result);
+        }
+
+        [HttpGet("{id:guid}/detail")]
+        public async Task<IActionResult> GetDetail(Guid id)
+        {
+            var result = await _providerService.GetDetailByIdAsync(id);
+            if (result == null)
+                return NotFound(new { message = "Provider not found." });
+            return ApiResponseFactory.Ok(result);
         }
 
         [HttpPost]

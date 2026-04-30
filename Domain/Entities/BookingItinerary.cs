@@ -25,7 +25,8 @@ namespace TouRest.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal FinalPrice { get; set; }
         [Required]
-        public BookingItineraryStatus Status { get; set; }
+
+?>":/     public BookingItineraryStatus Status { get; set; }
 
         // Navigation properties
         public Booking Booking { get; set; } = null!;

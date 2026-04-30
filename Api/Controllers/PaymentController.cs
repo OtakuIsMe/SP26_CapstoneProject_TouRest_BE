@@ -1,24 +1,46 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PayOS.Models.Webhooks;
 using TouRest.Api.Common;
-using TouRest.Api.Extensions;
+using TouRest.Application.DTOs.Payment;
 using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
     [ApiController]
-    [Route("api/payments")]
+    [Route("api/payment")]
+    [Authorize]
     public class PaymentController : ControllerBase
     {
+        private readonly IVNPayService _vnPayService;
         private readonly IPaymentService _paymentService;
         private readonly ILogger<PaymentController> _logger;
 
-        public PaymentController(IPaymentService paymentService, ILogger<PaymentController> logger)
+        public PaymentController(IVNPayService vnPayService, IPaymentService paymentService, ILogger<PaymentController> logger)
         {
+            _vnPayService = vnPayService;
             _paymentService = paymentService;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Tạo QR thanh toán VNPay cho một booking.
+        /// </summary>
+        [HttpPost("qr")]
+        public async Task<IActionResult> CreateQr([FromBody] CreateQrPaymentRequest request)
+        {
+            var ipAddr = HttpContext.Connection.RemoteIpAddress?.ToString()
+                         ?? request.IpAddr
+                         ?? "127.0.0.1";
+
+            var result = await _vnPayService.GenerateQrAsync(
+                request.BookingId,
+                ipAddr,
+                request.ExpireMinutes);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.Message, code = result.Code });
+
+            return ApiResponseFactory.Ok(result);
         }
 
         [HttpPost("booking/{bookingId:guid}")]

@@ -31,7 +31,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();
-            services.AddScoped<VoucherRepository, VoucherRepository>();
+            services.AddScoped<IVoucherRepository, VoucherRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IRefundRepository, RefundRepository>();
@@ -59,6 +59,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IRefundService, RefundService>();
             services.AddScoped<IRouteOptimizerService, RouteOptimizerService>();
+            services.AddHttpClient<IVNPayService, VNPayService>();
             return services;
         }
     }
