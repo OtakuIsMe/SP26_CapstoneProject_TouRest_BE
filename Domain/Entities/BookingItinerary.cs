@@ -22,7 +22,8 @@ namespace TouRest.Domain.Entities
         public int Price { get; set; }
 
         [Required]
-        public BookingItineraryStatus Status { get; set; }
+
+?>":/     public BookingItineraryStatus Status { get; set; }
 
         // Navigation properties
         public Booking Booking { get; set; } = null!;

@@ -22,8 +22,9 @@ namespace TouRest.Application.Mappings
             CreateMap<Itinerary, ItineraryDTO>()
                 .ForMember(dest => dest.StopCount, opt => opt.MapFrom(src => src.Stops.Count))
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
-            // Map ItinerarySchedule entity to ItineraryScheduleDTO
-            CreateMap<ItinerarySchedule, ItineraryScheduleDTO>();
+            // Map ItinerarySchedule entity to ItineraryScheduleDTO (GuideName is resolved manually)
+            CreateMap<ItinerarySchedule, ItineraryScheduleDTO>()
+                .ForMember(dest => dest.GuideName, opt => opt.MapFrom(src => src.Guide != null ? (src.Guide.FullName ?? src.Guide.Username) : null));
             //Map ItineraryCreateDTO to Itinerary entity for creating new itineraries
             CreateMap<ItineraryCreateRequest, Itinerary>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))

@@ -247,6 +247,24 @@ namespace TouRest.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(al => al.TargetUserId)
                 .OnDelete(DeleteBehavior.SetNull);
+            // ============= DECIMAL PRECISION =============
+
+            modelBuilder.Entity<Agency>()
+                .Property(a => a.Latitude)
+                .HasPrecision(11, 8);
+
+            modelBuilder.Entity<Agency>()
+                .Property(a => a.Longitude)
+                .HasPrecision(11, 8);
+
+            modelBuilder.Entity<Provider>()
+                .Property(p => p.Latitude)
+                .HasPrecision(11, 8);
+
+            modelBuilder.Entity<Provider>()
+                .Property(p => p.Longitude)
+                .HasPrecision(11, 8);
+
             // ============= UNIQUE CONSTRAINTS =============
 
             // Unique constraint for Role Code
