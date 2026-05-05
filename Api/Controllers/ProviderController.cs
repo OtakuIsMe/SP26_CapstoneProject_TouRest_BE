@@ -41,7 +41,6 @@ namespace TouRest.Api.Controllers
         public async Task<IActionResult> GetMe()
         {
             var userId = User.GetUserId();
-            Console.WriteLine(userId);
             var result = await _providerService.GetByUserIdAsync(userId);
             if (result == null)
                 return NotFound(new { message = "Provider not found." });

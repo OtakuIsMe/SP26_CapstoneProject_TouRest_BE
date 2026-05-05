@@ -7,6 +7,6 @@ namespace TouRest.Application.Common.Constants
         public const string Command    = "genqr";
         public const string CurrCode   = "VND";
         public const string Locale     = "vn";
-        public const string OrderType  = "other";
+        public const string OrderType  = "travel";
     }
 }

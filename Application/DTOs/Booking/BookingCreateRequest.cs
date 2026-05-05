@@ -8,8 +8,8 @@ namespace TouRest.Application.DTOs.Booking
         public Guid ScheduleId { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "NumberOfPeople must be at least 1")]
-        public int NumberOfPeople { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "NumberOfGuests must be at least 1")]
+        public int NumberOfGuests { get; set; }
 
         public string? VoucherCode { get; set; }
 

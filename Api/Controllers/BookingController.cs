@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
 using TouRest.Api.Extensions;
-using TouRest.Api.Extensions;
 using TouRest.Application.DTOs.Booking;
 using TouRest.Application.Interfaces;
 

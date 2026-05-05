@@ -1,9 +1,4 @@
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TouRest.Application.DTOs.Booking;
 using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
@@ -40,42 +35,30 @@ namespace TouRest.Application.Services
             _mapper               = mapper;
         }
 
-        public async Task<BookingDTO> GetBookingAsync(Guid id)
+        public async Task<BookingDTO> GetBookingAsync(Guid id, Guid userId, bool isAdmin)
         {
             var booking = await _bookingRepo.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException("Booking not found");
-            CheckUserOwnTheBooking(booking, userId, isAdmin);
+            if (!isAdmin && booking.UserId != userId)
+                throw new UnauthorizedAccessException("You do not own this booking");
             return _mapper.Map<BookingDTO>(booking);
-        }
-        public async Task<BookingDTO> CreateBookingAsync(BookingCreateRequest request, Guid userId)
-        {
-            var booking = _mapper.Map<Booking>(request);
-            booking.Id = Guid.NewGuid();
-            booking.UserId = userId;
-            booking.Code = $"BK-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..8].ToUpper()}";
-            booking.TotalAmount = 0;
-            booking.Status = BookingStatus.Pending;
-            booking.CreatedAt = DateTime.UtcNow;
-            booking.UpdatedAt = DateTime.UtcNow;
-            var createdBooking = await _bookingRepo.CreateAsync(booking);
-            return _mapper.Map<BookingDTO>(createdBooking);
         }
 
         public async Task<BookingCreateResponse> CreateBookingAsync(BookingCreateRequest request, Guid userId)
         {
-            // 1. Load schedule
+            // 1. Load schedule and check spots
             var schedule = await _scheduleRepo.GetByIdAsync(request.ScheduleId)
                 ?? throw new KeyNotFoundException("Schedule not found");
 
-            if (schedule.SpotLeft < request.NumberOfPeople)
+            if (schedule.SpotLeft < request.NumberOfGuests)
                 throw new InvalidOperationException(
-                    $"Not enough spots. Available: {schedule.SpotLeft}, requested: {request.NumberOfPeople}");
+                    $"Not enough spots. Available: {schedule.SpotLeft}, requested: {request.NumberOfGuests}");
 
             // 2. Load itinerary for base price
             var itinerary = await _itineraryRepo.GetByIdAsync(schedule.ItineraryId)
                 ?? throw new KeyNotFoundException("Itinerary not found");
 
-            int baseAmount = itinerary.Price * request.NumberOfPeople;
+            long baseAmount = itinerary.Price * request.NumberOfGuests;
 
             // 3. Validate voucher
             var (voucher, voucherError) = await ValidateVoucherAsync(request.VoucherCode, baseAmount);
@@ -83,16 +66,16 @@ namespace TouRest.Application.Services
                 throw new ArgumentException(voucherError);
 
             // 4. Apply discount
-            int discountAmount = CalculateDiscount(baseAmount, voucher);
-            int totalAmount    = baseAmount - discountAmount;
+            long discountAmount = CalculateDiscount(baseAmount, voucher);
+            long totalAmount    = baseAmount - discountAmount;
 
             // 5. Create booking
-            var bookingCode = GenerateCode();
+            var code = GenerateCode();
             var booking = new Booking
             {
                 Id            = Guid.NewGuid(),
                 UserId        = userId,
-                Code          = bookingCode,
+                Code          = code,
                 TotalAmount   = totalAmount,
                 Status        = BookingStatus.Pending,
                 PaymentStatus = PaymentStatus.Pending,
@@ -110,7 +93,8 @@ namespace TouRest.Application.Services
                 ItineraryScheduleId = schedule.Id,
                 VoucherId           = voucher?.Id,
                 Price               = itinerary.Price,
-                NumberOfPeople      = request.NumberOfPeople,
+                FinalPrice          = totalAmount,
+                NumberOfGuests      = request.NumberOfGuests,
                 Status              = BookingItineraryStatus.Pending,
                 CreatedAt           = DateTime.UtcNow,
                 UpdatedAt           = DateTime.UtcNow,
@@ -118,7 +102,7 @@ namespace TouRest.Application.Services
             await _bookingItineraryRepo.CreateAsync(line);
 
             // 7. Decrease schedule spots
-            schedule.SpotLeft -= request.NumberOfPeople;
+            schedule.SpotLeft -= request.NumberOfGuests;
             await _scheduleRepo.UpdateAsync(schedule);
 
             // 8. Increment voucher usage
@@ -131,7 +115,7 @@ namespace TouRest.Application.Services
             return new BookingCreateResponse
             {
                 BookingId      = booking.Id,
-                Code           = bookingCode,
+                Code           = code,
                 BaseAmount     = baseAmount,
                 DiscountAmount = discountAmount,
                 TotalAmount    = totalAmount,
@@ -141,26 +125,36 @@ namespace TouRest.Application.Services
 
         public async Task<BookingDTO> UpdateBookingAsync(Guid id, Guid userId, bool isAdmin, BookingUpdateRequest request)
         {
-            var existingBooking = await CheckBooking(id);
-            CheckUserOwnTheBooking(existingBooking, userId, isAdmin);
-            _mapper.Map(request, existingBooking);
-            existingBooking.UpdatedAt = DateTime.UtcNow;
-            var updatedBooking = await _bookingRepository.UpdateAsync(existingBooking);
-            return _mapper.Map<BookingDTO>(updatedBooking);
+            var existing = await _bookingRepo.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Booking not found");
+            if (!isAdmin && existing.UserId != userId)
+                throw new UnauthorizedAccessException("You do not own this booking");
+            _mapper.Map(request, existing);
+            existing.UpdatedAt = DateTime.UtcNow;
+            var updated = await _bookingRepo.UpdateAsync(existing);
+            return _mapper.Map<BookingDTO>(updated);
         }
 
         public async Task DeleteBookingAsync(Guid id, Guid userId, bool isAdmin)
         {
-            var existingBooking = await _bookingRepo.GetByIdAsync(id)
+            var existing = await _bookingRepo.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException("Booking not found");
-            CheckUserOwnTheBooking(existingBooking, userId, isAdmin);
-            existingBooking.Status = BookingStatus.Cancelled;
-            existingBooking.UpdatedAt = DateTime.UtcNow;
-            await _bookingRepo.UpdateAsync(existingBooking);
+            if (!isAdmin && existing.UserId != userId)
+                throw new UnauthorizedAccessException("You do not own this booking");
+            existing.Status    = BookingStatus.Cancelled;
+            existing.UpdatedAt = DateTime.UtcNow;
+            await _bookingRepo.UpdateAsync(existing);
         }
-        // ── Helpers ──────────────────────────────────────────────────────────
 
-        private async Task<(Voucher? voucher, string? error)> ValidateVoucherAsync(string? code, int baseAmount)
+        public async Task<List<BookingDTO>> GetBookingsByUserIdAsync(Guid userId)
+        {
+            var bookings = await _bookingRepo.GetBookingsByUserIdAsync(userId);
+            return _mapper.Map<List<BookingDTO>>(bookings);
+        }
+
+        // ── Private helpers ───────────────────────────────────────────────────
+
+        private async Task<(Voucher? voucher, string? error)> ValidateVoucherAsync(string? code, long baseAmount)
         {
             if (string.IsNullOrWhiteSpace(code)) return (null, null);
 
@@ -178,23 +172,22 @@ namespace TouRest.Application.Services
             if (voucher.UsageLimit.HasValue && voucher.UsedCount >= voucher.UsageLimit.Value)
                 return (null, "Voucher đã hết lượt sử dụng");
 
-            if (voucher.MinOrderAmount.HasValue && baseAmount < voucher.MinOrderAmount.Value)
+            if (voucher.MinOrderAmount.HasValue && baseAmount < (long)voucher.MinOrderAmount.Value)
                 return (null, $"Đơn hàng tối thiểu {voucher.MinOrderAmount.Value:N0}đ để dùng voucher này");
 
             return (voucher, null);
->>>>>>> main
         }
 
-        private static int CalculateDiscount(int baseAmount, Voucher? voucher)
+        private static long CalculateDiscount(long baseAmount, Voucher? voucher)
         {
             if (voucher == null) return 0;
 
-            int discount = voucher.DiscountType == DiscountType.Percent
-                ? (int)(baseAmount * voucher.DiscountValue / 100.0)
+            long discount = voucher.DiscountType == DiscountType.Percent
+                ? (long)(baseAmount * voucher.DiscountValue / 100.0)
                 : voucher.DiscountValue;
 
             if (voucher.MaxDiscountAmount.HasValue)
-                discount = Math.Min(discount, voucher.MaxDiscountAmount.Value);
+                discount = Math.Min(discount, (long)voucher.MaxDiscountAmount.Value);
 
             return Math.Min(discount, baseAmount);
         }

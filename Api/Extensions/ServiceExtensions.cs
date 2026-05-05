@@ -66,8 +66,6 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IWalletTransactionService, WalletTransactionService>();
             services.AddScoped<IPayoutService, PayoutService>();
             services.AddScoped<IRouteOptimizerService, RouteOptimizerService>();
-            services.AddHttpClient<IVNPayService, VNPayService>();
-
             return services;
         }
     }

@@ -40,7 +40,7 @@ namespace TouRest.Application.Services
             if (booking.Status != BookingStatus.Pending)
                 throw new InvalidOperationException("Booking is not in a payable state");
 
-            
+
             var existingPayment = await _paymentRepository.GetActivePaymentByBookingIdAsync(bookingId);
             if (existingPayment != null)
             {
@@ -49,16 +49,16 @@ namespace TouRest.Application.Services
                 await _paymentRepository.UpdateAsync(existingPayment);
             }
 
-            
+
             var totalAmount = booking.TotalAmount;
             var discountAmount = booking.BookingItineraries
                 .Sum(bi => bi.Price - bi.FinalPrice);
             var finalAmount = totalAmount - discountAmount;
 
-            
+
             var orderCode = long.Parse(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()[^9..]);
 
-            
+
             var paymentRequest = new CreatePaymentLinkRequest
             {
                 OrderCode = orderCode,
@@ -71,7 +71,7 @@ namespace TouRest.Application.Services
 
             var paymentLink = await _payOS.PaymentRequests.CreateAsync(paymentRequest);
 
-            
+
             var payment = new Payment
             {
                 Id = Guid.NewGuid(),
@@ -89,7 +89,9 @@ namespace TouRest.Application.Services
             };
 
             var created = await _paymentRepository.CreateAsync(payment);
-            return _mapper.Map<PaymentDTO>(created);
+            var dto = _mapper.Map<PaymentDTO>(created);
+            dto.QrCode = paymentLink.QrCode;  // ← gán trực tiếp
+            return dto;
         }
 
         public async Task HandleWebhookAsync(Webhook webhookData)
@@ -158,7 +160,7 @@ namespace TouRest.Application.Services
             }
             catch (Exception)
             {
-                
+
             }
         }
         private async Task<Booking> ValidateBookingOwnership(Guid bookingId, Guid userId)

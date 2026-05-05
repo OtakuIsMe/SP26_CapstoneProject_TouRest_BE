@@ -26,8 +26,7 @@ namespace TouRest.Domain.Entities
         [Required]
         public int NumberOfGuests { get; set; }
         [Required]
-
-?>":/     public BookingItineraryStatus Status { get; set; }
+        public BookingItineraryStatus Status { get; set; }
 
         // Navigation properties
         public Booking Booking { get; set; } = null!;
