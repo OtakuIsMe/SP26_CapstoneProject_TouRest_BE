@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -12,13 +13,13 @@ namespace TouRest.Domain.Entities
     public class Payment : BaseEntity
     {
         public Guid BookingId { get; set; }
-        public long OrderCode { get; set; }              
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Amount { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal DiscountAmount { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal FinalAmount { get; set; }
+        public long OrderCode { get; set; }
+        [Range(1, long.MaxValue)]
+        public long Amount { get; set; }
+        [Range(1, long.MaxValue)]
+        public long DiscountAmount { get; set; }
+        [Range(1, long.MaxValue)]
+        public long FinalAmount { get; set; }
         public PaymentStatus Status { get; set; }         
         public string? PayOSPaymentLinkId { get; set; }
         public string? CheckoutUrl { get; set; }

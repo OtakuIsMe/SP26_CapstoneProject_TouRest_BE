@@ -10,6 +10,7 @@ namespace TouRest.Domain.Enums
     {
         Manager = 0,
         Staff = 1,
-        Coordinator = 2
+        Coordinator = 2,
+        TourGuide = 3
     }
 }

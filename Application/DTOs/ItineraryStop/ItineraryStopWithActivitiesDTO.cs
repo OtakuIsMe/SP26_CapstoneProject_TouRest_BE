@@ -11,7 +11,7 @@ namespace TouRest.Application.DTOs.ItineraryStop
         public int ActivityOrder { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public int Price { get; set; }
+        public long Price { get; set; }
         public string? Note { get; set; }
     }
 

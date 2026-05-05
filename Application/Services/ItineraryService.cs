@@ -44,16 +44,26 @@ namespace TouRest.Application.Services
         public async Task<ItineraryDTO> AddItinerary(Guid agencyId, ItineraryCreateRequest create)
         {
             var itinerary = _mapper.Map<Itinerary>(create);
-            //after mapping, set default values for fields that are not in the create request
             itinerary.AgencyId = agencyId;
+            itinerary.Status = ItineraryStatus.Draft; 
+            itinerary.SpotLeft = create.MaxCapacity;  
+            itinerary.CreatedAt = DateTime.UtcNow;
+            itinerary.UpdatedAt = DateTime.UtcNow;
+
+
             var result = await _itineraryRepository.CreateAsync(itinerary);
             return _mapper.Map<ItineraryDTO>(result);
         }
 
-        public async Task<bool> DeleteItinerary(Guid id)
+        public async Task DeleteItinerary(Guid id)
         {
-            var result = await _itineraryRepository.DeleteAsync(id);
-            return result;
+            var itinerary = await _itineraryRepository.GetByIdAsync(id);
+            if(itinerary == null)
+            {
+                throw new KeyNotFoundException("Itinerary not found");
+            }
+            itinerary.Status = ItineraryStatus.Inactive;
+            await _itineraryRepository.UpdateAsync(itinerary);
         }
 
         public async Task<DTOs.Common.PagedResult<ItineraryDTO>> GetItineraries(ItinerarySearch search)
@@ -88,6 +98,7 @@ namespace TouRest.Application.Services
             if (!ItineraryStatusTransitions.CanTransition(existing.Status, update.Status))
                 throw new InvalidOperationException(
                     $"Invalid transition from {existing.Status} to {update.Status}");
+            existing.UpdatedAt = DateTime.UtcNow;
             _mapper.Map(update, existing);
             var result = await _itineraryRepository.UpdateAsync(existing);
             return _mapper.Map<ItineraryDTO>(result);
@@ -113,6 +124,7 @@ namespace TouRest.Application.Services
                 throw new InvalidOperationException(
                     $"Invalid transition from {itinerary.Status} to {request.Status}");
             itinerary.Status = request.Status;
+            itinerary.UpdatedAt = DateTime.UtcNow;
             var result = await _itineraryRepository.UpdateAsync(itinerary);
             return _mapper.Map<ItineraryDTO>(result);
         }

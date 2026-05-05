@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Agency
 {
@@ -20,5 +21,7 @@ namespace TouRest.Application.DTOs.Agency
 
         [Phone]
         public string? Phone { get; set; }
+        [Required]
+        public AgencyUserRole Role { get; set; }
     }
 }

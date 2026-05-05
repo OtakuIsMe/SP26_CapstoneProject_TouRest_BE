@@ -8,7 +8,7 @@ using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/bookings")]
     [ApiController]
     [Authorize]
     public class BookingController : ControllerBase
@@ -23,31 +23,45 @@ namespace TouRest.Api.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetBooking(Guid id)
         {
-            var booking = await _bookingService.GetBookingAsync(id);
+            var userId = User.GetUserId();
+            var isAdmin = User.IsInRole("ADMIN");
+            var booking = await _bookingService.GetBookingAsync(id, userId, isAdmin);
             return ApiResponseFactory.Ok(booking);
+        }
+        [HttpGet("me")]
+        [Authorize(Roles = "CUSTOMER")]
+        public async Task<IActionResult> GetMyBookings()
+        {
+            var userId = User.GetUserId();
+            var result = await _bookingService.GetBookingsByUserIdAsync(userId);
+            return ApiResponseFactory.Ok(result);
         }
         [HttpPost]
         [Authorize(Roles = "ADMIN, CUSTOMER")]
         public async Task<IActionResult> AddBooking([FromBody] BookingCreateRequest create)
         {
             var userId = User.GetUserId();
-            await _bookingService.CreateBookingAsync(create, userId);
-            return ApiResponseFactory.Created( new {}, "Booking was created");
+            var result = await _bookingService.CreateBookingAsync(create, userId);
+            return ApiResponseFactory.Created(result, "Booking was created");
         }
 
         [HttpPut("{id:guid}")]
         [Authorize(Roles = "ADMIN, CUSTOMER")]
         public async Task<IActionResult> UpdateBooking(Guid id, [FromBody] BookingUpdateRequest update)
         {
-            var booking = await _bookingService.UpdateBookingAsync(id, update);
+            var userId = User.GetUserId();
+            var isAdmin = User.IsInRole("ADMIN");
+            var booking = await _bookingService.UpdateBookingAsync(id, userId, isAdmin, update);
             return ApiResponseFactory.Ok(booking);
         }
          [HttpDelete("{id:guid}")]
         [Authorize(Roles = "ADMIN, CUSTOMER")]
          public async Task<IActionResult> DeleteBooking(Guid id)
             {
-            await _bookingService.DeleteBookingAsync(id);
-            return ApiResponseFactory.Ok(new { }, "Booking deleted");
+            var userId = User.GetUserId();
+            var isAdmin = User.IsInRole("ADMIN");
+            await _bookingService.DeleteBookingAsync(id, userId, isAdmin);
+            return ApiResponseFactory.NoContent("Booking Deleted");
         }
     }
 }

@@ -42,6 +42,14 @@ namespace TouRest.Infrastructure.Repositories
                 Enum.TryParse<Domain.Enums.ItineraryStatus>(search.Status, ignoreCase: true, out var statusEnum))
                 query = query.Where(x => x.Status == statusEnum);
 
+            if (search.VehicleType != null)
+            {
+                query = query.Where(x => x.Stops.Any(s => s.Vehicle.Type == search.VehicleType));
+            }
+            if (!string.IsNullOrWhiteSpace(search.Destination))
+            {
+                query = query.Where(x => x.Stops.Any(s => s.Address != null && s.Address.Contains(search.Destination)));
+            } 
             return query;
         }
 

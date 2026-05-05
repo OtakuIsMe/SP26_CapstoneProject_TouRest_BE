@@ -18,7 +18,9 @@ namespace TouRest.Domain.Entities
         [Required]
         public Guid TypeId { get; set; }
         [Required]
+        [Range(1, int.MaxValue)]
         public int PicNumber { get; set; }
-        public User User { get; set; } = null!;
+        public Guid? PublicByUserId { get; set; }
+        public User? User { get; set; }
     }
 }

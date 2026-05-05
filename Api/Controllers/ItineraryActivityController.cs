@@ -8,7 +8,7 @@ using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-    [Route("api/activity")]
+    [Route("api/itinerary-activities")]
     [ApiController]
     public class ItineraryActivityController : ControllerBase
     {

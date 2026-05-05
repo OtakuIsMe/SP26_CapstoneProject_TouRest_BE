@@ -10,6 +10,7 @@ namespace TouRest.Domain.Enums
     {
         Active = 0,
         Archived = 1,
-        Reported = 2
+        Reported = 2,
+        Remove = 3
     }
 }

@@ -38,5 +38,10 @@ namespace TouRest.Infrastructure.Repositories
             var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             return (items, total);
         }
+        public async Task<Agency?> GetAgencyByIdWithCreator(Guid agencyId)
+        {
+            return await _context.Agencies.Include(x=>x.User).AsNoTracking().FirstOrDefaultAsync(x=>x.Id == agencyId);
+        }
+
     }
 }

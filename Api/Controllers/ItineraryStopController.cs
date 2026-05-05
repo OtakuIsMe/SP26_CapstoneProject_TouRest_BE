@@ -10,7 +10,7 @@ using TouRest.Application.Interfaces;
 
 namespace TouRest.Api.Controllers
 {
-    [Route("api/stop")]
+    [Route("api/itinerary-stops")]
     [ApiController]
     public class ItineraryStopController : ControllerBase
     {

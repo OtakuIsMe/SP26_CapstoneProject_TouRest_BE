@@ -11,7 +11,7 @@ using TouRest.Application.Interfaces;
 namespace TouRest.Api.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("api/auths")]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;

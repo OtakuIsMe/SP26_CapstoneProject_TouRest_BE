@@ -15,7 +15,7 @@ namespace TouRest.Application.Interfaces
         Task<PagedResult<ItineraryDTO>> GetItineraries(ItinerarySearch search);
         Task<ItineraryDTO> AddItinerary(Guid agencyId, ItineraryCreateRequest create);
         Task<ItineraryDTO> UpdateItinerary(Guid id, ItineraryUpdateRequest update);
-        Task<bool> DeleteItinerary(Guid id);
+        Task DeleteItinerary(Guid id);
         Task<ItineraryDTO?> GetItineraryById(Guid id);
         Task<ItineraryDTO?> UpdateItineraryStatus(Guid id, ItineraryUpdateStatusRequest status);
         Task<ItineraryDTO> CreateFullAsync(Guid agencyId, ItineraryFullCreateRequest request);

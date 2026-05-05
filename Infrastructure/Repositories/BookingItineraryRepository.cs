@@ -19,6 +19,14 @@ namespace TouRest.Infrastructure.Repositories
         {
             return await _context.BookingItineraries.Where(x => x.BookingId == bookingId).ToListAsync();
         }
+        public async Task<BookingItinerary?> GetBookingItineraryWithDetails(Guid id)
+        {
+            return await _context.BookingItineraries
+                .Include(bi => bi.Booking)
+                .Include(bi => bi.ItinerarySchedule)
+                    .ThenInclude(s => s.Itinerary)
+                .FirstOrDefaultAsync(bi => bi.Id == id);
+        }
     }
 
 }

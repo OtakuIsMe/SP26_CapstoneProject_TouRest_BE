@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Domain.Enums;
 
 namespace TouRest.Application.DTOs.Provider
 {
@@ -20,5 +21,7 @@ namespace TouRest.Application.DTOs.Provider
 
         [Phone]
         public string? Phone { get; set; }
+        [Required]
+        public ProviderUserRole Role { get; set; }
     }
 }

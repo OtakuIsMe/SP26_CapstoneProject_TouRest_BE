@@ -42,6 +42,7 @@ namespace TouRest.Domain.Entities
 
         [MaxLength(100)]
         public string? DistrictId { get; set; }
+        public string? UserAvatar { get; set; }
 
         [Required]
         public UserStatus Status { get; set; }

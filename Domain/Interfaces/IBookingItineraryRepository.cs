@@ -10,5 +10,6 @@ namespace TouRest.Domain.Interfaces
     public interface IBookingItineraryRepository : IBaseRepository<BookingItinerary>
     {
         Task<List<BookingItinerary>> GetBookingItinerariesByBookingId(Guid bookingId);
+        Task<BookingItinerary?> GetBookingItineraryWithDetails(Guid id);
     }
 }

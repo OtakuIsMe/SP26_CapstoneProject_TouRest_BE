@@ -25,8 +25,8 @@ namespace TouRest.Domain.Entities
         public DateTime EndTime { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0")]
-        public int Price { get; set; }
+        [Range(1, long.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        public long Price { get; set; }
 
         [MaxLength(500)]
         public string? Note { get; set; }

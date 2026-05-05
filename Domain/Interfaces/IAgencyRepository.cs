@@ -12,5 +12,6 @@ namespace TouRest.Domain.Interfaces
         Task<Agency?> GetByContactEmailAsync(string contactEmail);
         Task<Agency?> GetMyAgency(Guid userId);
         Task<(List<Agency> Items, int TotalCount)> GetPagedAsync(int page, int pageSize);
+        Task<Agency?> GetAgencyByIdWithCreator(Guid agencyId);
     }
 }
