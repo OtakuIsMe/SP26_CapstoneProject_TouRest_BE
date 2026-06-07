@@ -34,6 +34,14 @@ namespace TouRest.Api.Controllers
             var result = await _paymentService.CreatePaymentAsync(bookingId, userId);
             return ApiResponseFactory.Created(result, "Payment link created");
         }
+
+        [HttpPost("wallet/{bookingId}")]
+        public async Task<IActionResult> PayWithWallet(Guid bookingId)
+        {
+            var userId = User.GetUserId();
+            var result = await _paymentService.PayWithWalletAsync(bookingId, userId);
+            return ApiResponseFactory.Created(result, "Wallet payment completed");
+        }
         
         /// <summary>
         /// Cancel an active payment for a booking

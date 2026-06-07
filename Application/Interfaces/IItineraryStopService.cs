@@ -14,5 +14,7 @@ namespace TouRest.Application.Interfaces
         Task<ItineraryStopDTO> UpdateItineraryStop(Guid id, ItineraryStopUpdateRequest update);
         Task<bool> DeleteItineraryStop(Guid id);
         Task<ItineraryStopDTO?> GetItineraryStopById(Guid id);
+        Task AssignStaffToStopAsync(Guid scheduleId, Guid stopId, Guid staffId, Guid providerId);
+        Task UnassignStaffFromStopAsync(Guid scheduleId, Guid stopId, Guid providerId);
     }
 }

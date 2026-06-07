@@ -11,12 +11,14 @@ namespace TouRest.Application.Common.Helpers
     {
         private static readonly Dictionary<ItineraryStatus, ItineraryStatus[]> AllowedTransitions = new()
         {
-            { ItineraryStatus.Draft,    new[] { ItineraryStatus.Active                            } },
-            { ItineraryStatus.Active,   new[] { ItineraryStatus.Inactive, ItineraryStatus.Draft   } },
-            { ItineraryStatus.Inactive, Array.Empty<ItineraryStatus>()                              },
+            { ItineraryStatus.Draft,    new[] { ItineraryStatus.Active,   ItineraryStatus.Inactive } },
+            { ItineraryStatus.Active,   new[] { ItineraryStatus.Inactive, ItineraryStatus.Draft    } },
+            { ItineraryStatus.Inactive, new[] { ItineraryStatus.Draft,    ItineraryStatus.Active   } },
         };
 
         public static bool CanTransition(ItineraryStatus current, ItineraryStatus next)
-            => AllowedTransitions.TryGetValue(current, out var allowed) && allowed.Contains(next);
+            // Same status = no actual transition (just saving other fields) → always allowed
+            => current == next
+            || (AllowedTransitions.TryGetValue(current, out var allowed) && allowed.Contains(next));
     }
 }

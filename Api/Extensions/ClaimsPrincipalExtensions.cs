@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TouRest.Domain.Enums;
 
@@ -7,7 +8,8 @@ namespace TouRest.Api.Extensions
     {
         public static Guid GetUserId(this ClaimsPrincipal user)
         {
-            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)
+                ?? user.FindFirst(JwtRegisteredClaimNames.Sub);
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 throw new UnauthorizedAccessException("Invalid user token");
 

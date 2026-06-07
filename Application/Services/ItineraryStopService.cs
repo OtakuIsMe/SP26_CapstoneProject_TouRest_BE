@@ -9,6 +9,7 @@ using TouRest.Application.DTOs.ItineraryStop;
 using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
 using TouRest.Domain.Interfaces;
+using TouRest.Domain.Enums;
 
 namespace TouRest.Application.Services
 {
@@ -17,13 +18,16 @@ namespace TouRest.Application.Services
         private readonly IItineraryStopRepository _itineraryStopRepository;
         private readonly IItineraryRepository _itineraryRepository;
         private readonly IRouteOptimizerService _routeOptimizerService;
+        private readonly IStopStaffAssignmentRepository _assignmentRepo;
         private readonly IMapper _mapper;
-        public ItineraryStopService(IItineraryStopRepository itineraryStopRepository, IItineraryRepository itineraryRepository, 
-            IRouteOptimizerService routeOptimizerService,IMapper mapper)
+
+        public ItineraryStopService(IItineraryStopRepository itineraryStopRepository, IItineraryRepository itineraryRepository,
+            IRouteOptimizerService routeOptimizerService, IStopStaffAssignmentRepository assignmentRepo, IMapper mapper)
         {
             _itineraryStopRepository = itineraryStopRepository;
             _itineraryRepository = itineraryRepository;
             _routeOptimizerService = routeOptimizerService;
+            _assignmentRepo = assignmentRepo;
             _mapper = mapper;
         }
 
@@ -75,10 +79,26 @@ namespace TouRest.Application.Services
             return result;
 
         }
-        /*        public async Task<List<ItineraryStopDTO>> GetAllItineraryStops()
-                {
-                    var list = await _itineraryStopRepository.GetAllAsync();
-                    return _mapper.Map<List<ItineraryStopDTO>>(list);
-                }*/
+        public async Task AssignStaffToStopAsync(Guid scheduleId, Guid stopId, Guid staffId, Guid providerId)
+        {
+            var stop = await _itineraryStopRepository.GetItineraryStop(stopId)
+                ?? throw new KeyNotFoundException("Stop not found.");
+
+            if (stop.ProviderId != providerId)
+                throw new UnauthorizedAccessException("This stop does not belong to your provider.");
+
+            await _assignmentRepo.UpsertAsync(scheduleId, stopId, staffId);
+        }
+
+        public async Task UnassignStaffFromStopAsync(Guid scheduleId, Guid stopId, Guid providerId)
+        {
+            var stop = await _itineraryStopRepository.GetItineraryStop(stopId)
+                ?? throw new KeyNotFoundException("Stop not found.");
+
+            if (stop.ProviderId != providerId)
+                throw new UnauthorizedAccessException("This stop does not belong to your provider.");
+
+            await _assignmentRepo.DeleteAsync(scheduleId, stopId);
+        }
     }
 }

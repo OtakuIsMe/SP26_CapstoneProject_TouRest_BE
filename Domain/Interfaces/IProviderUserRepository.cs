@@ -12,5 +12,9 @@ namespace TouRest.Domain.Interfaces
     {
         Task AddUserIntoProvider(Guid providerId, Guid userId, ProviderUserRole role);
         Task<ProviderUser?> GetByUserIdAsync(Guid userId);
+        Task<bool> IsUserInProviderAsync(Guid providerId, Guid userId);
+        Task RemoveUserFromProviderAsync(Guid providerId, Guid userId);
+        Task<List<ProviderUser>> GetStaffByProviderIdAsync(Guid providerId);
+        Task<List<ProviderUser>> GetManagersByProviderIdAsync(Guid providerId);
     }
 }

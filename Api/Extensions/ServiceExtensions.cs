@@ -1,4 +1,5 @@
-﻿using TouRest.Application.Common.Helpers;
+﻿using TouRest.Api.Services;
+using TouRest.Application.Common.Helpers;
 using TouRest.Application.Interfaces;
 using TouRest.Application.Services;
 using TouRest.Domain.Interfaces;
@@ -78,6 +79,7 @@ namespace TouRest.Api.Extensions
             services.AddScoped<IRouteOptimizerService, RouteOptimizerService>();
             services.AddScoped<IVehicleService, VehicleService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<INotificationRealtimePublisher, SignalRNotificationPublisher>();
             services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
             services.AddScoped<IProviderDashboardService, ProviderDashboardService>();
             services.AddScoped<IItineraryTrackingService, ItineraryTrackingService>();

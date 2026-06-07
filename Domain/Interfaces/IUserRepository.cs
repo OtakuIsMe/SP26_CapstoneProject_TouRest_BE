@@ -11,5 +11,6 @@ namespace TouRest.Domain.Interfaces
     {
         Task<User?> GetByEmailAsync(string email);
         Task<(List<User> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? search);
+        Task<List<User>> GetAllByRoleCodeAsync(string roleCode);
     }
 }

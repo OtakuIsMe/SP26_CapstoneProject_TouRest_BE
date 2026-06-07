@@ -19,8 +19,10 @@ namespace TouRest.Api.Controllers
         private readonly IProviderDashboardService _dashboardService;
         private readonly IProviderStaffService _staffService;
         private readonly IStorageService _storageService;
+        private readonly IProviderUserService _providerUserService;
+        private readonly IItineraryStopService _stopService;
 
-        public ProviderController(IProviderService providerService, IAuthService authService, IItineraryScheduleService scheduleService, IProviderDashboardService dashboardService, IProviderStaffService staffService, IStorageService storageService)
+        public ProviderController(IProviderService providerService, IAuthService authService, IItineraryScheduleService scheduleService, IProviderDashboardService dashboardService, IProviderStaffService staffService, IStorageService storageService, IProviderUserService providerUserService, IItineraryStopService stopService)
         {
             _providerService = providerService;
             _authService = authService;
@@ -28,6 +30,8 @@ namespace TouRest.Api.Controllers
             _dashboardService = dashboardService;
             _staffService = staffService;
             _storageService = storageService;
+            _providerUserService = providerUserService;
+            _stopService = stopService;
         }
 
         [HttpGet]
@@ -76,7 +80,7 @@ namespace TouRest.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "PROVIDER")]
+        [Authorize(Roles = "CUSTOMER")]
         public async Task<IActionResult> Create([FromForm] CreateProviderRequest request)
         {
             var userId = User.GetUserId();
@@ -211,6 +215,69 @@ namespace TouRest.Api.Controllers
 
             var result = await _staffService.SendMedicalResultAsync(passengerId, scheduleId, provider.Id, notes, imageUrls);
             return ApiResponseFactory.Ok(result);
+        }
+
+        // Jobs with stops + staff assignment (PROVIDER only)
+
+        [HttpGet("jobs/with-stops")]
+        [Authorize(Roles = "PROVIDER")]
+        public async Task<IActionResult> GetJobsWithStops()
+        {
+            var provider = await GetCurrentProvider();
+            var result = await _scheduleService.GetSchedulesWithStopsAsync(provider.Id);
+            return ApiResponseFactory.Ok(result);
+        }
+
+        [HttpPut("stops/{stopId:guid}/assign-staff")]
+        [Authorize(Roles = "PROVIDER")]
+        public async Task<IActionResult> AssignStaffToStop(Guid stopId, [FromBody] AssignStaffToStopRequest request)
+        {
+            var provider = await GetCurrentProvider();
+            await _stopService.AssignStaffToStopAsync(request.ScheduleId, stopId, request.StaffId, provider.Id);
+            return ApiResponseFactory.Ok(new { stopId, scheduleId = request.ScheduleId, assignedStaffId = request.StaffId }, "Staff assigned to stop.");
+        }
+
+        [HttpDelete("stops/{stopId:guid}/assign-staff")]
+        [Authorize(Roles = "PROVIDER")]
+        public async Task<IActionResult> UnassignStaffFromStop(Guid stopId, [FromBody] AssignStaffToStopRequest request)
+        {
+            var provider = await GetCurrentProvider();
+            await _stopService.UnassignStaffFromStopAsync(request.ScheduleId, stopId, provider.Id);
+            return ApiResponseFactory.Ok(new { stopId }, "Staff unassigned from stop.");
+        }
+
+        // Staff management endpoints (PROVIDER only)
+
+        [HttpGet("staff")]
+        [Authorize(Roles = "PROVIDER")]
+        public async Task<IActionResult> GetMyStaff()
+        {
+            var provider = await GetCurrentProvider();
+            var result = await _providerUserService.GetStaffAsync(provider.Id);
+            return ApiResponseFactory.Ok(result);
+        }
+
+        [HttpPost("{providerId:guid}/create-staff")]
+        [Authorize(Roles = "PROVIDER")]
+        public async Task<IActionResult> CreateStaffAccount(Guid providerId, [FromBody] CreateProviderStaffRequest request)
+        {
+            var result = await _providerUserService.CreateStaffAccountAsync(providerId, request);
+            return ApiResponseFactory.Created(result, "Staff account created successfully.");
+        }
+
+        [HttpPost("{providerId:guid}/remove-staff")]
+        [Authorize(Roles = "PROVIDER")]
+        public async Task<IActionResult> RemoveStaff(Guid providerId, [FromBody] RemoveProviderUserRequest request)
+        {
+            await _providerUserService.RemoveStaffAsync(providerId, request.UserId);
+            return ApiResponseFactory.Ok(new { }, "Staff member removed.");
+        }
+
+        private async Task<ProviderResponse> GetCurrentProvider()
+        {
+            var userId = User.GetUserId();
+            return await _providerService.GetByUserIdAsync(userId)
+                ?? throw new KeyNotFoundException("No provider found for the current user.");
         }
 
         //[HttpDelete("{id:guid}")]

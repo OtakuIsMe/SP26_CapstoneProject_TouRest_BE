@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TouRest.Api.Common;
 using TouRest.Api.Extensions;
 using TouRest.Application.DTOs.Agency;
+using TouRest.Application.DTOs.Deposit;
 using TouRest.Application.DTOs.Auth;
 using TouRest.Application.DTOs.Payout;
 using TouRest.Application.DTOs.Provider;
@@ -28,9 +29,12 @@ namespace TouRest.Api.Controllers
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly IWalletService _walletService;
+        private readonly IItineraryScheduleService _scheduleService;
+        private readonly IDepositService _depositService;
 
         public AdminController(ILogger<AdminController> logger, IAdminService adminService, IAuthService authService,
-            IAgencyService agencyService, IUserService userService, IEmailService emailService, IAdminDashboardService dashboardService, IWalletService walletService)
+            IAgencyService agencyService, IUserService userService, IEmailService emailService, IAdminDashboardService dashboardService, IWalletService walletService,
+            IItineraryScheduleService scheduleService, IDepositService depositService)
 
         {
             _logger = logger;
@@ -41,6 +45,8 @@ namespace TouRest.Api.Controllers
             _emailService = emailService;
             _dashboardService = dashboardService;
             _walletService = walletService;
+            _scheduleService = scheduleService;
+            _depositService = depositService;
         }
         //agency
         [HttpGet("agencies/search")]
@@ -63,22 +69,21 @@ namespace TouRest.Api.Controllers
         
         public async Task<IActionResult> ApproveAgency(Guid id, [FromBody] CreateAgencyAccountRequest createAccount)
         {
+            if (createAccount == null)
+                throw new ArgumentNullException(nameof(createAccount), "Account details are required.");
 
             var userId = User.GetUserId();
             //_logger.LogInformation("Admin {AdminId} is approving agency {AgencyId}", userId, id);
 
             var agencyWithCreator = await _agencyService.GetAgencyByIdWithCreator(id);
-            if(agencyWithCreator == null)
-            {
+            if (agencyWithCreator == null)
                 throw new KeyNotFoundException("Agency not found");
-            }
-            var email = agencyWithCreator.User.Email;
+
+            var email = agencyWithCreator.User?.Email;
             if (string.IsNullOrEmpty(email))
-            {
-                throw new Exception("Agency creator email is missing.");
-            }
-            await _adminService.CreateAgencyAccount(id, createAccount);
+                throw new InvalidOperationException("Agency creator email is missing.");
             await _adminService.ApproveAgency(id);
+            await _adminService.CreateAgencyAccount(id, createAccount);
 
        //     try
        //     {
@@ -252,6 +257,44 @@ namespace TouRest.Api.Controllers
         {
             return ApiResponseFactory.Ok(await _dashboardService.GetTopAgenciesAsync(limit));
         }
+        [HttpGet("schedules")]
+        public async Task<IActionResult> GetAllSchedules()
+        {
+            var result = await _scheduleService.GetAllSchedulesAsync();
+            return ApiResponseFactory.Ok(result);
+        }
+
+        /// <summary>
+        /// Preview full refund outcome if admin cancels this schedule NOW.
+        /// Admin always gets full deposit refund (no 48h rule) and customers get full trip refund.
+        /// </summary>
+        [HttpGet("schedules/{scheduleId:guid}/cancel-preview")]
+        public async Task<IActionResult> PreviewCancelSchedule(Guid scheduleId)
+        {
+            try
+            {
+                var result = await _depositService.PreviewAdminCancelAsync(scheduleId);
+                return ApiResponseFactory.Ok(result);
+            }
+            catch (KeyNotFoundException ex)      { return NotFound(ex.Message); }
+            catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
+        }
+
+        /// <summary>
+        /// Admin cancels a schedule. Refunds ALL provider deposits to agency and full trip cost to customers.
+        /// </summary>
+        [HttpPost("schedules/{scheduleId:guid}/cancel")]
+        public async Task<IActionResult> CancelSchedule(Guid scheduleId)
+        {
+            try
+            {
+                var result = await _depositService.AdminCancelScheduleAsync(scheduleId);
+                return ApiResponseFactory.Ok(result, "Schedule cancelled");
+            }
+            catch (KeyNotFoundException ex)      { return NotFound(ex.Message); }
+            catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
+        }
+
         //payouts page
         [HttpGet("payouts")]
         public async Task<IActionResult> GetPendingPayouts()

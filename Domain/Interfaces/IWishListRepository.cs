@@ -31,6 +31,7 @@ namespace TouRest.Domain.Interfaces
         Task<bool> AgencyExistsAsync(Guid agencyId);
         Task<bool> ProviderExistsAsync(Guid providerId);
         Task<bool> ItineraryExistsAsync(Guid itineraryId);
+        Task<List<Wishlist>> GetByItineraryIdAsync(Guid itineraryId);
     }
 
 }

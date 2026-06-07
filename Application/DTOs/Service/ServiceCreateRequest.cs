@@ -30,5 +30,7 @@ namespace TouRest.Application.DTOs.Service
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "BasePrice must be greater than 0")]
         public int BasePrice { get; set; }
+
+        public ServiceStatus Status { get; set; } = ServiceStatus.Active;
     }
 }

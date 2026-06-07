@@ -64,7 +64,7 @@ namespace TouRest.Application.Services
         {
             var providers = await _providerRepository.GetAllAsync();
             return providers
-                .Where(p => p.Latitude != 0 && p.Longitude != 0)
+                .Where(p => p.Status == ProviderStatus.Active && p.Latitude != 0 && p.Longitude != 0)
                 .Select(p => new ProviderMapDTO
                 {
                     Id           = p.Id,

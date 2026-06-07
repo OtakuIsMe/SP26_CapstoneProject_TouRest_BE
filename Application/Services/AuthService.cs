@@ -23,6 +23,7 @@ namespace TouRest.Application.Services
         private readonly IProviderUserRepository _providerUserRepository;
         private readonly IAgencyRepository _agencyRepository;
         private readonly IAgencyUserRepository _agencyUserRepository;
+        private readonly IWalletRepository _walletRepository;
 
         public AuthService(
             IUserRepository userRepository,
@@ -34,7 +35,8 @@ namespace TouRest.Application.Services
             IProviderRepository providerRepository,
             IProviderUserRepository providerUserRepository,
             IAgencyRepository agencyRepository,
-            IAgencyUserRepository agencyUserRepository)
+            IAgencyUserRepository agencyUserRepository,
+            IWalletRepository walletRepository)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
@@ -46,6 +48,7 @@ namespace TouRest.Application.Services
             _providerUserRepository = providerUserRepository;
             _agencyRepository = agencyRepository;
             _agencyUserRepository = agencyUserRepository;
+            _walletRepository = walletRepository;
         }
 
         public async Task<(AuthResponseDTO auth, string refreshToken)> LoginAsync(LoginRequestDTO request)
@@ -94,6 +97,15 @@ namespace TouRest.Application.Services
             user.PasswordHash = _passwordHasher.HashPassword(request.Password);
             user.RoleId = userRole.Id;
             await _userRepository.CreateAsync(user);
+
+            await _walletRepository.CreateAsync(new Wallet
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Balance = 0,
+                PendingBalance = 0,
+                CreatedAt = DateTime.UtcNow,
+            });
         }
 
         public async Task<(AuthResponseDTO auth, string refreshToken)> RefreshTokenAsync(string refreshTokenValue, Guid userId)
@@ -180,6 +192,12 @@ namespace TouRest.Application.Services
                 var agencyUser = await _agencyUserRepository.GetAgencyUserByUserId(userId);
                 if (agencyUser != null)
                     subRole = agencyUser.Role.ToString().ToLower();
+            }
+            else if (user.Role.Code.Equals("PROVIDER", StringComparison.OrdinalIgnoreCase))
+            {
+                var providerUser = await _providerUserRepository.GetByUserIdAsync(userId);
+                if (providerUser != null)
+                    subRole = providerUser.Role.ToString().ToLower();
             }
 
             return new MeDTO

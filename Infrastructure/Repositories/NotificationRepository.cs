@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TouRest.Application.Interfaces;
 using TouRest.Domain.Entities;
 using TouRest.Domain.Interfaces;
 using TouRest.Infrastructure.Persistence;
@@ -12,8 +13,20 @@ namespace TouRest.Infrastructure.Repositories
 {
     public class NotificationRepository : BaseRepository<Notification>, INotificationRepository
     {
-        public NotificationRepository(AppDbContext context) : base(context)
+        private readonly INotificationRealtimePublisher _publisher;
+
+        public NotificationRepository(
+            AppDbContext context,
+            INotificationRealtimePublisher publisher) : base(context)
         {
+            _publisher = publisher;
+        }
+
+        public override async Task<Notification> CreateAsync(Notification entity)
+        {
+            var created = await base.CreateAsync(entity);
+            await _publisher.PublishAsync(created);
+            return created;
         }
         public async Task<List<Notification>> GetByUserIdAsync(Guid userId)
         {

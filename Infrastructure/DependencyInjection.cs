@@ -24,6 +24,8 @@ namespace TouRest.Infrastructure
             services.AddScoped<IVoucherRepository, VoucherRepository>();
             services.AddScoped<IWishListRepository, WishListRepository>();
             services.AddScoped<IProviderUserRepository, ProviderUserRepository>();
+            services.AddScoped<IStopStaffAssignmentRepository, StopStaffAssignmentRepository>();
+            services.AddScoped<IProviderDepositRepository, ProviderDepositRepository>();
             services.AddScoped<IAgencyRepository, AgencyRepository>();
             services.AddScoped<IAgencyUserRepository, AgencyUserRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();

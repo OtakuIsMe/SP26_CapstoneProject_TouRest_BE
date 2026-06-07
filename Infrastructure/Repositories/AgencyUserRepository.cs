@@ -65,6 +65,13 @@ namespace TouRest.Infrastructure.Repositories
             return await _context.AgencyUsers.Include(au => au.User)
                 .FirstOrDefaultAsync(au => au.UserId == userId);
         }
+
+        public async Task<AgencyUser?> GetManagerByAgencyIdAsync(Guid agencyId)
+        {
+            return await _context.AgencyUsers.Include(au => au.User)
+                .FirstOrDefaultAsync(au => au.AgencyId == agencyId && au.Role == AgencyUserRole.Manager);
+        }
+
         public async Task<List<AgencyGuideDTO>> GetGuidesByAgencyIdAsync(Guid agencyId)
         {
             var now = DateTime.UtcNow;

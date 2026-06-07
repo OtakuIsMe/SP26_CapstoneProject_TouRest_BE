@@ -42,5 +42,14 @@ namespace TouRest.Infrastructure.Repositories
             var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             return (items, total);
         }
+
+        public async Task<List<User>> GetAllByRoleCodeAsync(string roleCode)
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.Role != null && u.Role.Code == roleCode)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TouRest.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddAdminRoleSeed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -325,6 +325,28 @@ namespace TouRest.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "wallets",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Balance = table.Column<long>(type: "bigint", nullable: false),
+                    PendingBalance = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_wallets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_wallets_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "wishlists",
                 columns: table => new
                 {
@@ -394,6 +416,30 @@ namespace TouRest.Infrastructure.Migrations
                         name: "FK_Vehicles_agencies_AgencyId",
                         column: x => x.AgencyId,
                         principalTable: "agencies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "booking_passengers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BookingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    IdNumber = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_booking_passengers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_booking_passengers_bookings_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "bookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -484,37 +530,54 @@ namespace TouRest.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "wallets",
+                name: "payouts",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AgencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Balance = table.Column<long>(type: "bigint", nullable: false),
-                    PendingBalance = table.Column<long>(type: "bigint", nullable: false),
+                    WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Amount = table.Column<long>(type: "bigint", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    AdminNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PayOSTransferId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    BankAccount = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccountHolder = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_wallets", x => x.Id);
+                    table.PrimaryKey("PK_payouts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_wallets_agencies_AgencyId",
-                        column: x => x.AgencyId,
-                        principalTable: "agencies",
+                        name: "FK_payouts_wallets_WalletId",
+                        column: x => x.WalletId,
+                        principalTable: "wallets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "wallet_transactions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Amount = table.Column<long>(type: "bigint", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<int>(type: "int", nullable: false),
+                    ReferenceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_wallet_transactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_wallets_providers_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "providers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_wallets_users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "users",
+                        name: "FK_wallet_transactions_wallets_WalletId",
+                        column: x => x.WalletId,
+                        principalTable: "wallets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -530,7 +593,6 @@ namespace TouRest.Infrastructure.Migrations
                     Price = table.Column<long>(type: "bigint", nullable: false),
                     DurationDays = table.Column<int>(type: "int", nullable: false),
                     MaxCapacity = table.Column<int>(type: "int", nullable: false),
-                    SpotLeft = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     TourGuideId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -615,59 +677,6 @@ namespace TouRest.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "payouts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Amount = table.Column<long>(type: "bigint", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    AdminNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PayOSTransferId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    BankAccount = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AccountHolder = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_payouts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_payouts_wallets_WalletId",
-                        column: x => x.WalletId,
-                        principalTable: "wallets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "wallet_transactions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Amount = table.Column<long>(type: "bigint", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    Reason = table.Column<int>(type: "int", nullable: false),
-                    ReferenceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_wallet_transactions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_wallet_transactions_wallets_WalletId",
-                        column: x => x.WalletId,
-                        principalTable: "wallets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "itinerary_schedule",
                 columns: table => new
                 {
@@ -710,7 +719,7 @@ namespace TouRest.Infrastructure.Migrations
                     Longitude = table.Column<double>(type: "float", nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    VehicleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VehicleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -799,6 +808,42 @@ namespace TouRest.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "medical_results",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PassengerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_medical_results", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_medical_results_booking_passengers_PassengerId",
+                        column: x => x.PassengerId,
+                        principalTable: "booking_passengers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_medical_results_itinerary_schedule_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "itinerary_schedule",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_medical_results_providers_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "providers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "itinerary_activities",
                 columns: table => new
                 {
@@ -827,6 +872,78 @@ namespace TouRest.Infrastructure.Migrations
                         name: "FK_itinerary_activities_services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "provider_deposits",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ItineraryScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProviderName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    ItineraryStopId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ActualFirstActivityTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ServiceTotal = table.Column<long>(type: "bigint", nullable: false),
+                    DepositAmount = table.Column<long>(type: "bigint", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_provider_deposits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_provider_deposits_itinerary_schedule_ItineraryScheduleId",
+                        column: x => x.ItineraryScheduleId,
+                        principalTable: "itinerary_schedule",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_provider_deposits_itinerary_stops_ItineraryStopId",
+                        column: x => x.ItineraryStopId,
+                        principalTable: "itinerary_stops",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_provider_deposits_providers_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "providers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "stop_staff_assignments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StopId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_stop_staff_assignments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_stop_staff_assignments_itinerary_schedule_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "itinerary_schedule",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_stop_staff_assignments_itinerary_stops_StopId",
+                        column: x => x.StopId,
+                        principalTable: "itinerary_stops",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_stop_staff_assignments_users_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -867,15 +984,36 @@ namespace TouRest.Infrastructure.Migrations
                         onDelete: ReferentialAction.SetNull);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "medical_result_images",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MedicalResultId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_medical_result_images", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_medical_result_images_medical_results_MedicalResultId",
+                        column: x => x.MedicalResultId,
+                        principalTable: "medical_results",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "roles",
                 columns: new[] { "Id", "Code", "CreatedAt", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
                     { new Guid("11111111-1111-1111-1111-111111111111"), "CUSTOMER", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Khách hàng", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), "ADMIN", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Quản trị viên", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), "PROVIDER", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Nhà cung cấp dịch vụ", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), "AGENCY", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Đại lý du lịch", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { new Guid("22222222-2222-2222-2222-222222222222"), "ADMIN", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Qu?n tr? viên", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), "PROVIDER", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Nhà cung c?p d?ch v?", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), "AGENCY", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ð?i lý du l?ch", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -923,6 +1061,11 @@ namespace TouRest.Infrastructure.Migrations
                 name: "IX_booking_itineraries_VoucherId",
                 table: "booking_itineraries",
                 column: "VoucherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_booking_passengers_BookingId",
+                table: "booking_passengers",
+                column: "BookingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_bookings_Code",
@@ -999,6 +1142,27 @@ namespace TouRest.Infrastructure.Migrations
                 column: "ItineraryScheduleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_medical_result_images_MedicalResultId",
+                table: "medical_result_images",
+                column: "MedicalResultId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_medical_results_PassengerId_ScheduleId",
+                table: "medical_results",
+                columns: new[] { "PassengerId", "ScheduleId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_medical_results_ProviderId",
+                table: "medical_results",
+                column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_medical_results_ScheduleId",
+                table: "medical_results",
+                column: "ScheduleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_notifications_RecipientUserId",
                 table: "notifications",
                 column: "RecipientUserId");
@@ -1035,6 +1199,21 @@ namespace TouRest.Infrastructure.Migrations
                 name: "IX_payouts_WalletId",
                 table: "payouts",
                 column: "WalletId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_provider_deposits_ItineraryScheduleId",
+                table: "provider_deposits",
+                column: "ItineraryScheduleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_provider_deposits_ItineraryStopId",
+                table: "provider_deposits",
+                column: "ItineraryStopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_provider_deposits_ProviderId",
+                table: "provider_deposits",
+                column: "ProviderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_provider_users_ProviderId",
@@ -1090,6 +1269,22 @@ namespace TouRest.Infrastructure.Migrations
                 column: "ProviderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_stop_staff_assignments_ScheduleId_StopId",
+                table: "stop_staff_assignments",
+                columns: new[] { "ScheduleId", "StopId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_stop_staff_assignments_StaffId",
+                table: "stop_staff_assignments",
+                column: "StaffId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_stop_staff_assignments_StopId",
+                table: "stop_staff_assignments",
+                column: "StopId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_users_Email",
                 table: "users",
                 column: "Email",
@@ -1122,20 +1317,6 @@ namespace TouRest.Infrastructure.Migrations
                 name: "IX_wallet_transactions_WalletId",
                 table: "wallet_transactions",
                 column: "WalletId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_wallets_AgencyId",
-                table: "wallets",
-                column: "AgencyId",
-                unique: true,
-                filter: "[AgencyId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_wallets_ProviderId",
-                table: "wallets",
-                column: "ProviderId",
-                unique: true,
-                filter: "[ProviderId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_wallets_UserId",
@@ -1172,6 +1353,9 @@ namespace TouRest.Infrastructure.Migrations
                 name: "itinerary_tracking");
 
             migrationBuilder.DropTable(
+                name: "medical_result_images");
+
+            migrationBuilder.DropTable(
                 name: "notifications");
 
             migrationBuilder.DropTable(
@@ -1179,6 +1363,9 @@ namespace TouRest.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "payouts");
+
+            migrationBuilder.DropTable(
+                name: "provider_deposits");
 
             migrationBuilder.DropTable(
                 name: "provider_users");
@@ -1193,6 +1380,9 @@ namespace TouRest.Infrastructure.Migrations
                 name: "reports");
 
             migrationBuilder.DropTable(
+                name: "stop_staff_assignments");
+
+            migrationBuilder.DropTable(
                 name: "wallet_transactions");
 
             migrationBuilder.DropTable(
@@ -1202,7 +1392,7 @@ namespace TouRest.Infrastructure.Migrations
                 name: "booking_itineraries");
 
             migrationBuilder.DropTable(
-                name: "itinerary_stops");
+                name: "medical_results");
 
             migrationBuilder.DropTable(
                 name: "packages");
@@ -1214,22 +1404,28 @@ namespace TouRest.Infrastructure.Migrations
                 name: "Payments");
 
             migrationBuilder.DropTable(
-                name: "wallets");
+                name: "itinerary_stops");
 
             migrationBuilder.DropTable(
-                name: "itinerary_schedule");
+                name: "wallets");
 
             migrationBuilder.DropTable(
                 name: "vouchers");
 
             migrationBuilder.DropTable(
+                name: "booking_passengers");
+
+            migrationBuilder.DropTable(
+                name: "itinerary_schedule");
+
+            migrationBuilder.DropTable(
                 name: "Vehicles");
 
             migrationBuilder.DropTable(
-                name: "bookings");
+                name: "providers");
 
             migrationBuilder.DropTable(
-                name: "providers");
+                name: "bookings");
 
             migrationBuilder.DropTable(
                 name: "itineraries");

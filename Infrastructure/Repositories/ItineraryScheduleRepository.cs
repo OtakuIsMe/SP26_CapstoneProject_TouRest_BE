@@ -42,10 +42,26 @@ namespace TouRest.Infrastructure.Repositories
                 .FirstOrDefaultAsync(s => s.Id == scheduleId);
         }
 
+        public async Task<List<ItinerarySchedule>> GetAllAsync()
+        {
+            return await _context.ItinerarySchedules
+                .Include(s => s.Itinerary)
+                    .ThenInclude(i => i.Agency)
+                .Include(s => s.Itinerary)
+                    .ThenInclude(i => i.Stops)
+                        .ThenInclude(st => st.Activities)
+                .Include(s => s.Guide)
+                .OrderBy(s => s.StartTime)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<List<ItinerarySchedule>> GetByAgencyIdAsync(Guid agencyId)
         {
             return await _context.ItinerarySchedules
                 .Include(s => s.Itinerary)
+                    .ThenInclude(i => i.Stops)
+                        .ThenInclude(st => st.Activities)
                 .Include(s => s.Guide)
                 .Where(s => s.Itinerary.AgencyId == agencyId)
                 .OrderBy(s => s.StartTime)
@@ -57,6 +73,8 @@ namespace TouRest.Infrastructure.Repositories
         {
             return await _context.ItinerarySchedules
                 .Include(s => s.Itinerary)
+                    .ThenInclude(i => i.Stops)
+                        .ThenInclude(st => st.Activities)
                 .Include(s => s.Guide)
                 .Where(s => s.GuideId == guideId)
                 .OrderBy(s => s.StartTime)
@@ -69,7 +87,8 @@ namespace TouRest.Infrastructure.Repositories
             return await _context.ItinerarySchedules
                 .Include(s => s.Itinerary).ThenInclude(i => i.Agency)
                 .Include(s => s.Itinerary).ThenInclude(i => i.Stops.Where(st => st.ProviderId == providerId))
-                    .ThenInclude(st => st.Activities)
+                    .ThenInclude(st => st.Activities.OrderBy(a => a.ActivityOrder))
+                    .ThenInclude(a => a.Service)
                 .Include(s => s.Guide)
                 .Where(s => s.Itinerary.Stops.Any(stop => stop.ProviderId == providerId))
                 .OrderBy(s => s.StartTime)

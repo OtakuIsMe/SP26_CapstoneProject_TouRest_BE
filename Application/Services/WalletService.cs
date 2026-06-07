@@ -40,62 +40,56 @@ namespace TouRest.Application.Services
             _walletTransactionRepository = walletTransactionRepository;
         }
 
-        private async Task<(Wallet wallet, string ownerType)> ResolveWalletAsync(Guid userId)
+        private async Task<Wallet> GetOrCreateUserWalletAsync(Guid userId)
         {
-            // Check agency first
-            var agencyUser = await _agencyUserRepository.GetAgencyUserByUserId(userId);
-            if (agencyUser != null)
-            {
-                var wallet = await _walletRepository.GetByAgencyIdAsync(agencyUser.AgencyId)
-                    ?? await CreateWalletAsync(agencyId: agencyUser.AgencyId);
-                return (wallet, "Agency");
-            }
+            var wallet = await _walletRepository.GetByUserIdAsync(userId);
+            if (wallet != null) return wallet;
 
-            // Check provider
-            var providerUser = await _providerUserRepository.GetByUserIdAsync(userId);
-            if (providerUser != null)
+            var createdWallet = new Wallet
             {
-                var wallet = await _walletRepository.GetByProviderIdAsync(providerUser.ProviderId)
-                    ?? await CreateWalletAsync(providerId: providerUser.ProviderId);
-                return (wallet, "Provider");
-            }
-
-            // Fall back to user wallet (customer)
-            var userWallet = await _walletRepository.GetByUserIdAsync(userId)
-                ?? await CreateWalletAsync(userId: userId);
-            return (userWallet, "User");
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Balance = 0,
+                PendingBalance = 0,
+                CreatedAt = DateTime.UtcNow,
+            };
+            return await _walletRepository.CreateAsync(createdWallet);
         }
 
-        private async Task<Wallet> CreateWalletAsync(Guid? userId = null, Guid? agencyId = null, Guid? providerId = null)
+        private async Task<Wallet?> GetManagerWalletByAgencyIdAsync(Guid agencyId)
         {
-            var wallet = new Wallet
-            {
-                Id             = Guid.NewGuid(),
-                UserId         = userId,
-                AgencyId       = agencyId,
-                ProviderId     = providerId,
-                Balance        = 0,
-                PendingBalance = 0,
-                CreatedAt      = DateTime.UtcNow,
-            };
-            return await _walletRepository.CreateAsync(wallet);
+            var manager = await _agencyUserRepository.GetManagerByAgencyIdAsync(agencyId);
+            if (manager == null) return null;
+
+            return await GetOrCreateUserWalletAsync(manager.UserId);
+        }
+
+        private async Task<Wallet?> GetManagerWalletByProviderIdAsync(Guid providerId)
+        {
+            var managers = await _providerUserRepository.GetManagersByProviderIdAsync(providerId);
+            var manager = managers.FirstOrDefault();
+            if (manager == null) return null;
+
+            return await GetOrCreateUserWalletAsync(manager.UserId);
         }
 
         public async Task<WalletDTO> GetWalletAsync(Guid userId)
         {
-            var (wallet, ownerType) = await ResolveWalletAsync(userId);
+            // For GET /wallet API, always return customer's personal wallet, not agency/provider
+            var wallet = await GetOrCreateUserWalletAsync(userId);
             return new WalletDTO
             {
                 Id = wallet.Id,
                 Balance = wallet.Balance,
                 PendingBalance = wallet.PendingBalance,
-                OwnerType = ownerType
+                OwnerType = "User"
             };
         }
 
         public async Task<List<SavedBankDTO>> GetSavedBanksAsync(Guid userId)
         {
-            var (wallet, _) = await ResolveWalletAsync(userId);
+            // For GET /wallet/banks API, always return customer's personal wallet banks
+            var wallet = await GetOrCreateUserWalletAsync(userId);
             var payouts = await _payoutRepository.GetByWalletIdAsync(wallet.Id);
             return payouts
                 .GroupBy(p => p.BankAccount)
@@ -112,7 +106,8 @@ namespace TouRest.Application.Services
 
         public async Task RequestPayoutAsync(Guid userId, PayoutRequestDTO request)
         {
-            var (wallet, _) = await ResolveWalletAsync(userId);
+            // For payout API, use customer's personal wallet
+            var wallet = await GetOrCreateUserWalletAsync(userId);
             if (wallet.Balance - wallet.PendingBalance < request.Amount)
                 throw new InvalidOperationException("Insufficient balance");
             wallet.PendingBalance += request.Amount;
@@ -267,7 +262,7 @@ namespace TouRest.Application.Services
 
             foreach (var earning in providerEarnings)
             {
-                var wallet = await _walletRepository.GetByProviderIdAsync(earning.ProviderId);
+                var wallet = await GetManagerWalletByProviderIdAsync(earning.ProviderId);
                 if (wallet == null) continue;
 
                 wallet.Balance += earning.Total;
@@ -288,7 +283,7 @@ namespace TouRest.Application.Services
 
             foreach (var group in agencyGroups)
             {
-                var wallet = await _walletRepository.GetByAgencyIdAsync(group.Key);
+                var wallet = await GetManagerWalletByAgencyIdAsync(group.Key);
                 if (wallet == null) continue;
 
                 var total = group.Sum(bi => bi.FinalPrice);

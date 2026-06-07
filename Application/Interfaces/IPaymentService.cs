@@ -11,6 +11,7 @@ namespace TouRest.Application.Interfaces
     public interface IPaymentService
     {
         Task<PaymentDTO> CreatePaymentAsync(Guid bookingId, Guid userId);
+        Task<PaymentDTO> PayWithWalletAsync(Guid bookingId, Guid userId);
         Task<PaymentDTO> CancelPaymentAsync(Guid bookingId, Guid userId);
         Task HandleWebhookAsync(Webhook webhookData);
         Task<PaymentDTO> GetActivePaymentAsync(Guid bookingId);

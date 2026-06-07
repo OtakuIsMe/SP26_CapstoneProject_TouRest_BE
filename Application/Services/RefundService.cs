@@ -157,7 +157,7 @@ namespace TouRest.Application.Services
             }
 
             // Get paid amount (only refund if payment exists)
-            var payment = await _paymentRepository.GetActivePaymentByBookingIdAsync(bookingId);
+            var payment = await _paymentRepository.GetPaidPaymentByBookingIdAsync(bookingId);
             long paidAmount   = payment?.FinalAmount ?? 0;
             long refundAmount = refundPercent > 0 && paidAmount > 0
                 ? paidAmount * refundPercent / 100

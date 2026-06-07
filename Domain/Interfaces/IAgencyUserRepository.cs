@@ -17,6 +17,7 @@ namespace TouRest.Domain.Interfaces
         Task<List<AgencyUser>> GetAgencyUsers(Guid agencyId);
         Task<List<AgencyUser>> GetTourGuidesByAgencyIdAsync(Guid agencyId);
         Task<AgencyUser?> GetAgencyUserByUserId(Guid userId);
+        Task<AgencyUser?> GetManagerByAgencyIdAsync(Guid agencyId);
         Task<List<AgencyUser>> SearchUsersByAgency(Guid id, SearchUserByAgency search);
         Task<List<AgencyGuideDTO>> GetGuidesByAgencyIdAsync(Guid agencyId);
     }

@@ -23,6 +23,7 @@ namespace TouRest.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IMapper _mapper;
 
         public AdminService(
@@ -35,6 +36,7 @@ namespace TouRest.Application.Services
             IUserRepository userRepository,
             IRoleRepository roleRepository,
             IPasswordHasher passwordHasher,
+            INotificationRepository notificationRepository,
             IMapper mapper)
         {
             _adminRepository = adminRepository;
@@ -46,6 +48,7 @@ namespace TouRest.Application.Services
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _passwordHasher = passwordHasher;
+            _notificationRepository = notificationRepository;
             _mapper = mapper;
         }
 
@@ -78,6 +81,7 @@ namespace TouRest.Application.Services
 
         public async Task CreateAgencyAccount(Guid agencyId, CreateAgencyAccountRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
 
             var agency = await _agencyRepository.GetByIdAsync(agencyId);
             if (agency == null)
@@ -111,12 +115,27 @@ namespace TouRest.Application.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                RecipientUserId = agency.CreateByUserId,
+                Title = "Your agency has been approved",
+                Message = $"Congratulations! Your agency '{agency.Name}' has been approved. You can now log in with email: {request.Email} and password: {request.Password} to manage your agency.",
+                EntityType = NotificationEntityType.Other,
+                EntityId = agencyId,
+                IsRead = false,
+            };
+
+            var agencyRoleAssignment = request.Role == default ? AgencyUserRole.Manager : request.Role;
+
             await _userRepository.CreateAsync(agencyAccount);
-            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, agencyAccount.Id, request.Role);
+            await _agencyUserRepository.AddUserToAgencyAsync(agencyId, agencyAccount.Id, agencyRoleAssignment);
+            await _notificationRepository.CreateAsync(notification);
         }
 
         public async Task CreateProviderAccount(Guid providerId, CreateProviderAccountRequest request)
-        { 
+        {
+            ArgumentNullException.ThrowIfNull(request);
 
             var provider = await _providerRepository.GetByIdAsync(providerId);
             if (provider == null)
@@ -146,8 +165,22 @@ namespace TouRest.Application.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                RecipientUserId = provider.CreateByUserId,
+                Title = "Your provider has been approved",
+                Message = $"Congratulations! Your provider '{provider.Name}' has been approved. You can now log in with email: {request.Email} and password: {request.Password} to manage your provider.",
+                EntityType = NotificationEntityType.Other,
+                EntityId = providerId,
+                IsRead = false,
+            };
+
+            var providerRoleAssignment = request.Role == default ? ProviderUserRole.Manager : request.Role;
+
             await _userRepository.CreateAsync(providerAccount);
-            await _providerUserRepository.AddUserIntoProvider(providerId, providerAccount.Id, request.Role);
+            await _providerUserRepository.AddUserIntoProvider(providerId, providerAccount.Id, providerRoleAssignment);
+            await _notificationRepository.CreateAsync(notification);
         }
 
         public async Task BanUserAsync(Guid userId)

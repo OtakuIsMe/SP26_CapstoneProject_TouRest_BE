@@ -8,10 +8,12 @@ namespace TouRest.Domain.Enums
 {
     public enum WalletTransactionReason
     {
-        BookingEarning = 1,   
-        Refund = 2,           
-        Payout = 3,           
-        PayoutRejected = 4    
+        BookingEarning = 1,
+        Refund = 2,
+        Payout = 3,
+        PayoutRejected = 4,
+        Commission = 5,
+        BookingPayment = 6
     }
 
 }

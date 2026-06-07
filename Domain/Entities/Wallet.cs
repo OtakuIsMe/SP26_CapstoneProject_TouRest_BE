@@ -12,17 +12,13 @@ namespace TouRest.Domain.Entities
     [Table("wallets")]
     public class Wallet : BaseEntity
     {
-        public Guid? UserId { get; set; }       
-        public Guid? AgencyId { get; set; }      
-        public Guid? ProviderId { get; set; }
+        public Guid? UserId { get; set; }
         [Range(0, long.MaxValue)]
         public long Balance { get; set; } = 0;
         [Range(0, long.MaxValue)]
-        public long PendingBalance { get; set; } = 0;  
+        public long PendingBalance { get; set; } = 0;
 
         // Navigation
         public User? User { get; set; }
-        public Agency? Agency { get; set; }
-        public Provider? Provider { get; set; }
     }
 }

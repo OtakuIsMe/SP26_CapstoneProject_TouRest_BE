@@ -10,5 +10,6 @@ namespace TouRest.Domain.Enums
     {
         Customer = 1,
         Admin = 2,
+        Agency = 3,
     }
 }

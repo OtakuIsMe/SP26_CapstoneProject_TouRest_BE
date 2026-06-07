@@ -5,12 +5,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PayOS;
+using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using TouRest.Api.Extensions;
 using TouRest.Api.Hubs;
+using TouRest.Api.Services;
 using TouRest.Api.Middlewares;
 using TouRest.Application;
 using TouRest.Application.Common.Constants;
@@ -34,7 +36,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")
+            ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ?? ["http://localhost:3000"];
+
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -112,7 +118,23 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = AuthConstants.JwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(AuthConstants.JwtSecret)),
-        RoleClaimType = ClaimTypes.Role
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = JwtRegisteredClaimNames.Sub,
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) &&
+                path.StartsWithSegments("/notificationHub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 builder.Services.AddAuthorization(options =>
@@ -126,6 +148,7 @@ builder.Services.AddAuthorization(options =>
 });
 builder.Services.AddApiServices();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IUserIdProvider, JwtUserIdProvider>();
 var emailSettings = new EmailSettings
 {
     Host = Environment.GetEnvironmentVariable("EMAIL_HOST")!,
@@ -160,6 +183,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<AppHub>("/appHub");
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();

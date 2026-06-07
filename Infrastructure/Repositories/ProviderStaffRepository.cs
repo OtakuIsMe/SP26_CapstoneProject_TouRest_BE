@@ -10,10 +10,14 @@ namespace TouRest.Infrastructure.Repositories
     public class ProviderStaffRepository : IProviderStaffRepository
     {
         private readonly AppDbContext _context;
+        private readonly INotificationRepository _notificationRepo;
 
-        public ProviderStaffRepository(AppDbContext context)
+        public ProviderStaffRepository(
+            AppDbContext context,
+            INotificationRepository notificationRepo)
         {
             _context = context;
+            _notificationRepo = notificationRepo;
         }
 
         public async Task<List<ProviderTourGroupDTO>> GetTourGroupsAsync(Guid providerId)
@@ -194,8 +198,7 @@ namespace TouRest.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstAsync(mr => mr.PassengerId == passengerId && mr.ScheduleId == scheduleId);
 
-            // Notify the booking owner that their passenger's result is ready
-            _context.Notifications.Add(new Notification
+            await _notificationRepo.CreateAsync(new Notification
             {
                 Id              = Guid.NewGuid(),
                 RecipientUserId = bp.Booking.UserId,
@@ -206,7 +209,6 @@ namespace TouRest.Infrastructure.Repositories
                 IsRead          = false,
                 CreatedAt       = DateTime.UtcNow,
             });
-            await _context.SaveChangesAsync();
 
             return new ProviderPassengerDTO
             {

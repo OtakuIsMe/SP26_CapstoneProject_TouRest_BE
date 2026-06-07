@@ -20,7 +20,8 @@ namespace TouRest.Application.Services
         }
         public async Task<List<WalletTransactionDTO>> GetTransactionsAsync(Guid userId)
         {
-            var wallet = await _walletRepository.GetByOwnerAsync(userId)
+            // For GET /wallet/transactions API, always return customer's personal wallet transactions
+            var wallet = await _walletRepository.GetByUserIdAsync(userId)
                 ?? throw new KeyNotFoundException("Wallet not found");
             var transactions = await _repo.GetByWalletIdAsync(wallet.Id);
             return transactions.Select(t => new WalletTransactionDTO

@@ -22,12 +22,14 @@ namespace TouRest.Api.Controllers
         private readonly IAgencyService _agencyService;
         private readonly IItineraryScheduleService _scheduleService;
         private readonly IItineraryStopRepository _stopRepository;
+        private readonly IAgencyUserRepository _agencyUserRepository;
 
         public ItineraryController(IItineraryService itineraryService, IAgencyService agencyService,
             IItineraryScheduleService scheduleService, IItineraryStopRepository stopRepository,
-            ILogger<ItineraryController> logger)
+            IAgencyUserRepository agencyUserRepository, ILogger<ItineraryController> logger)
         {
-            _itineraryService = itineraryService;
+            _itineraryService    = itineraryService;
+            _agencyUserRepository = agencyUserRepository;
             _agencyService = agencyService;
             _scheduleService = scheduleService;
             _stopRepository = stopRepository;
@@ -162,13 +164,16 @@ namespace TouRest.Api.Controllers
         {
             try
             {
-                var result = await _scheduleService.AddAsync(id, request);
+                var userId    = User.GetUserId();
+                var agencyUser = await _agencyUserRepository.GetAgencyUserByUserId(userId)
+                    ?? throw new KeyNotFoundException("Agency user not found");
+
+                var result = await _scheduleService.AddAsync(id, request, agencyUser.AgencyId);
                 return ApiResponseFactory.Created(result, "Schedule added");
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            catch (ArgumentException ex)        { return BadRequest(ex.Message); }
+            catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
+            catch (KeyNotFoundException ex)      { return NotFound(ex.Message); }
         }
 
         [HttpDelete("{id:guid}/schedules/{scheduleId:guid}")]

@@ -30,6 +30,14 @@ namespace TouRest.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Payment?> GetPaidPaymentByBookingIdAsync(Guid bookingId)
+        {
+            return await _context.Payments
+                .Where(p => p.BookingId == bookingId && p.Status == PaymentStatus.Paid)
+                .OrderByDescending(p => p.CreatedAt)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Payment?> GetLatestPaymentByBookingIdAsync(Guid bookingId)
         {
             return await _context.Payments

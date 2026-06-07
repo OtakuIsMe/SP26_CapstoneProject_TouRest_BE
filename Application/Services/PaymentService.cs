@@ -62,12 +62,9 @@ namespace TouRest.Application.Services
             }
 
 
-            // grossAmount = total before discount (bi.Price = baseAmount after BookingService fix)
-            // discountAmount = bi.Price - bi.FinalPrice = discount applied at booking time
-            // finalAmount = booking.TotalAmount (already NET = grossAmount - discount)
-            var grossAmount = booking.BookingItineraries.Sum(bi => bi.Price);
+            var grossAmount    = booking.BookingItineraries.Sum(bi => bi.Price);
             var discountAmount = booking.BookingItineraries.Sum(bi => bi.Price - bi.FinalPrice);
-            var finalAmount = booking.TotalAmount;
+            var finalAmount    = booking.TotalAmount;
 
 
             var orderCode = long.Parse(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()[^9..]);
@@ -108,6 +105,72 @@ namespace TouRest.Application.Services
             return dto;
         }
 
+        public async Task<PaymentDTO> PayWithWalletAsync(Guid bookingId, Guid userId)
+        {
+            var booking = await ValidateBookingOwnership(bookingId, userId);
+            if (booking.Status != BookingStatus.Pending)
+                throw new InvalidOperationException("Booking is not in a payable state");
+
+            var existingPayment = await _paymentRepository.GetActivePaymentByBookingIdAsync(bookingId);
+            if (existingPayment != null)
+            {
+                await CancelPayOSLinkAsync(existingPayment);
+                existingPayment.Status = PaymentStatus.Cancelled;
+                await _paymentRepository.UpdateAsync(existingPayment);
+            }
+
+            // Booking payment uses customer's personal wallet, not agency/provider wallet
+            var wallet = await _walletRepository.GetByUserIdAsync(userId);
+            if (wallet == null)
+                throw new KeyNotFoundException("Wallet not found");
+
+            var finalAmount = booking.TotalAmount;
+            if (wallet.Balance < finalAmount)
+                throw new InvalidOperationException("Insufficient wallet balance");
+
+            wallet.Balance -= finalAmount;
+            wallet.UpdatedAt = DateTime.UtcNow;
+            await _walletRepository.UpdateAsync(wallet);
+
+            var walletTransaction = new WalletTransaction
+            {
+                Id = Guid.NewGuid(),
+                WalletId = wallet.Id,
+                Amount = finalAmount,
+                Type = WalletTransactionType.Debit,
+                Reason = WalletTransactionReason.BookingPayment,
+                ReferenceId = bookingId,
+                Note = $"Payment for booking {booking.Code} using wallet",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            await _walletTransactionRepository.CreateAsync(walletTransaction);
+
+            var orderCode = long.Parse(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()[^9..]);
+            var payment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                BookingId = bookingId,
+                OrderCode = orderCode,
+                Amount = booking.BookingItineraries.Sum(bi => bi.Price),
+                DiscountAmount = booking.BookingItineraries.Sum(bi => bi.Price - bi.FinalPrice),
+                FinalAmount = finalAmount,
+                Status = PaymentStatus.Paid,
+                TransactionReference = $"WALLET-{walletTransaction.Id}",
+                ExpiredAt = DateTime.UtcNow.AddMinutes(15),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                CheckoutUrl = null,
+                PayOSPaymentLinkId = null,
+                PaidAt = DateTime.UtcNow
+            };
+
+            var created = await _paymentRepository.CreateAsync(payment);
+            await ConfirmBookingAsync(payment, booking);
+
+            return _mapper.Map<PaymentDTO>(created);
+        }
+
         public async Task HandleWebhookAsync(Webhook webhookData)
         {
             // Verify signature — throws if invalid
@@ -128,68 +191,7 @@ namespace TouRest.Application.Services
                 var booking = await _bookingRepository.GetByIdAsync(payment.BookingId);
                 if (booking != null)
                 {
-                    booking.Status        = BookingStatus.Confirmed;
-                    booking.PaymentStatus = PaymentStatus.Paid;
-                    booking.UpdatedAt     = DateTime.UtcNow;
-                    await _bookingRepository.UpdateAsync(booking);
-
-                    // Confirm all itinerary lines for this booking
-                    var lines = await _bookingItineraryRepository.GetBookingItinerariesByBookingId(payment.BookingId);
-                    foreach (var line in lines)
-                    {
-                        line.Status    = BookingItineraryStatus.Confirmed;
-                        line.UpdatedAt = DateTime.UtcNow;
-                        await _bookingItineraryRepository.UpdateAsync(line);
-                    }
-
-                    await _notificationRepository.CreateAsync(new Notification
-                    {
-                        Id = Guid.NewGuid(),
-                        RecipientUserId = booking.UserId,
-                        Title = "Payment Confirmed",
-                        Message = $"Your payment of {payment.FinalAmount:N0}đ for booking #{booking.Code} has been confirmed.",
-                        EntityType = NotificationEntityType.Booking,
-                        EntityId = payment.BookingId,
-                        IsRead = false,
-                        CreatedAt = DateTime.UtcNow,
-                    });
-                    //after confirm booking, distribute earnings to agencies
-                    var bookingWithDetails = await _bookingRepository.GetBookingWithItineraries(payment.BookingId);
-                    if (bookingWithDetails != null)
-                    {
-                        // Group by agency
-                        var agencyEarnings = bookingWithDetails.BookingItineraries
-                            .GroupBy(bi => bi.ItinerarySchedule.Itinerary.AgencyId)
-                            .Select(g => new
-                            {
-                                AgencyId = g.Key,
-                                TotalEarning = g.Sum(bi => bi.FinalPrice)
-                            });
-
-                        foreach (var earning in agencyEarnings)
-                        {
-                            var agencyWallet = await _walletRepository.GetByAgencyIdAsync(earning.AgencyId);
-                            if (agencyWallet != null)
-                            {
-                                agencyWallet.Balance += earning.TotalEarning;
-                                agencyWallet.UpdatedAt = DateTime.UtcNow;
-                                await _walletRepository.UpdateAsync(agencyWallet);
-
-                                await _walletTransactionRepository.CreateAsync(new WalletTransaction
-                                {
-                                    Id = Guid.NewGuid(),
-                                    WalletId = agencyWallet.Id,
-                                    Amount = earning.TotalEarning,
-                                    Type = WalletTransactionType.Credit,
-                                    Reason = WalletTransactionReason.BookingEarning,
-                                    ReferenceId = payment.BookingId,
-                                    Note = $"Booking {booking.Code} payment received",
-                                    CreatedAt = DateTime.UtcNow,
-                                    UpdatedAt = DateTime.UtcNow
-                                });
-                            }
-                        }
-                    }
+                    await ConfirmBookingAsync(payment, booking);
                 }
             }
             else // failed or cancelled
@@ -250,30 +252,7 @@ namespace TouRest.Application.Services
             var booking = await _bookingRepository.GetByIdAsync(payment.BookingId);
             if (booking == null) return;
 
-            booking.Status        = BookingStatus.Confirmed;
-            booking.PaymentStatus = PaymentStatus.Paid;
-            booking.UpdatedAt     = DateTime.UtcNow;
-            await _bookingRepository.UpdateAsync(booking);
-
-            var lines = await _bookingItineraryRepository.GetBookingItinerariesByBookingId(payment.BookingId);
-            foreach (var line in lines)
-            {
-                line.Status    = BookingItineraryStatus.Confirmed;
-                line.UpdatedAt = DateTime.UtcNow;
-                await _bookingItineraryRepository.UpdateAsync(line);
-            }
-
-            await _notificationRepository.CreateAsync(new Notification
-            {
-                Id              = Guid.NewGuid(),
-                RecipientUserId = booking.UserId,
-                Title           = "Payment Confirmed",
-                Message         = $"Your payment for booking #{booking.Code} has been confirmed.",
-                EntityType      = NotificationEntityType.Booking,
-                EntityId        = payment.BookingId,
-                IsRead          = false,
-                CreatedAt       = DateTime.UtcNow,
-            });
+            await ConfirmBookingAsync(payment, booking);
         }
 
         private async Task CancelPayOSLinkAsync(Payment payment)
@@ -288,6 +267,35 @@ namespace TouRest.Application.Services
 
             }
         }
+
+        private async Task ConfirmBookingAsync(Payment payment, Booking booking)
+        {
+            booking.Status = BookingStatus.Confirmed;
+            booking.PaymentStatus = PaymentStatus.Paid;
+            booking.UpdatedAt = DateTime.UtcNow;
+            await _bookingRepository.UpdateAsync(booking);
+
+            var lines = await _bookingItineraryRepository.GetBookingItinerariesByBookingId(payment.BookingId);
+            foreach (var line in lines)
+            {
+                line.Status = BookingItineraryStatus.Confirmed;
+                line.UpdatedAt = DateTime.UtcNow;
+                await _bookingItineraryRepository.UpdateAsync(line);
+            }
+
+            await _notificationRepository.CreateAsync(new Notification
+            {
+                Id = Guid.NewGuid(),
+                RecipientUserId = booking.UserId,
+                Title = "Payment Confirmed",
+                Message = $"Your payment of {payment.FinalAmount:N0}đ for booking #{booking.Code} has been confirmed. Funds are held until the tour is completed.",
+                EntityType = NotificationEntityType.Booking,
+                EntityId = payment.BookingId,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow,
+            });
+        }
+
         private async Task<Booking> ValidateBookingOwnership(Guid bookingId, Guid userId)
         {
             var booking = await _bookingRepository.GetBookingWithItineraries(bookingId);

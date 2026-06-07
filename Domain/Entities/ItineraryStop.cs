@@ -36,5 +36,6 @@ namespace TouRest.Domain.Entities
         public Itinerary Itinerary { get; set; } = null!;
         public Provider? Provider { get; set; }
         public ICollection<ItineraryActivity> Activities { get; set; } = [];
+        public ICollection<StopStaffAssignment> StaffAssignments { get; set; } = [];
     }
 }

@@ -25,6 +25,7 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<ItineraryActivity> ItineraryActivities => Set<ItineraryActivity>();
         public DbSet<ItinerarySchedule> ItinerarySchedules => Set<ItinerarySchedule>();
         public DbSet<ItineraryTracking> ItineraryTrackings => Set<ItineraryTracking>();
+        public DbSet<StopStaffAssignment> StopStaffAssignments => Set<StopStaffAssignment>();
         public DbSet<Booking> Bookings => Set<Booking>();
         public DbSet<BookingItinerary> BookingItineraries => Set<BookingItinerary>();
         public DbSet<BookingPassenger> BookingPassengers => Set<BookingPassenger>();
@@ -43,6 +44,7 @@ namespace TouRest.Infrastructure.Persistence
         public DbSet<Vehicle> Vehicles => Set<Vehicle>();
         public DbSet<MedicalResult> MedicalResults => Set<MedicalResult>();
         public DbSet<MedicalResultImage> MedicalResultImages => Set<MedicalResultImage>();
+        public DbSet<ProviderDeposit> ProviderDeposits => Set<ProviderDeposit>();
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
 
@@ -134,6 +136,48 @@ namespace TouRest.Infrastructure.Persistence
                 .HasForeignKey(s => s.ProviderId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
+
+            // Configure ProviderDeposit relationships
+            modelBuilder.Entity<ProviderDeposit>()
+                .HasOne(d => d.ItinerarySchedule)
+                .WithMany()
+                .HasForeignKey(d => d.ItineraryScheduleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProviderDeposit>()
+                .HasOne(d => d.ItineraryStop)
+                .WithMany()
+                .HasForeignKey(d => d.ItineraryStopId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProviderDeposit>()
+                .HasOne(d => d.Provider)
+                .WithMany()
+                .HasForeignKey(d => d.ProviderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure StopStaffAssignment relationships
+            modelBuilder.Entity<StopStaffAssignment>()
+                .HasOne(a => a.Schedule)
+                .WithMany()
+                .HasForeignKey(a => a.ScheduleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StopStaffAssignment>()
+                .HasOne(a => a.Stop)
+                .WithMany(s => s.StaffAssignments)
+                .HasForeignKey(a => a.StopId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<StopStaffAssignment>()
+                .HasOne(a => a.Staff)
+                .WithMany()
+                .HasForeignKey(a => a.StaffId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StopStaffAssignment>()
+                .HasIndex(a => new { a.ScheduleId, a.StopId })
+                .IsUnique();
 
             // Configure ItineraryActivity - ItineraryStop relationship
             modelBuilder.Entity<ItineraryActivity>()
@@ -310,20 +354,6 @@ namespace TouRest.Infrastructure.Persistence
                 .HasForeignKey<Wallet>(w => w.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Wallet - Agency
-            modelBuilder.Entity<Wallet>()
-                .HasOne(w => w.Agency)
-                .WithOne()
-                .HasForeignKey<Wallet>(w => w.AgencyId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Wallet - Provider
-            modelBuilder.Entity<Wallet>()
-                .HasOne(w => w.Provider)
-                .WithOne()
-                .HasForeignKey<Wallet>(w => w.ProviderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // WalletTransaction - Wallet
             modelBuilder.Entity<WalletTransaction>()
                 .HasOne(wt => wt.Wallet)
@@ -454,16 +484,6 @@ namespace TouRest.Infrastructure.Persistence
                 .HasIndex(w => w.UserId)
                 .IsUnique()
                 .HasFilter("[UserId] IS NOT NULL");
-
-            modelBuilder.Entity<Wallet>()
-                .HasIndex(w => w.AgencyId)
-                .IsUnique()
-                .HasFilter("[AgencyId] IS NOT NULL");
-
-            modelBuilder.Entity<Wallet>()
-                .HasIndex(w => w.ProviderId)
-                .IsUnique()
-                .HasFilter("[ProviderId] IS NOT NULL");
             modelBuilder.Entity<Itinerary>()
                 .HasIndex(i => i.AgencyId);
 

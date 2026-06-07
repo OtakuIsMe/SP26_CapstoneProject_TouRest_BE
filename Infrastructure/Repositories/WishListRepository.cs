@@ -68,5 +68,13 @@ namespace TouRest.Infrastructure.Repositories
         {
             return await _context.Itineraries.AnyAsync(i => i.Id == itineraryId);
         }
+
+        public async Task<List<Wishlist>> GetByItineraryIdAsync(Guid itineraryId)
+        {
+            return await _context.Wishlists
+                .AsNoTracking()
+                .Where(w => w.ItemId == itineraryId && w.ItemType == TouRest.Domain.Enums.WishlistItemType.Itinerary)
+                .ToListAsync();
+        }
     }
 }

@@ -208,7 +208,8 @@ namespace TouRest.Application.Services
         public async Task<List<ItineraryDTO>> GetMyItinerariesAsync(Guid agencyId)
         {
             var list = await _itineraryRepository.GetByAgencyIdAsync(agencyId);
-            return _mapper.Map<List<ItineraryDTO>>(list);
+            return _mapper.Map<List<ItineraryDTO>>(
+                list.Where(i => i.Status != ItineraryStatus.Inactive).ToList());
         }
 
         public async Task<List<ItineraryProviderDTO>> GetProvidersInItineraryAsync(Guid itineraryId)
