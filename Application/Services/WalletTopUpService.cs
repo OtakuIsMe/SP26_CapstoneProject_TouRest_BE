@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using PayOS;
 using PayOS.Models.V2.PaymentRequests;
 using TouRest.Application.DTOs.Wallet;
@@ -10,6 +11,13 @@ namespace TouRest.Application.Services
 {
     public class WalletTopUpService : IWalletTopUpService
     {
+        // DEV/TEST: PayOS is charged this amount; wallet is credited with the real amount.
+        // Set to 0 to disable test mode and charge the real amount.
+        private const long TestPaymentAmount = 2_000;
+
+        // Stores orderCode → intended wallet credit amount while payment is pending.
+        private static readonly ConcurrentDictionary<long, long> _pendingAmounts = new();
+
         private readonly IWalletRepository _walletRepo;
         private readonly IWalletTransactionRepository _walletTxRepo;
         private readonly PayOSClient _payOS;
@@ -19,9 +27,9 @@ namespace TouRest.Application.Services
             IWalletTransactionRepository walletTxRepo,
             PayOSClient payOS)
         {
-            _walletRepo  = walletRepo;
+            _walletRepo   = walletRepo;
             _walletTxRepo = walletTxRepo;
-            _payOS       = payOS;
+            _payOS        = payOS;
         }
 
         public async Task<WalletTopUpDTO> CreateTopUpAsync(Guid userId, long amount)
@@ -29,13 +37,16 @@ namespace TouRest.Application.Services
             _ = await _walletRepo.GetByUserIdAsync(userId)
                 ?? throw new KeyNotFoundException("Wallet not found");
 
-            var orderCode = long.Parse(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()[^9..]);
-            var appUrl    = Environment.GetEnvironmentVariable("APP_URL") ?? "http://localhost:3000";
+            var orderCode   = long.Parse(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()[^9..]);
+            var appUrl      = Environment.GetEnvironmentVariable("APP_URL") ?? "http://localhost:3000";
+            var chargeAmount = TestPaymentAmount > 0 ? TestPaymentAmount : amount;
+
+            _pendingAmounts[orderCode] = amount;
 
             var link = await _payOS.PaymentRequests.CreateAsync(new CreatePaymentLinkRequest
             {
                 OrderCode   = orderCode,
-                Amount      = (int)amount,
+                Amount      = (int)chargeAmount,
                 Description = $"Nap vi {amount / 1000}k",
                 CancelUrl   = $"{appUrl}/payment/cancel",
                 ReturnUrl   = $"{appUrl}/payment/success",
@@ -55,17 +66,17 @@ namespace TouRest.Application.Services
 
         public async Task<WalletTopUpDTO> GetStatusAsync(long orderCode)
         {
-            // If already credited in our DB, return Paid immediately
             if (await _walletTxRepo.ExistsByTopUpOrderCodeAsync(orderCode))
                 return new WalletTopUpDTO { OrderCode = orderCode, Status = "Paid" };
 
             try
             {
                 var info = await _payOS.PaymentRequests.GetAsync(orderCode);
+                var realAmount = _pendingAmounts.TryGetValue(orderCode, out var stored) ? stored : info.Amount;
                 return new WalletTopUpDTO
                 {
                     OrderCode = orderCode,
-                    Amount    = info.Amount,
+                    Amount    = realAmount,
                     Status    = info.Status.ToString(),
                 };
             }
@@ -77,34 +88,37 @@ namespace TouRest.Application.Services
 
         public async Task FinalizeTopUpByOrderCodeAsync(long orderCode, Guid userId)
         {
-            // Double-credit guard
             if (await _walletTxRepo.ExistsByTopUpOrderCodeAsync(orderCode)) return;
 
-            // Verify with PayOS
             PaymentLink info;
             try { info = await _payOS.PaymentRequests.GetAsync(orderCode); }
             catch { return; }
 
             if (info.Status != PaymentLinkStatus.Paid) return;
 
+            // Use stored real amount; fall back to what PayOS reported if the server restarted.
+            var creditAmount = _pendingAmounts.TryGetValue(orderCode, out var stored) ? stored : info.Amount;
+
             var wallet = await _walletRepo.GetByUserIdAsync(userId)
                 ?? throw new KeyNotFoundException("Wallet not found");
 
-            wallet.Balance   += info.Amount;
-            wallet.UpdatedAt =  DateTime.UtcNow;
+            wallet.Balance   += creditAmount;
+            wallet.UpdatedAt  = DateTime.UtcNow;
             await _walletRepo.UpdateAsync(wallet);
 
             await _walletTxRepo.CreateAsync(new WalletTransaction
             {
                 Id        = Guid.NewGuid(),
                 WalletId  = wallet.Id,
-                Amount    = info.Amount,
+                Amount    = creditAmount,
                 Type      = WalletTransactionType.Credit,
                 Reason    = WalletTransactionReason.TopUp,
                 Note      = $"TopUp#{orderCode}",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });
+
+            _pendingAmounts.TryRemove(orderCode, out _);
         }
     }
 }
