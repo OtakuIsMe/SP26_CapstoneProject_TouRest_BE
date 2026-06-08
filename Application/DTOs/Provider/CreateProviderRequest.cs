@@ -52,6 +52,7 @@ namespace TouRest.Application.DTOs.Provider
 
         [Required]
         [MaxLength(20)]
+        [RegularExpression(@"^[0-9]{8,11}$", ErrorMessage = "Phone number must be 8–11 digits.")]
         public string ContactPhone { get; set; } = null!;
 
         public List<IFormFile>? Images { get; set; }

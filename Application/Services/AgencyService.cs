@@ -61,6 +61,15 @@ namespace TouRest.Application.Services
         public async Task<AgencyDTO> AddAgency(Guid userCreateId, AgencyCreateRequestDTO create)
         {
             ArgumentNullException.ThrowIfNull(create);
+
+            var existingAgency = await _agencyRepository.GetByCreateByUserIdAsync(userCreateId);
+            if (existingAgency != null && existingAgency.Status != AgencyStatus.Suspended)
+                throw new InvalidOperationException("User has already registered an agency.");
+
+            var existingByEmail = await _agencyRepository.GetByContactEmailAsync(create.ContactEmail);
+            if (existingByEmail != null && existingByEmail.Status != AgencyStatus.Suspended)
+                throw new InvalidOperationException("Contact email already exists.");
+
             var agency = _mapper.Map<Agency>(create);
             agency.Id = Guid.NewGuid();
             agency.CreateByUserId = userCreateId;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +13,8 @@ namespace TouRest.Domain.Enums
         Payout = 3,
         PayoutRejected = 4,
         Commission = 5,
-        BookingPayment = 6
+        BookingPayment = 6,
+        TopUp = 7
     }
 
 }

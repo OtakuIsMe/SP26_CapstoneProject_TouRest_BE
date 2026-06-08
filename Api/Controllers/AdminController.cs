@@ -82,7 +82,6 @@ namespace TouRest.Api.Controllers
             var email = agencyWithCreator.User?.Email;
             if (string.IsNullOrEmpty(email))
                 throw new InvalidOperationException("Agency creator email is missing.");
-            await _adminService.ApproveAgency(id);
             await _adminService.CreateAgencyAccount(id, createAccount);
 
        //     try

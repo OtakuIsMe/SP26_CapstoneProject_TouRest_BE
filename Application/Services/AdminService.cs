@@ -87,8 +87,11 @@ namespace TouRest.Application.Services
             if (agency == null)
                 throw new KeyNotFoundException("Agency not found");
 
-            if (agency.Status != AgencyStatus.Active)
-                throw new InvalidOperationException("Only approved agencies can have accounts created");
+            if (agency.Status != AgencyStatus.Pending && agency.Status != AgencyStatus.Active)
+                throw new InvalidOperationException("Only pending or approved agencies can have accounts created");
+
+            if (agency.Status == AgencyStatus.Pending)
+                await _adminRepository.ApproveAgency(agencyId);
 
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser != null)
@@ -141,8 +144,11 @@ namespace TouRest.Application.Services
             if (provider == null)
                 throw new KeyNotFoundException("Provider not found");
 
-            if (provider.Status != ProviderStatus.Active)
-                throw new InvalidOperationException("Only approved providers can have accounts created");
+            if (provider.Status != ProviderStatus.Pending && provider.Status != ProviderStatus.Active)
+                throw new InvalidOperationException("Only pending or approved providers can have accounts created");
+
+            if (provider.Status == ProviderStatus.Pending)
+                await _adminRepository.ApproveProvider(providerId);
 
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser != null)
@@ -235,7 +241,20 @@ namespace TouRest.Application.Services
                 throw new KeyNotFoundException("Agency not found");
             if (agency.Status != AgencyStatus.Pending)
                 throw new InvalidOperationException("Only pending agencies can be rejected");
+
             await _adminRepository.RejectAgency(agencyId);
+
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                RecipientUserId = agency.CreateByUserId,
+                Title = "Your agency registration has been rejected",
+                Message = $"We're sorry, your agency registration '{agency.Name}' has been rejected. Please contact support for more information.",
+                EntityType = NotificationEntityType.Other,
+                EntityId = agencyId,
+                IsRead = false,
+            };
+            await _notificationRepository.CreateAsync(notification);
         }
 
         public async Task RejectProvider(Guid providerId)
@@ -245,7 +264,20 @@ namespace TouRest.Application.Services
                 throw new KeyNotFoundException("Provider not found");
             if (provider.Status != ProviderStatus.Pending)
                 throw new InvalidOperationException("Only pending providers can be rejected");
+
             await _adminRepository.RejectProvider(providerId);
+
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                RecipientUserId = provider.CreateByUserId,
+                Title = "Your provider registration has been rejected",
+                Message = $"We're sorry, your provider registration '{provider.Name}' has been rejected. Please contact support for more information.",
+                EntityType = NotificationEntityType.Other,
+                EntityId = providerId,
+                IsRead = false,
+            };
+            await _notificationRepository.CreateAsync(notification);
         }
 
         public async Task UnbanUserAsync(Guid userId)

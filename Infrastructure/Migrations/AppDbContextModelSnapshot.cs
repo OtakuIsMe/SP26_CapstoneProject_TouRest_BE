@@ -82,7 +82,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("CreateByUserId");
 
-                    b.ToTable("agencies");
+                    b.ToTable("agencies", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.AgencyUser", b =>
@@ -112,7 +112,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("agency_users");
+                    b.ToTable("agency_users", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.AuditLog", b =>
@@ -164,7 +164,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("TargetUserId");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Booking", b =>
@@ -211,7 +211,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("bookings");
+                    b.ToTable("bookings", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.BookingItinerary", b =>
@@ -258,7 +258,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("BookingId", "ItineraryScheduleId")
                         .IsUnique();
 
-                    b.ToTable("booking_itineraries");
+                    b.ToTable("booking_itineraries", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.BookingPassenger", b =>
@@ -298,7 +298,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("booking_passengers");
+                    b.ToTable("booking_passengers", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Feedback", b =>
@@ -356,7 +356,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("RepliedByUserId");
 
-                    b.ToTable("feedbacks");
+                    b.ToTable("feedbacks", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Image", b =>
@@ -390,7 +390,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("images");
+                    b.ToTable("images", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Itinerary", b =>
@@ -438,7 +438,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("TourGuideId");
 
-                    b.ToTable("itineraries");
+                    b.ToTable("itineraries", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ItineraryActivity", b =>
@@ -486,7 +486,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("ItineraryStopId", "ActivityOrder")
                         .IsUnique();
 
-                    b.ToTable("itinerary_activities");
+                    b.ToTable("itinerary_activities", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ItinerarySchedule", b =>
@@ -528,7 +528,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("ItineraryId");
 
-                    b.ToTable("itinerary_schedule");
+                    b.ToTable("itinerary_schedule", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ItineraryStop", b =>
@@ -579,7 +579,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("ItineraryId", "StopOrder")
                         .IsUnique();
 
-                    b.ToTable("itinerary_stops");
+                    b.ToTable("itinerary_stops", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ItineraryTracking", b =>
@@ -607,7 +607,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("ItineraryScheduleId");
 
-                    b.ToTable("itinerary_tracking");
+                    b.ToTable("itinerary_tracking", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.MedicalResult", b =>
@@ -647,7 +647,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("PassengerId", "ScheduleId")
                         .IsUnique();
 
-                    b.ToTable("medical_results");
+                    b.ToTable("medical_results", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.MedicalResultImage", b =>
@@ -674,7 +674,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("MedicalResultId");
 
-                    b.ToTable("medical_result_images");
+                    b.ToTable("medical_result_images", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Notification", b =>
@@ -715,7 +715,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("RecipientUserId");
 
-                    b.ToTable("notifications");
+                    b.ToTable("notifications", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Package", b =>
@@ -751,7 +751,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("packages");
+                    b.ToTable("packages", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.PackageService", b =>
@@ -772,7 +772,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("PackageId", "SortOrder")
                         .IsUnique();
 
-                    b.ToTable("package_services");
+                    b.ToTable("package_services", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Payment", b =>
@@ -830,7 +830,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("OrderCode")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Payout", b =>
@@ -879,7 +879,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("payouts");
+                    b.ToTable("payouts", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Provider", b =>
@@ -945,7 +945,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("CreateByUserId");
 
-                    b.ToTable("providers");
+                    b.ToTable("providers", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ProviderDeposit", b =>
@@ -994,7 +994,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.ToTable("provider_deposits");
+                    b.ToTable("provider_deposits", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.ProviderUser", b =>
@@ -1024,7 +1024,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("provider_users");
+                    b.ToTable("provider_users", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.RefreshToken", b =>
@@ -1065,7 +1065,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("refresh_tokens");
+                    b.ToTable("refresh_tokens", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Refund", b =>
@@ -1121,7 +1121,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("PaymentId")
                         .IsUnique();
 
-                    b.ToTable("refunds");
+                    b.ToTable("refunds", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Report", b =>
@@ -1165,7 +1165,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("reports");
+                    b.ToTable("reports", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Role", b =>
@@ -1195,7 +1195,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("roles");
+                    b.ToTable("roles", (string)null);
 
                     b.HasData(
                         new
@@ -1272,7 +1272,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.ToTable("services");
+                    b.ToTable("services", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.StopStaffAssignment", b =>
@@ -1305,7 +1305,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("ScheduleId", "StopId")
                         .IsUnique();
 
-                    b.ToTable("stop_staff_assignments");
+                    b.ToTable("stop_staff_assignments", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.User", b =>
@@ -1381,7 +1381,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Vehicle", b =>
@@ -1417,7 +1417,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("AgencyId");
 
-                    b.ToTable("Vehicles");
+                    b.ToTable("Vehicles", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Voucher", b =>
@@ -1484,7 +1484,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("vouchers");
+                    b.ToTable("vouchers", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Wallet", b =>
@@ -1514,7 +1514,7 @@ namespace TouRest.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[UserId] IS NOT NULL");
 
-                    b.ToTable("wallets");
+                    b.ToTable("wallets", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.WalletTransaction", b =>
@@ -1552,7 +1552,7 @@ namespace TouRest.Infrastructure.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("wallet_transactions");
+                    b.ToTable("wallet_transactions", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Wishlist", b =>
@@ -1583,7 +1583,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasIndex("ItemId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("wishlists");
+                    b.ToTable("wishlists", (string)null);
                 });
 
             modelBuilder.Entity("TouRest.Domain.Entities.Agency", b =>
@@ -1902,7 +1902,7 @@ namespace TouRest.Infrastructure.Migrations
                     b.HasOne("TouRest.Domain.Entities.ItineraryStop", "ItineraryStop")
                         .WithMany()
                         .HasForeignKey("ItineraryStopId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TouRest.Domain.Entities.Provider", "Provider")

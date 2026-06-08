@@ -14,10 +14,14 @@ namespace TouRest.Infrastructure.Repositories
     {
         public WalletTransactionRepository(AppDbContext context) : base(context) { }
         public async Task<List<WalletTransaction>> GetByWalletIdAsync(Guid walletId)
-    => await _context.WalletTransactions
-        .Where(t => t.WalletId == walletId)
-        .OrderByDescending(t => t.CreatedAt)
-        .AsNoTracking()
-        .ToListAsync();
+            => await _context.WalletTransactions
+                .Where(t => t.WalletId == walletId)
+                .OrderByDescending(t => t.CreatedAt)
+                .AsNoTracking()
+                .ToListAsync();
+
+        public async Task<bool> ExistsByTopUpOrderCodeAsync(long orderCode)
+            => await _context.WalletTransactions
+                .AnyAsync(t => t.Note == $"TopUp#{orderCode}");
     }
 }

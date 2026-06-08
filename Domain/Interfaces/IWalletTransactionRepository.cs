@@ -10,5 +10,6 @@ namespace TouRest.Domain.Interfaces
     public interface IWalletTransactionRepository : IBaseRepository<WalletTransaction>
     {
         Task<List<WalletTransaction>> GetByWalletIdAsync(Guid walletId);
+        Task<bool> ExistsByTopUpOrderCodeAsync(long orderCode);
     }
 }

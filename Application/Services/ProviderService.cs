@@ -114,17 +114,13 @@ namespace TouRest.Application.Services
 
         public async Task<ProviderResponse> CreateAsync(Guid currentUserId, CreateProviderRequest request)
         {
-            var emailExists = await _providerRepository.ExistsByContactEmailAsync(request.ContactEmail);
-            if (emailExists)
-            {
+            var existingByEmail = await _providerRepository.GetByContactEmailAsync(request.ContactEmail);
+            if (existingByEmail != null && existingByEmail.Status != ProviderStatus.Suspended)
                 throw new InvalidOperationException("Contact email already exists.");
-            }
 
             var existingProvider = await _providerRepository.GetByCreateByUserIdAsync(currentUserId);
-            if (existingProvider != null)
-            {
+            if (existingProvider != null && existingProvider.Status != ProviderStatus.Suspended)
                 throw new InvalidOperationException("User has already registered a provider.");
-            }
 
             var provider = new Provider
             {

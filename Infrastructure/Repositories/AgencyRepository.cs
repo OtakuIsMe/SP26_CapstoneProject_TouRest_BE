@@ -21,6 +21,13 @@ namespace TouRest.Infrastructure.Repositories
             return await _context.Agencies
                 .FirstOrDefaultAsync(a => a.ContactEmail == contactEmail);
         }
+
+        public async Task<Agency?> GetByCreateByUserIdAsync(Guid userId)
+        {
+            return await _context.Agencies
+                .FirstOrDefaultAsync(a => a.CreateByUserId == userId);
+        }
+
         public async Task<Agency?> GetMyAgency(Guid userId)
         {
             return await _context.AgencyUsers

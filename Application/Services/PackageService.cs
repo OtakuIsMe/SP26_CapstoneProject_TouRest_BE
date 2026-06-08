@@ -110,7 +110,7 @@ namespace TouRest.Application.Services
                 Code = request.Code.Trim(),
                 Name = request.Name.Trim(),
                 BasePrice = request.BasePrice,
-                Status = PackageStatus.Archived,
+                Status = PackageStatus.Active,
                 CreatedAt = DateTime.UtcNow
             };
 
