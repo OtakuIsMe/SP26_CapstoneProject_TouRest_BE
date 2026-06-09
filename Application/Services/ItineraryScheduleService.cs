@@ -285,6 +285,7 @@ namespace TouRest.Application.Services
                     SpotLeft          = s.SpotLeft,
                     GuideId           = s.GuideId,
                     GuideName         = s.Guide != null ? (s.Guide.FullName ?? s.Guide.Username) : null,
+                    Status            = s.Status.ToString(),
                     FirstActivityTime = firstActivity?.StartTime,
                 };
             }).ToList();
@@ -525,8 +526,9 @@ namespace TouRest.Application.Services
 
             foreach (var line in activeBookingLines)
             {
-                line.Status    = BookingItineraryStatus.Completed;
-                line.UpdatedAt = DateTime.UtcNow;
+                line.Status             = BookingItineraryStatus.Completed;
+                line.UpdatedAt          = DateTime.UtcNow;
+                line.ItinerarySchedule  = null!; // detach to prevent EF tracking conflict with already-tracked schedule entity
                 await _bookingItineraryRepository.UpdateAsync(line);
             }
 
@@ -609,10 +611,9 @@ namespace TouRest.Application.Services
                 }
             }
 
-            // Credit agency: agency_service_per_pax × actual_pax × 80%
-            // agency_service_per_pax = itinerary.Price − total_provider_per_pax
-            long agencyPerPax   = schedule.Itinerary.Price - totalProviderPerPax;
-            long agencyPayout   = (long)(agencyPerPax * actualPax * PayoutRate);
+            // Credit agency: 80% of margin (tour price minus provider costs) × actual pax
+            long agencyNetPerPax = schedule.Itinerary.Price - totalProviderPerPax;
+            long agencyPayout    = agencyNetPerPax > 0 ? (long)(agencyNetPerPax * actualPax * PayoutRate) : 0;
 
             if (agencyPayout > 0)
             {
@@ -641,7 +642,7 @@ namespace TouRest.Application.Services
                         Type        = WalletTransactionType.Credit,
                         Reason      = WalletTransactionReason.BookingEarning,
                         ReferenceId = scheduleId,
-                        Note        = $"Agency earnings: {agencyPerPax:N0}đ/pax × {actualPax} pax × 80%",
+                        Note        = $"Agency earnings: ({schedule.Itinerary.Price:N0}đ - {totalProviderPerPax:N0}đ)/pax × {actualPax} pax × 80%",
                         CreatedAt   = DateTime.UtcNow,
                         UpdatedAt   = DateTime.UtcNow,
                     });
